@@ -1,0 +1,39 @@
+---
+#
+# useCases
+#
+# Allows to provide links to use case specific guides.
+# All links will be added to the bottom of the dashboard's homepage (i.e. "Home")
+#
+# In addition, use case specific previews can be added and grouped by "section".
+# These preview URLs will be available on the dashboard's preview page (i.e. "Deployment Preview").
+# Preview URLs will be refreshed every 10 seconds.
+#
+useCases:
+  my-use-case:
+    previews:
+    - section: my-use-case
+      description: Dynatrace
+      url: "https://dynatrace.com"
+    guides:
+    - description: "This is a template as well as example repository for ACE-Box external use cases"
+      url: "https://github.com/dynatrace-ace/ace-box-ext-template/blob/HEAD/README.md"
+#
+# extRefs
+#
+# Allows to provide references to external tools. Description will be added to the dashboard's homepage.
+#
+# References can optionally contain credentials. Credentials will be added to the dashboard's "Links" page.
+# Credentials itself can be of type "text" or "password". Values of "password" credentials are hidden in the UI.
+#
+extRefs:
+  Github repo:
+    description: "This is a template as well as example repository for ACE-Box external use cases"
+    url: "https://github.com/dynatrace-ace/ace-box-ext-template/blob/HEAD/README.md"
+    creds:
+      - description: "Github username"
+        type: "text"
+        value: "my-github-user-name"
+      - description: "Github password"
+        type: "password"
+        value: "my-super-secret-password"

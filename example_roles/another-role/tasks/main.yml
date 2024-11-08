@@ -1,0 +1,3 @@
+---
+- debug:
+    msg: "Hello from another role in your external use case!"

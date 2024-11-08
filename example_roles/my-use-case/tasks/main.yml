@@ -1,0 +1,52 @@
+---
+# 
+# my-use-case is the only required role.
+# However, in addition to tasks in my-use-case, 
+# additional roles can be included.
+# Such roles can either be provided as part the
+# external repo or included from a curated list
+# of ACE-Box default roles.
+# 
+- debug:
+    msg: "Hello from {{ my_ext_use_case_name }}!"
+
+# 
+# microk8s, dt-oneagent and jenkins are curated roles provided by 
+# the ACE-Box.
+# Curated roles can be sourced from within your use case.
+# 
+- include_role:
+    name: "microk8s"
+
+- include_role:
+    name: "dt-oneagent"
+
+# Include and template use case specific values before installing Jenkins
+- set_fact:
+    include_jenkins_value_file: "{{ role_path }}/templates/my-use-case-jenkins-jobs.yml.j2"
+
+- include_role:
+    name: jenkins
+    tasks_from: template-values-file
+
+- include_role:
+    name: jenkins
+
+# Include and template use case specific values before installing Dashboard
+- set_fact:
+    include_dashboard_value_file: "{{ role_path }}/templates/my-use-case-dashboard.yml.j2"
+
+- include_role:
+    name: dashboard
+    tasks_from: template-values-file
+
+- include_role:
+    name: dashboard
+
+# 
+# All other roles provided in an external use case are 
+# synched with the ACE-Box Ansible directory and can
+# therefore be sourced just like curated roles.
+# 
+- include_role:
+    name: "another-role"
