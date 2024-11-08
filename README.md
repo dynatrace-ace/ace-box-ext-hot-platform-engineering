@@ -24,3 +24,5 @@ Add notes of the extra vars needed to be configured
 ## DTU provisioning
 
 When an ACE-Box with external use case is provisioned by the DTU team, make sure to grant read access to the Github [ace-box-dtu](https://github.com/orgs/dynatrace-ace/teams/ace-box-dtu) team. This allows them to source the use case during their provisioning process.
+
+docker image build . -f packages/backend/Dockerfile --tag 10.43.26.222:5000/backstage:1.0.0
