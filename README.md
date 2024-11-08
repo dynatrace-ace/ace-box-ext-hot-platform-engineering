@@ -1,8 +1,13 @@
-# ace-box-ext-template
+# Platform Engineering - Use Case
 
 ## Description
 
-The `ace-box-ext-template` provides a template structure and examples of how to create a custom [ACE-Box](https://github.com/Dynatrace/ace-box) use case.
+Scenario to demonstrate how Dynatrace integrates with platform engineering practices. You can deploy this use case along with the ace-box to use in HoT or demos
+
+## Guide
+
+_in progress..._
+
 
 ## Version and compatibility
 
@@ -10,7 +15,7 @@ Please add a note pointing out which versions of the external use case are compa
 
 | Release | Verified against ace-box version |
 | --- | --- |
-| 1.0.0 | v1.15.0 |
+| 1.0.0 | vx.y.z |
 
 ## Extra variables
 
