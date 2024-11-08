@@ -1,3 +1,64 @@
 ---
 - debug:
-    msg: "Hello from your external use case!"
+    msg: "Platform Engineering HoT automated provisioning started..."
+
+# WORKING
+- include_role:
+    name: k3s
+
+# WORKING
+- include_role:
+    name: gitlab
+
+# WORKING
+- name: Install Docker - needed for backstage
+  become: true
+  become_user: root
+  community.general.snap:
+    name:
+    - docker
+
+##
+# TO DO: currently broken while building a docker image
+##
+# - include_role:
+#     name: backstage
+
+# WORKING
+- include_role:
+    name: argocd
+
+# TO DO
+# - include_tasks:
+#     file: argo-workflows.yml
+
+# WORKING
+- include_role:
+    name: otel-collector
+
+# TO DO
+# - include_tasks:
+#     file: openfeature.yml
+
+##
+# TO DO: For Keptn check the role, it could be a pretty old version and we need to re-construct it
+##
+# - include_role:
+#     name: keptn
+# - include_tasks:
+#     file: keptn.yml
+
+# TO DO
+# - include_tasks:
+#     file: kubeaudit.yml
+
+# TO DO
+# - include_tasks:
+#     file: kubehunter.yml
+
+# WORKING
+- include_role:
+    name: dt-operator
+
+- include_role:
+    name: dashboard

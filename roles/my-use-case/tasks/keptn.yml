@@ -1,0 +1,4 @@
+- name: multiline shell command example
+  shell: |
+    ls 
+    echo "Hello"
