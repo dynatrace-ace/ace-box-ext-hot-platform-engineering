@@ -109,6 +109,7 @@
   ansible.builtin.find:
     paths: "{{ role_path }}/templates"
     patterns: "*.j2"
+    recurse: yes
   register: found_templates
 
 - name: Template and copy each file to the destination
