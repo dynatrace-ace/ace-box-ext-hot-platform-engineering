@@ -44,10 +44,10 @@
     gitlab_prj_namespace_id: "{{ gitlab_group_id }}"
 
 - set_fact:
-    apptemplates_dest: "{{ role_path }}/files/apptemplates"
-    backstagetemplates_dest: "{{ role_path }}/files/backstagetemplates"
     usecase_source: "{{ role_path }}/files"
-    usecase_templates: "{{ role_path }}/templates"
+    usecase_dest: "{{ role_path }}/gitlabfiles"
+    apptemplates_dest: "{{ usecase_dest }}/apptemplates"
+    backstagetemplates_dest: "{{ usecase_dest }}/backstagetemplates"
 
 - include_role:
     name: gitlab
@@ -104,19 +104,33 @@
     name: gitlab
     tasks_from: source-endpoints    
 
+- name: Copy Git repo files
+  ansible.builtin.copy:
+    src: "{{ usecase_source }}/"
+    dest: "{{ usecase_dest }}/"
+    remote_src: yes
+    directory_mode: yes
 
-- name: Find all template files in the source directory
-  ansible.builtin.find:
-    paths: "{{ role_path }}/templates"
-    patterns: "*.j2"
-    recurse: yes
-  register: found_templates
+- name: Replace PLACEHOLDERS for template files in git
+  shell:
+    cmd: "find . -type f \( -not -path '*/\.*' -not -iname \"README.md\" \) -exec sed -i \"s#GEOLOCATION_PLACEHOLDER#${{ dynatrace_geolocation }}#g\" {} + "
+         "find . -type f \( -not -path '*/\.*' -not -iname \"README.md\" \) -exec sed -i \"s#DT_TENANT_LIVE_PLACEHOLDER#${{ dynatrace_tenant_url }}#g\" {} + "
+         "find . -type f \( -not -path '*/\.*' -not -iname \"README.md\" \) -exec sed -i \"s#DT_TENANT_APPS_PLACEHOLDER#${{ extra_vars.dt_environment_url_gen3 }}#g\" {} + "
+         "find . -type f \( -not -path '*/\.*' -not -iname \"README.md\" \) -exec sed -i \"s#BASE_DOMAIN_PLACEHOLDER#{{ ingress_domain }}#g\" {}"
 
-- name: Template and copy each file to the destination
-  ansible.builtin.template:
-    src: "{{ item.path }}"
-    dest: "{{ item.path | regex_replace('^.*templates/', 'files/') | regex_replace('.j2$', '') }}"
-  loop: "{{ found_templates.files }}"
+
+# - name: Find all template files in the source directory
+#   ansible.builtin.find:
+#     paths: "{{ role_path }}/templates"
+#     patterns: "*.j2"
+#     recurse: yes
+#   register: found_templates
+
+# - name: Template and copy each file to the destination
+#   ansible.builtin.template:
+#     src: "{{ item.path }}"
+#     dest: "{{ item.path | regex_replace('^.*templates/', 'files/') | regex_replace('.j2$', '') }}"
+#   loop: "{{ found_templates.files }}"
 
 - name: Publish apptemplates to Gitlab
   include_role:
