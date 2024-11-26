@@ -10,13 +10,145 @@
 - include_role:
     name: gitlab
 
-# WORKING
-- name: Install Docker - needed for backstage
-  become: true
-  become_user: root
-  community.general.snap:
-    name:
-    - docker
+- include_role:
+    name: private-registry
+
+- name: Gitlab - Ensure Group
+  include_role:
+    name: gitlab
+    tasks_from: ensure-group
+  vars:
+    gitlab_group_name: "{{ gitlab_group }}"
+
+- name: Gitlab - Ensure Default Group Vars
+  include_role:
+    name: gitlab
+    tasks_from: ensure-default-group-vars
+  vars:
+    gitlab_group_name: "{{ gitlab_group }}"
+
+- name: Gitlab - Ensure Backstage Template Project
+  include_role:
+    name: gitlab
+    tasks_from: ensure-project
+  vars:
+    gitlab_prj: "{{ gitlab_backstage_template_repo_name }}"
+    gitlab_prj_namespace_id: "{{ gitlab_group_id }}"
+
+- name: Gitlab - Ensure App Template Project
+  include_role:
+    name: gitlab
+    tasks_from: ensure-project
+  vars:
+    gitlab_prj: "{{ gitlab_app_template_repo_name }}"
+    gitlab_prj_namespace_id: "{{ gitlab_group_id }}"
+
+- set_fact:
+    apptemplates_dest: "{{ role_path }}/gitlabfiles/apptemplates"
+    backstagetemplates_dest: "{{ role_path }}/gitlabfiles/backstagetemplates"
+    usecase_source: "{{ role_path }}/files"
+    usecase_templates: "{{ role_path }}/templates"
+
+- include_role:
+    name: gitlab
+    tasks_from: source-endpoints-external
+  when: gitlab_external_endpoint is not defined
+
+- include_role:
+    name: gitlab
+    tasks_from: source-secret
+  when: gitlab_personal_access_token is not defined or gitlab_username is not defined or gitlab_password is not defined
+
+- name: Gitlab - Additional Environment Variables
+  include_role:
+    name: gitlab
+    tasks_from: ensure-group-var
+  vars:
+    gitlab_var_key: "{{ item.key }}"
+    gitlab_var_value: "{{ item.value }}"
+  loop:
+    - {
+        key: "DT_PLATFORM_TENANT_URL",
+        value: "{{ extra_vars.dt_environment_url_gen3.rstrip('/') }}",
+      }
+    - {
+        key: "DT_OAUTH_CLIENT_ID",
+        value: "{{ extra_vars.dt_oauth_client_id }}",
+      }
+    - {
+        key: "DT_OAUTH_CLIENT_SECRET",
+        value: "{{ extra_vars.dt_oauth_client_secret }}",
+      }
+    - {
+        key: "DT_OAUTH_SSO_ENDPOINT",
+        value: "{{ extra_vars.dt_oauth_sso_endpoint.rstrip('/') }}",
+      }
+    - {
+        key: "DT_OAUTH_ACCOUNT_URN",
+        value: "{{ extra_vars.dt_oauth_account_urn }}",
+      }
+    - { key: "GITLAB_USERNAME", value: "{{ gitlab_username }}" }
+    - { key: "GITLAB_PASSWORD", value: "{{ gitlab_password }}" }
+    - {
+        key: "GITLAB_PRIVATE_TOKEN",
+        value: "{{ gitlab_personal_access_token }}",
+      }
+    - {
+        key: "GITLAB_EXTERNAL_ENDPOINT",
+        value: "{{ gitlab_external_endpoint }}",
+      }
+    - { key: "DEMO_IDENTIFIER", value: "{{ demo_identifier }}" }
+
+- name: Source Gitlab endpoint
+  include_role:
+    name: gitlab
+    tasks_from: source-endpoints    
+
+
+- name: Find all template files in the source directory
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/templates"
+    patterns: "*.j2"
+  register: found_templates
+
+- name: Template and copy each file to the destination
+  ansible.builtin.template:
+    src: "{{ item.path }}"
+    dest: "{{ item.path | regex_replace('^.*templates/', 'gitlabfiles/') | regex_replace('.j2$', '') }}"
+  loop: "{{ found_templates.files }}"
+
+- name: Publish apptemplates to Gitlab
+  include_role:
+    name: repository
+  vars:
+    git_username: "root"
+    git_password: "{{ gitlab_password }}"
+    git_domain: "{{ gitlab_domain }}"
+    git_remote: "gitlab"
+    git_org: "{{ gitlab_group }}"
+    git_repo: "{{ gitlab_app_template_repo_name }}"
+    repo_src: "{{ apptemplates_dest }}"
+
+- name: Publish backstagetemplates to Gitlab
+  include_role:
+    name: repository
+  vars:
+    git_username: "root"
+    git_password: "{{ gitlab_password }}"
+    git_domain: "{{ gitlab_domain }}"
+    git_remote: "gitlab"
+    git_org: "{{ gitlab_group }}"
+    git_repo: "{{ gitlab_backstage_template_repo_name }}"
+    repo_src: "{{ backstagetemplates_dest }}"
+
+
+# # WORKING
+# - name: Install Docker - needed for backstage
+#   become: true
+#   become_user: root
+#   community.general.snap:
+#     name:
+#     - docker
 
 ##
 # TO DO: currently broken while building a docker image
