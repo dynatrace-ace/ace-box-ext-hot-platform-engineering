@@ -46,6 +46,8 @@
 - set_fact:
     usecase_source: "{{ role_path }}/files"
     usecase_dest: "{{ role_path }}/gitlabfiles"
+
+- set_fact:    
     apptemplates_dest: "{{ usecase_dest }}/apptemplates"
     backstagetemplates_dest: "{{ usecase_dest }}/backstagetemplates"
 
