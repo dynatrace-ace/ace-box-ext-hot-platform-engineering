@@ -44,8 +44,8 @@
     gitlab_prj_namespace_id: "{{ gitlab_group_id }}"
 
 - set_fact:
-    apptemplates_dest: "{{ role_path }}/gitlabfiles/apptemplates"
-    backstagetemplates_dest: "{{ role_path }}/gitlabfiles/backstagetemplates"
+    apptemplates_dest: "{{ role_path }}/files/apptemplates"
+    backstagetemplates_dest: "{{ role_path }}/files/backstagetemplates"
     usecase_source: "{{ role_path }}/files"
     usecase_templates: "{{ role_path }}/templates"
 
@@ -107,14 +107,14 @@
 
 - name: Find all template files in the source directory
   ansible.builtin.find:
-    paths: "{{ playbook_dir }}/templates"
+    paths: "{{ role_path }}/templates"
     patterns: "*.j2"
   register: found_templates
 
 - name: Template and copy each file to the destination
   ansible.builtin.template:
     src: "{{ item.path }}"
-    dest: "{{ item.path | regex_replace('^.*templates/', 'gitlabfiles/') | regex_replace('.j2$', '') }}"
+    dest: "{{ item.path | regex_replace('^.*templates/', 'files/') | regex_replace('.j2$', '') }}"
   loop: "{{ found_templates.files }}"
 
 - name: Publish apptemplates to Gitlab
