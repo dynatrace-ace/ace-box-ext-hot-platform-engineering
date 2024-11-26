@@ -111,7 +111,7 @@
     src: "{{ usecase_source }}/"
     dest: "{{ usecase_dest }}/"
     remote_src: yes
-    directory_mode: yes
+    directory_mode: "u+rwx"
 
 - name: Replace PLACEHOLDERS for template files in git
   shell: |
