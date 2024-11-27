@@ -239,7 +239,7 @@
     resource_definition:
       type: Opaque
       data:
-        GITLAB_TOKEN: "{{ gitlab_personal_access_token | b64encode }}"
+        GITLAB_TOKEN: "{{ gitlab_personal_access_token }}"
 #        ARGOCD_TOKEN: "{{ argocd_token }}"
         DT_TENANT_LIVE: "{{ dynatrace_tenant_url }}"
         DT_TENANT_APPS: "{{ extra_vars.dt_environment_url_gen3 }}"
