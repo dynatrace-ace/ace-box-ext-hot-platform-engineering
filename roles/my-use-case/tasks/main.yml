@@ -151,8 +151,9 @@
     find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#GEOLOCATION_PLACEHOLDER#{{ dynatrace_geolocation }}#g" {} \;
     find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_LIVE_PLACEHOLDER#{{ dynatrace_tenant_url }}#g" {} \;
     find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_APPS_PLACEHOLDER#{{ extra_vars.dt_environment_url_gen3 }}#g" {} \;
-    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#{{ ingress_domain }}#{{ ingress_domain }}#g" {} \;
+    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#BASE_DOMAIN_PLACEHOLDER#{{ ingress_domain }}#g" {} \;
     find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#FORKED_TEMPLATE_REPO_PLACEHOLDER#{{ gitlab_repo_base_url }}/platform#g" {} \;
+    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#PROTOCOL_PLACEHOLDER#{{ ingress_protocol }}#g" {} \;
 
 - name: Publish apptemplates to Gitlab
   include_role:

@@ -7,13 +7,13 @@ data:
   app-config.production.yaml: |
     app:
       title: DT HOT Day - Backstage
-      baseUrl: https://backstage.BASE_DOMAIN_PLACEHOLDER
+      baseUrl: PROTOCOL_PLACEHOLDER://backstage.BASE_DOMAIN_PLACEHOLDER
 
     organization:
       name: DT HOT Day - Backstage
 
     backend:
-      baseUrl: https://backstage.BASE_DOMAIN_PLACEHOLDER
+      baseUrl: PROTOCOL_PLACEHOLDER://backstage.BASE_DOMAIN_PLACEHOLDER
       listen:
         port: 7007 # TODO set the port Backstage is listening on
       csp:
@@ -22,7 +22,7 @@ data:
         connect-src: ["'self'", 'http:', 'https:']
         img-src: ["'self'", "https:"]
       cors:
-        origin: https://backstage.BASE_DOMAIN_PLACEHOLDER
+        origin: PROTOCOL_PLACEHOLDER://backstage.BASE_DOMAIN_PLACEHOLDER
         methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
         credentials: true
       # If you want to use Postgres see https://backstage.io/docs/tutorials/switching-sqlite-postgres/
@@ -55,7 +55,7 @@ data:
     #       token: ${GITHUB_TOKEN}
       gitlab:
         - host: gitlab.BASE_DOMAIN_PLACEHOLDER
-          apiBaseUrl: https://gitlab.BASE_DOMAIN_PLACEHOLDER/api/v4
+          apiBaseUrl: PROTOCOL_PLACEHOLDER://gitlab.BASE_DOMAIN_PLACEHOLDER/api/v4
           token: ${GITLAB_TOKEN}
     catalog:
       rules:
@@ -78,7 +78,7 @@ data:
         gitlab:
           public:
             host: gitlab.BASE_DOMAIN_PLACEHOLDER
-            apiBaseUrl: https://gitlab.BASE_DOMAIN_PLACEHOLDER/api/v4
+            apiBaseUrl: PROTOCOL_PLACEHOLDER://gitlab.BASE_DOMAIN_PLACEHOLDER/api/v4
             # proxySecure: true
             branch: main
             skipForkedRepos: true
@@ -93,7 +93,7 @@ data:
         - type: 'config'
           instances:
             - name: argocd
-              url: https://argo.BASE_DOMAIN_PLACEHOLDER
+              url: PROTOCOL_PLACEHOLDER://argo.BASE_DOMAIN_PLACEHOLDER
               token: ${ARGOCD_TOKEN}
               
     # See https://backstage.io/docs/features/kubernetes/configuration
@@ -133,7 +133,7 @@ data:
       environments:
         - name: ${DT_TENANT_NAME} # abc12345
           url: ${DT_TENANT_APPS} # https://abc12345.sprint.apps.dynatracelabs.com
-          tokenUrl: https://sso-sprint.dynatracelabs.com/sso/oauth2/token
+          tokenUrl: https://sso.dynatrace.com/sso/oauth2/token
           accountUrn: ${DT_ACCOUNT_URN}
           clientId: ${DT_CLIENT_ID}
           clientSecret: ${DT_CLIENT_SECRET}
