@@ -216,7 +216,7 @@
 
 - name: Install ArgoCD CLI
   shell: |
-    wget -O argocd https://github.com/argoproj/argo-cd/releases/download/v2.9.3/argocd-linux-amd64
+    wget -O argocd https://github.com/argoproj/argo-cd/releases/download/v2.12.2/argocd-linux-amd64
     chmod +x argocd
     sudo mv argocd /usr/bin
     argocd login argo --core
