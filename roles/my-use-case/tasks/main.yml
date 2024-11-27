@@ -51,16 +51,6 @@
     gitlab_prj: "{{ gitlab_platform_repo_name }}"
     gitlab_prj_namespace_id: "{{ gitlab_group_id }}"    
 
-- set_fact:
-    usecase_source: "{{ role_path }}/files"
-    usecase_dest: "{{ role_path }}/gitlabfiles"
-    gitlab_repo_base_url: "{{ gitlab_external_endpoint }}/gitlab_group"
-
-- set_fact:    
-    apptemplates_dest: "{{ usecase_dest }}/apptemplates"
-    backstagetemplates_dest: "{{ usecase_dest }}/backstagetemplates"
-    platform_dest: "{{ usecase_dest }}/platform"
-
 - include_role:
     name: gitlab
     tasks_from: source-endpoints-external
@@ -70,6 +60,16 @@
     name: gitlab
     tasks_from: source-secret
   when: gitlab_personal_access_token is not defined or gitlab_username is not defined or gitlab_password is not defined
+
+- set_fact:
+    usecase_source: "{{ role_path }}/files"
+    usecase_dest: "{{ role_path }}/gitlabfiles"
+    gitlab_repo_base_url: "{{ gitlab_external_endpoint }}/gitlab_group"
+
+- set_fact:    
+    apptemplates_dest: "{{ usecase_dest }}/apptemplates"
+    backstagetemplates_dest: "{{ usecase_dest }}/backstagetemplates"
+    platform_dest: "{{ usecase_dest }}/platform"
 
 - name: Gitlab - Additional Environment Variables
   include_role:
