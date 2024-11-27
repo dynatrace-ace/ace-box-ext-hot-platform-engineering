@@ -221,9 +221,9 @@
     sudo mv argocd /usr/bin
     argocd login argo --core
 
-- name: Get ArgoCD Token
-  shell: argocd account generate-token --account alice
-  register: argocd_token
+# - name: Get ArgoCD Token
+#   shell: argocd account generate-token --account alice
+#   register: argocd_token
 
 
 #
@@ -240,7 +240,7 @@
       type: Opaque
       data:
         GITLAB_TOKEN: "{{ gitlab_personal_access_token | b64encode }}"
-        ARGOCD_TOKEN: "{{ argocd_token }}"
+#        ARGOCD_TOKEN: "{{ argocd_token }}"
         DT_TENANT_LIVE: "{{ dynatrace_tenant_url }}"
         DT_TENANT_APPS: "{{ extra_vars.dt_environment_url_gen3 }}"
         DT_EVENT_INGEST_TOKEN: "{{ dynatrace_api_token }}"
