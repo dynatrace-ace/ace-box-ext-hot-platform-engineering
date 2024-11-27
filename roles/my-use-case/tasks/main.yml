@@ -125,11 +125,13 @@
 
 - name: Replace PLACEHOLDERS for template files in git
   shell: |
-    find {{ usecase_dest }} -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#GEOLOCATION_PLACEHOLDER#{{ dynatrace_geolocation }}#g" {} \;
-    find {{ usecase_dest }} -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_LIVE_PLACEHOLDER#{{ dynatrace_tenant_url }}#g" {} \;
-    find {{ usecase_dest }} -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_APPS_PLACEHOLDER#{{ extra_vars.dt_environment_url_gen3 }}#g" {} \;
-    find {{ usecase_dest }} -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#BASE_DOMAIN_PLACEHOLDER#{{ ingress_domain }}#g" {} \;
-    find {{ usecase_dest }} -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#FORKED_TEMPLATE_REPO_PLACEHOLDER#{{ gitlab_repo_base_url }}#g" {} \;
+    pwd
+    cd {{ usecase_dest }}
+    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#GEOLOCATION_PLACEHOLDER#{{ dynatrace_geolocation }}#g" {} \;
+    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_LIVE_PLACEHOLDER#{{ dynatrace_tenant_url }}#g" {} \;
+    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_APPS_PLACEHOLDER#{{ extra_vars.dt_environment_url_gen3 }}#g" {} \;
+    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#BASE_DOMAIN_PLACEHOLDER#{{ ingress_domain }}#g" {} \;
+    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#FORKED_TEMPLATE_REPO_PLACEHOLDER#{{ gitlab_repo_base_url }}#g" {} \;
 
 
 # - name: Find all template files in the source directory
@@ -199,9 +201,6 @@
 # WORKING
 - include_role:
     name: argocd
-
-- set_fact:    
-    argocd_gitlab_generator_owner_url: "{{ argocd_gitlab_generator_owner_url }}"
 
 - name: Connect ArgoCD to GitLab
   include_role:
