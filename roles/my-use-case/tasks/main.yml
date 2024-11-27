@@ -64,7 +64,7 @@
 - set_fact:
     usecase_source: "{{ role_path }}/files"
     usecase_dest: "{{ role_path }}/gitlabfiles"
-    gitlab_repo_base_url: "{{ gitlab_external_endpoint }}/gitlab_group"
+    gitlab_repo_base_url: "{{ gitlab_external_endpoint }}/{{ gitlab_group }}"
 
 - set_fact:    
     apptemplates_dest: "{{ usecase_dest }}/apptemplates"
