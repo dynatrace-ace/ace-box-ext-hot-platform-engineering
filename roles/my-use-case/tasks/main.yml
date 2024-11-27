@@ -202,7 +202,7 @@
 
 - name: Connect ArgoCD to GitLab
   include_role:
-    name: argo
+    name: argocd
     tasks_from: ensure-gitlab-application-set       
 
 # TO DO
