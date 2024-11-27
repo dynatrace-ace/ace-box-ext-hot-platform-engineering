@@ -1,6 +1,7 @@
 ---
 monacoVersion: "2.14.2"
 gitlab_group: "group1"
+argocd_gitlab_generator_owner: "group1"
 gitlab_backstage_template_repo_name: "backstage-templates"
 gitlab_app_template_repo_name: "applications-templates"
 gitlab_platform_repo_name: "platform"
