@@ -120,6 +120,7 @@
   ansible.builtin.copy:
     src: "{{ usecase_source }}/"
     dest: "{{ usecase_dest }}/"
+    force: true
     remote_src: yes
     directory_mode: "u+rwx"
 
