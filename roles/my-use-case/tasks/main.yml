@@ -2,17 +2,31 @@
 - debug:
     msg: "Platform Engineering HoT automated provisioning started..."
 
-# WORKING
+#
+# Install K3s
 - include_role:
     name: k3s
 
-# WORKING
+#
+# Install Dynatrace Operator
+- include_role:
+    name: dt-operator
+
+#
+# Install the OTel Collector
+- include_role:
+    name: otel-collector
+
+#
+# Install GitLab
 - include_role:
     name: gitlab
 
 - include_role:
     name: private-registry
 
+#
+# Create the default group1 group
 - name: Gitlab - Ensure Group
   include_role:
     name: gitlab
@@ -27,6 +41,8 @@
   vars:
     gitlab_group_name: "{{ gitlab_group }}"
 
+#
+# Create GitLab Projects: Backstage Template, App Template & Platform
 - name: Gitlab - Ensure Backstage Template Project
   include_role:
     name: gitlab
@@ -116,6 +132,10 @@
     name: gitlab
     tasks_from: source-endpoints    
 
+#
+# Copy all files for the 3 GitLab Repos from files to gitlabfiles
+# > then replace PLACEHOLDERS
+# > then upload to gitlab
 - name: Copy Git repo files
   ansible.builtin.copy:
     src: "{{ usecase_source }}/"
@@ -132,21 +152,7 @@
     find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_LIVE_PLACEHOLDER#{{ dynatrace_tenant_url }}#g" {} \;
     find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_APPS_PLACEHOLDER#{{ extra_vars.dt_environment_url_gen3 }}#g" {} \;
     find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#BASE_DOMAIN_PLACEHOLDER#{{ ingress_domain }}#g" {} \;
-    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#FORKED_TEMPLATE_REPO_PLACEHOLDER#{{ gitlab_repo_base_url }}#g" {} \;
-
-
-# - name: Find all template files in the source directory
-#   ansible.builtin.find:
-#     paths: "{{ role_path }}/templates"
-#     patterns: "*.j2"
-#     recurse: yes
-#   register: found_templates
-
-# - name: Template and copy each file to the destination
-#   ansible.builtin.template:
-#     src: "{{ item.path }}"
-#     dest: "{{ item.path | regex_replace('^.*templates/', 'files/') | regex_replace('.j2$', '') }}"
-#   loop: "{{ found_templates.files }}"
+    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#FORKED_TEMPLATE_REPO_PLACEHOLDER#{{ gitlab_repo_base_url }}/platform#g" {} \;
 
 - name: Publish apptemplates to Gitlab
   include_role:
@@ -185,24 +191,57 @@
     repo_src: "{{ platform_dest }}"
 
 
-# # WORKING
-# - name: Install Docker - needed for backstage
-#   become: true
-#   become_user: root
-#   community.general.snap:
-#     name:
-#     - docker
-
-##
-# TO DO: currently broken while building a docker image
-##
-# - include_role:
-#     name: backstage
-
-# WORKING
+#
+# Now lets install ArgoCD
 - include_role:
     name: argocd
 
+- name: Install ArgoCD CLI
+  shell: |
+    wget -O argocd https://github.com/argoproj/argo-cd/releases/download/v2.9.3/argocd-linux-amd64
+    chmod +x argocd
+    sudo mv argocd /usr/bin
+    argocd login argo --core
+
+- name: Get ArgoCD Token
+  shell: argocd account generate-token --account alice
+  register: argocd_token
+
+
+#
+# Lets create some secrets that tools like Backstage need
+# NEEDS TO HAPPEN BEFORE ArgoCD deploys our platform
+- name: Create Backstage Secret
+  kubernetes.core.k8s:
+    name: "backstage-secrets"
+    api_version: v1
+    kind: Secret
+    state: present
+    namespace: "backstage"
+    resource_definition:
+      type: Opaque
+      data:
+        GITLAB_TOKEN: "{{ gitlab_personal_access_token | b64encode }}"
+        ARGOCD_TOKEN: "{{ argocd_token }}"
+        DT_TENANT_LIVE: "{{ dynatrace_tenant_url }}"
+        DT_TENANT_APPS: "{{ extra_vars.dt_environment_url_gen3 }}"
+        DT_EVENT_INGEST_TOKEN: "{{ dynatrace_api_token }}"
+        DT_TENANT_NAME: "TENANT_NAME"
+        DT_CLIENT_ID: "{{ dt_oauth_client_id }} "
+        DT_CLIENT_SECRET: "{{ dt_oauth_client_secret }} "
+        DT_ACCOUNT_URN: "{{ dt_oauth_account_urn }} "
+
+
+#output = run_command(["kubectl", "-n", "dynatrace", "create", "secret", "generic", "dt-bizevent-oauth-details", f"--from-literal=dtTenant={DT_TENANT_LIVE}", f"--from-literal=oAuthClientID={DT_OAUTH_CLIENT_ID}", f"--from-literal=oAuthClientSecret={DT_OAUTH_CLIENT_SECRET}", f"--from-literal=accountURN={DT_OAUTH_ACCOUNT_URN}"])
+# output = run_command(["kubectl", "-n", "opentelemetry", "create", "secret", "generic", "dt-bizevent-oauth-details", f"--from-literal=dtTenant={DT_TENANT_LIVE}", f"--from-literal=oAuthClientID={DT_OAUTH_CLIENT_ID}", f"--from-literal=oAuthClientSecret={DT_OAUTH_CLIENT_SECRET}", f"--from-literal=accountURN={DT_OAUTH_ACCOUNT_URN}"])
+#output = run_command(["kubectl", "-n", "argocd", "create", "secret", "generic", "argocd-notifications-secret", f"--from-literal=dynatrace-url={DT_TENANT_LIVE}", f"--from-literal=dynatrace-token={DT_ALL_INGEST_TOKEN}"])
+#output = run_command(["kubectl", "-n", "monaco", "create", "secret", "generic", "monaco-secret", f"--from-literal=monacoToken={DT_MONACO_TOKEN}"])
+#output = run_command(["kubectl", "-n", "dynatrace", "create", "secret", "generic", "monaco-secret", f"--from-literal=monacoToken={DT_MONACO_TOKEN}"])
+
+
+#
+# This will connect ArgoCD to the GitLab Platform Repo
+# ArgoCD will find the Platform Definition and will start to deploy the Platform (Backstage, Workflows ...)
 - name: Connect ArgoCD to GitLab Platform Repo
   include_role:
     name: argocd
@@ -211,38 +250,6 @@
     argocd_gitlab_generator_k8s_path: "applications/platform"
     argocd_gitlab_generator_owner: "group1"
 
-
-# TO DO
-# - include_tasks:
-#     file: argo-workflows.yml
-
-# WORKING
-- include_role:
-    name: otel-collector
-
-# TO DO
-# - include_tasks:
-#     file: openfeature.yml
-
-##
-# TO DO: For Keptn check the role, it could be a pretty old version and we need to re-construct it
-##
-# - include_role:
-#     name: keptn
-# - include_tasks:
-#     file: keptn.yml
-
-# TO DO
-# - include_tasks:
-#     file: kubeaudit.yml
-
-# TO DO
-# - include_tasks:
-#     file: kubehunter.yml
-
-# WORKING
-- include_role:
-    name: dt-operator
 
 - include_role:
     name: dashboard
