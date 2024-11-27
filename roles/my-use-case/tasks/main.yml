@@ -202,10 +202,14 @@
 - include_role:
     name: argocd
 
-- name: Connect ArgoCD to GitLab
+- name: Connect ArgoCD to GitLab Platform Repo
   include_role:
     name: argocd
-    tasks_from: ensure-gitlab-application-set       
+    tasks_from: ensure-gitlab-application-set
+  var:
+    argocd_gitlab_generator_k8s_path: "applications/platform"
+    argocd_gitlab_generator_owner: "group1"
+
 
 # TO DO
 # - include_tasks:
