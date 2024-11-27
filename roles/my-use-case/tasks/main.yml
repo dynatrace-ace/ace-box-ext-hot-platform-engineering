@@ -115,10 +115,10 @@
 
 - name: Replace PLACEHOLDERS for template files in git
   shell: |
-    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#GEOLOCATION_PLACEHOLDER#${{ dynatrace_geolocation }}#g" {}
-    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_LIVE_PLACEHOLDER#${{ dynatrace_tenant_url }}#g" {}
-    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_APPS_PLACEHOLDER#${{ extra_vars.dt_environment_url_gen3 }}#g" {}
-    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#BASE_DOMAIN_PLACEHOLDER#${{ ingress_domain }}#g" {}
+    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#GEOLOCATION_PLACEHOLDER#{{ dynatrace_geolocation }}#g" {} \;
+    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_LIVE_PLACEHOLDER#{{ dynatrace_tenant_url }}#g" {} \;
+    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_APPS_PLACEHOLDER#{{ extra_vars.dt_environment_url_gen3 }}#g" {} \;
+    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#BASE_DOMAIN_PLACEHOLDER#{{ ingress_domain }}#g" {} \;
 
 
 # - name: Find all template files in the source directory
