@@ -43,6 +43,14 @@
     gitlab_prj: "{{ gitlab_app_template_repo_name }}"
     gitlab_prj_namespace_id: "{{ gitlab_group_id }}"
 
+- name: Gitlab - Ensure Platform Project
+  include_role:
+    name: gitlab
+    tasks_from: ensure-project
+  vars:
+    gitlab_prj: "{{ gitlab_platform_repo_name }}"
+    gitlab_prj_namespace_id: "{{ gitlab_group_id }}"    
+
 - set_fact:
     usecase_source: "{{ role_path }}/files"
     usecase_dest: "{{ role_path }}/gitlabfiles"
@@ -50,6 +58,7 @@
 - set_fact:    
     apptemplates_dest: "{{ usecase_dest }}/apptemplates"
     backstagetemplates_dest: "{{ usecase_dest }}/backstagetemplates"
+    platform_dest: "{{ usecase_dest }}/platform"
 
 - include_role:
     name: gitlab
@@ -158,6 +167,18 @@
     git_repo: "{{ gitlab_backstage_template_repo_name }}"
     repo_src: "{{ backstagetemplates_dest }}"
 
+- name: Publish Platform to Gitlab
+  include_role:
+    name: repository
+  vars:
+    git_username: "root"
+    git_password: "{{ gitlab_password }}"
+    git_domain: "{{ gitlab_domain }}"
+    git_remote: "gitlab"
+    git_org: "{{ gitlab_group }}"
+    git_repo: "{{ gitlab_platform_repo_name }}"
+    repo_src: "{{ platform_dest }}"
+
 
 # # WORKING
 # - name: Install Docker - needed for backstage
@@ -176,6 +197,11 @@
 # WORKING
 - include_role:
     name: argocd
+
+- name: Connect ArgoCD to GitLab
+  include_role:
+    name: argo
+    tasks_from: ensure-gitlab-application-set       
 
 # TO DO
 # - include_tasks:
