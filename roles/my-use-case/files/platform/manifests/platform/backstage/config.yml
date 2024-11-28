@@ -20,7 +20,8 @@ data:
         # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
         # Default Helmet Content-Security-Policy values can be removed by setting the key to false
         connect-src: ["'self'", 'http:', 'https:']
-        img-src: ["'self'", "https:"]
+        img-src: ["'self'", 'http:', 'https:']
+        upgrade-insecure-requests: false
       cors:
         origin: PROTOCOL_PLACEHOLDER://backstage.BASE_DOMAIN_PLACEHOLDER
         methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
@@ -56,6 +57,7 @@ data:
       gitlab:
         - host: gitlab.BASE_DOMAIN_PLACEHOLDER
           apiBaseUrl: PROTOCOL_PLACEHOLDER://gitlab.BASE_DOMAIN_PLACEHOLDER/api/v4
+          baseUrl: PROTOCOL_PLACEHOLDER://gitlab.BASE_DOMAIN_PLACEHOLDER
           token: ${GITLAB_TOKEN}
     catalog:
       rules:
