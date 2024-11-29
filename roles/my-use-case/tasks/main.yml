@@ -11,13 +11,6 @@
 - set_fact:
     usecase_source: "{{ role_path }}/files"
     usecase_dest: "{{ role_path }}/gitlabfiles"
-    gitlab_repo_base_url: "{{ gitlab_external_endpoint }}/{{ gitlab_group }}"
-
-- set_fact:    
-    apptemplates_dest: "{{ usecase_dest }}/apptemplates"
-    backstagetemplates_dest: "{{ usecase_dest }}/backstagetemplates"
-    platform_dest: "{{ usecase_dest }}/platform"    
-
 
 - debug:
     msg: | 
@@ -25,7 +18,6 @@
       "tenant_id: {{ tenant_id }}"
       "usecase_source: {{ usecase_source }}"
       "usecase_dest: {{ usecase_dest }}"
-      "gitlab_repo_base_url: {{ gitlab_repo_base_url }}"
 
 #
 # Install K3s
@@ -163,6 +155,12 @@
     force: true
     remote_src: yes
     directory_mode: "u+rwx"
+
+- set_fact:    
+    gitlab_repo_base_url: "{{ gitlab_external_endpoint }}/{{ gitlab_group }}"
+    apptemplates_dest: "{{ usecase_dest }}/apptemplates"
+    backstagetemplates_dest: "{{ usecase_dest }}/backstagetemplates"
+    platform_dest: "{{ usecase_dest }}/platform"    
 
 - name: Replace PLACEHOLDERS for template files in git
   shell: |
