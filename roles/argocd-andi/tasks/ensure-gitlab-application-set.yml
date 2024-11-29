@@ -24,6 +24,9 @@
 - set_fact:
     argocd_gitlab_generator_owner_url: "{{ ingress_protocol }}://gitlab.{{ ingress_domain }}/{{ argocd_gitlab_generator_owner }}"
 
+- set_fact:
+    my_fact: "{{ argocd_appset_repositorymatch | default('^') }}"  # Default value of ^ means ALL Repositories will be matched
+
 - name: Persist Gitlab PAT
   kubernetes.core.k8s:
     name: "gitlab-creds"

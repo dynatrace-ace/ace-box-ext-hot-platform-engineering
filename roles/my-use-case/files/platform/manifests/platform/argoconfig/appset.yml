@@ -13,7 +13,11 @@ spec:
       cloneProtocol: https
       gitlab:
         group: "group1"
-        api: "https://gitlab.BASE_DOMAIN_PLACEHOLDER/"
+        api: "PROTOCOL_PLACEHOLDER://gitlab.BASE_DOMAIN_PLACEHOLDER/"
+        insecure: true
+        tokenRef:
+          key: token
+          secretName: gitlab-creds        
   template:
     metadata:
       name: "{{ repository }}"

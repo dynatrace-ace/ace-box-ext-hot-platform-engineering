@@ -19,7 +19,13 @@ spec:
       - name: git-files
         path: /src
         git:
-          repo: "http://gitlab.BASE_DOMAIN_PLACEHOLDER/group1/${{ values.projectName }}-${{ values.teamIdentifier }}-${{ values.releaseStage }}-cd.git"
+          repo: "PROTOCOL_PLACEHOLDER://gitlab.BASE_DOMAIN_PLACEHOLDER/group1/${{ values.projectName }}-${{ values.teamIdentifier }}-${{ values.releaseStage }}-cd.git"
+          usernameSecret:
+            name: gitlab-creds
+            key: username
+          passwordSecret:
+            name: gitlab-creds
+            key: password
     container:
       image: dynatrace/dynatrace-configuration-as-code:latest
       args: [
@@ -36,14 +42,14 @@ spec:
           secretKeyRef:
             name: monaco-secret
             key: monacoToken
-      - name: MONACO_OAUTH_CLIENT_ID
-        valueFrom:
-          secretKeyRef:
-            name: srg-oauth-details
-            key: oAuthClientID
-      - name: MONACO_OAUTH_CLIENT_SECRET
-        valueFrom:
-          secretKeyRef:
-            name: srg-oauth-details
-            key: oAuthClientSecret
+      # - name: MONACO_OAUTH_CLIENT_ID
+      #   valueFrom:
+      #     secretKeyRef:
+      #       name: srg-oauth-details
+      #       key: oAuthClientID
+      # - name: MONACO_OAUTH_CLIENT_SECRET
+      #   valueFrom:
+      #     secretKeyRef:
+      #       name: srg-oauth-details
+      #       key: oAuthClientSecret
       workingDir: /src

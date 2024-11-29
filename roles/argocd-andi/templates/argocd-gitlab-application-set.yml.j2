@@ -2,10 +2,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: "gitlab-{{ argocd_gitlab_generator_owner }}"
+  name: "gitlab-{{ argocd_gitlab_generator_owner }}-"
 spec:
   generators:
     - scmProvider:
+        filters:
+        - repositoryMatch: "{{ argocd_appset_repositorymatch }}"
         requeueAfterSeconds: 60
         cloneProtocol: https
         gitlab:
