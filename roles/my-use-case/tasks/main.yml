@@ -212,8 +212,9 @@
         git_repo: "{{ gitlab_platform_repo_name }}"
         repo_src: "{{ platform_dest }}"
   rescue:
-    - debug:
-      msg: "GitLab Upload failed but we are continuing"
+    - name: Rescue Message
+      debug:
+        msg: "GitLab Upload failed but we are continuing"
 
 #
 # Now lets install ArgoCD
