@@ -1,6 +1,31 @@
 ---
+
+#
+# Setting some global facts!
+- set_fact:
+    dt_tenant_no_protocol: "{{ dynatrace_tenant_url | regex_search('[^\/\/]*$') }}"
+
+- set_fact:
+    tenant_id: "{{ dt_tenant_no_protocol | split('.') }}"
+
+- set_fact:
+    usecase_source: "{{ role_path }}/files"
+    usecase_dest: "{{ role_path }}/gitlabfiles"
+    gitlab_repo_base_url: "{{ gitlab_external_endpoint }}/{{ gitlab_group }}"
+
+- set_fact:    
+    apptemplates_dest: "{{ usecase_dest }}/apptemplates"
+    backstagetemplates_dest: "{{ usecase_dest }}/backstagetemplates"
+    platform_dest: "{{ usecase_dest }}/platform"    
+
+
 - debug:
-    msg: "Platform Engineering HoT automated provisioning started..."
+    msg: | 
+      "Platform Engineering HoT automated provisioning started..."
+      "tenant_id: {{ tenant_id }}"
+      "usecase_source: {{ usecase_source }}"
+      "usecase_dest: {{ usecase_dest }}"
+      "gitlab_repo_base_url: {{ gitlab_repo_base_url }}"
 
 #
 # Install K3s
@@ -76,16 +101,6 @@
     name: gitlab
     tasks_from: source-secret
   when: gitlab_personal_access_token is not defined or gitlab_username is not defined or gitlab_password is not defined
-
-- set_fact:
-    usecase_source: "{{ role_path }}/files"
-    usecase_dest: "{{ role_path }}/gitlabfiles"
-    gitlab_repo_base_url: "{{ gitlab_external_endpoint }}/{{ gitlab_group }}"
-
-- set_fact:    
-    apptemplates_dest: "{{ usecase_dest }}/apptemplates"
-    backstagetemplates_dest: "{{ usecase_dest }}/backstagetemplates"
-    platform_dest: "{{ usecase_dest }}/platform"
 
 - name: Gitlab - Additional Environment Variables
   include_role:
@@ -163,6 +178,7 @@
 - name: Publish apptemplates to Gitlab
   include_role:
     name: repository
+  ignore_errors: yes
   vars:
     git_username: "root"
     git_password: "{{ gitlab_password }}"
@@ -175,6 +191,7 @@
 - name: Publish backstagetemplates to Gitlab
   include_role:
     name: repository
+  ignore_errors: yes
   vars:
     git_username: "root"
     git_password: "{{ gitlab_password }}"
@@ -187,6 +204,7 @@
 - name: Publish Platform to Gitlab
   include_role:
     name: repository
+  ignore_errors: yes
   vars:
     git_username: "root"
     git_password: "{{ gitlab_password }}"
@@ -195,7 +213,6 @@
     git_org: "{{ gitlab_group }}"
     git_repo: "{{ gitlab_platform_repo_name }}"
     repo_src: "{{ platform_dest }}"
-
 
 #
 # Now lets install ArgoCD
@@ -232,12 +249,6 @@
 #   register: argocd_token
 
 
-- set_fact:
-    dt_tenant_no_protocol: "{{ dynatrace_tenant_url | regex_search('[^\/\/]*$') }}"
-
-- set_fact:
-    tenant_id: "{{ dt_tenant_no_protocol | split('.') }}"
-
 #
 # Lets create some secrets that tools like Backstage need
 # NEEDS TO HAPPEN BEFORE ArgoCD deploys our platform
@@ -249,7 +260,7 @@
       kind: Namespace
       metadata:
         name: backstage
-        
+
 - name: Create Backstage Secret
   kubernetes.core.k8s:
     name: "backstage-secrets"
