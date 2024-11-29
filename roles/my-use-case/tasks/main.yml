@@ -241,6 +241,15 @@
 #
 # Lets create some secrets that tools like Backstage need
 # NEEDS TO HAPPEN BEFORE ArgoCD deploys our platform
+- name: Create Backstage namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: backstage
+        
 - name: Create Backstage Secret
   kubernetes.core.k8s:
     name: "backstage-secrets"
