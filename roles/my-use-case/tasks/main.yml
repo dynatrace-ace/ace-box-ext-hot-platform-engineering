@@ -136,6 +136,11 @@
 # Copy all files for the 3 GitLab Repos from files to gitlabfiles
 # > then replace PLACEHOLDERS
 # > then upload to gitlab
+- name: Delete Git repo files
+  ansible.builtin.file:
+    path: "{{ usecase_dest }}/"
+    state: absent
+
 - name: Copy Git repo files
   ansible.builtin.copy:
     src: "{{ usecase_source }}/"
@@ -195,7 +200,7 @@
 #
 # Now lets install ArgoCD
 - include_role:
-    name: argocd
+    name: argocd-andi
 
 - name: Create Argo Config Map to define user Alice for API Access
   kubernetes.core.k8s:
@@ -217,7 +222,7 @@
 
 - name: Install ArgoCD CLI
   shell: |
-    wget -O argocd https://github.com/argoproj/argo-cd/releases/download/v2.12.2/argocd-linux-amd64
+    wget -O argocd https://github.com/argoproj/argo-cd/releases/download/v2.10.5/argocd-linux-amd64
     chmod +x argocd
     sudo mv argocd /usr/bin
     argocd login argo --core
@@ -263,7 +268,7 @@
 # ArgoCD will find the Platform Definition and will start to deploy the Platform (Backstage, Workflows ...)
 - name: Connect ArgoCD to GitLab Platform Repo
   include_role:
-    name: argocd
+    name: argocd-andi
     tasks_from: ensure-gitlab-application-set
   vars:
     argocd_gitlab_generator_k8s_path: "applications/platform"

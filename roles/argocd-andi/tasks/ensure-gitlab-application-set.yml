@@ -1,0 +1,52 @@
+# Copyright 2024 Dynatrace LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+- include_role:
+    name: gitlab
+    tasks_from: source-secret
+  when: gitlab_personal_access_token is not defined or gitlab_username is not defined or gitlab_password is not defined
+
+- set_fact:
+    argocd_gitlab_generator_api: "{{ ingress_protocol }}://gitlab.{{ ingress_domain }}/"
+
+- set_fact:
+    argocd_gitlab_generator_owner_url: "{{ ingress_protocol }}://gitlab.{{ ingress_domain }}/{{ argocd_gitlab_generator_owner }}"
+
+- name: Persist Gitlab PAT
+  kubernetes.core.k8s:
+    name: "gitlab-creds"
+    api_version: v1
+    kind: Secret
+    state: present
+    namespace: "{{ argocd_namespace }}"
+    resource_definition:
+      metadata:
+        labels:
+          app.kubernetes.io/name: gitlab-creds
+          app.kubernetes.io/part-of: argocd
+          argocd.argoproj.io/secret-type: repo-creds
+      type: Opaque
+      data:
+        type: "{{ 'git' | b64encode }}"
+        url: "{{ argocd_gitlab_generator_owner_url | b64encode }}"
+        username: "{{ gitlab_username | b64encode }}"
+        password: "{{ gitlab_personal_access_token | b64encode }}"
+        token: "{{ gitlab_personal_access_token | b64encode }}"
+
+- name: Ensure ApplicationSet
+  kubernetes.core.k8s:
+    state: present
+    template: "{{ role_path }}/templates/argocd-gitlab-application-set.yml.j2"
+    namespace: "{{ argocd_namespace }}"

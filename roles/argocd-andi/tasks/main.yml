@@ -1,0 +1,50 @@
+# Copyright 2024 Dynatrace LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+- name: Create namespace for ArgoCD
+  kubernetes.core.k8s:
+    name: "{{ argocd_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Apply ArgoCD manifest
+  kubernetes.core.k8s:
+    state: present
+    src: "{{ role_path }}/files/argocd-install.yml"
+    namespace: "{{ argocd_namespace }}"
+
+- name: Apply ArgoCD ingress http manifest
+  kubernetes.core.k8s:
+    state: present
+    template: "{{ role_path }}/templates/argocd-ingress-http.yml.j2"
+    namespace: "{{ argocd_namespace }}"
+
+- name: Apply ArgoCD ingress grpc manifest
+  kubernetes.core.k8s:
+    state: present
+    template: "{{ role_path }}/templates/argocd-ingress-grpc.yml.j2"
+    namespace: "{{ argocd_namespace }}"
+
+- include_tasks:
+    file: source-initial-admin-password.yml
+
+- set_fact:
+    argocd_dashboard_value_file: "{{ role_path }}/templates/argocd-dashboard.yml.j2"
+
+- include_role:
+    name: dashboard
+  vars:
+    include_dashboard_value_file: "{{ argocd_dashboard_value_file }}"
