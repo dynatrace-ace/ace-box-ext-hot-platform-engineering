@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
   generateName: wf-apply-monaco-
-  namespace: "monaco" # Job must run in monaco namespace as `monaco-secret` and `srg-oauth-details` secrets are available here
+  namespace: "argocd" # Job must run in argocd namespace all needed secrets are stored there, e.g: gitlab & monaco
   labels:
     workflows.argoproj.io/archive-strategy: "false"
   annotations:

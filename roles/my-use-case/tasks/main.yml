@@ -307,14 +307,14 @@
         OAUTH_CLIENT_SECRET: "{{ extra_vars.dt_oauth_client_secret | b64encode }}"
         ACCOUNT_URN: "{{ extra_vars.dt_oauth_account_urn | b64encode }}"
 
-- name: Create Monaco namespace
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: monaco
+# - name: Create Monaco namespace
+#   kubernetes.core.k8s:
+#     state: present
+#     definition:
+#       apiVersion: v1
+#       kind: Namespace
+#       metadata:
+#         name: monaco
 
 - name: Create Monaco Secret
   kubernetes.core.k8s:
@@ -322,7 +322,7 @@
     api_version: v1
     kind: Secret
     state: present
-    namespace: "monaco"
+    namespace: "argocd"
     resource_definition:
       type: Opaque
       data:
