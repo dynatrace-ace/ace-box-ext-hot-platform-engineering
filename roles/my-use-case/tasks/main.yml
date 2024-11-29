@@ -173,44 +173,47 @@
     find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#FORKED_TEMPLATE_REPO_PLACEHOLDER#{{ gitlab_repo_base_url }}/platform#g" {} \;
     find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#PROTOCOL_PLACEHOLDER#{{ ingress_protocol }}#g" {} \;
 
-- name: Publish apptemplates to Gitlab
-  include_role:
-    name: repository
-  ignore_errors: yes
-  vars:
-    git_username: "root"
-    git_password: "{{ gitlab_password }}"
-    git_domain: "{{ gitlab_domain }}"
-    git_remote: "gitlab"
-    git_org: "{{ gitlab_group }}"
-    git_repo: "{{ gitlab_app_template_repo_name }}"
-    repo_src: "{{ apptemplates_dest }}"
-
-- name: Publish backstagetemplates to Gitlab
-  include_role:
-    name: repository
-  ignore_errors: yes
-  vars:
-    git_username: "root"
-    git_password: "{{ gitlab_password }}"
-    git_domain: "{{ gitlab_domain }}"
-    git_remote: "gitlab"
-    git_org: "{{ gitlab_group }}"
-    git_repo: "{{ gitlab_backstage_template_repo_name }}"
-    repo_src: "{{ backstagetemplates_dest }}"
-
-- name: Publish Platform to Gitlab
-  include_role:
-    name: repository
-  ignore_errors: yes
-  vars:
-    git_username: "root"
-    git_password: "{{ gitlab_password }}"
-    git_domain: "{{ gitlab_domain }}"
-    git_remote: "gitlab"
-    git_org: "{{ gitlab_group }}"
-    git_repo: "{{ gitlab_platform_repo_name }}"
-    repo_src: "{{ platform_dest }}"
+- name: Publish to Gitlab
+  block:
+    - name: Publish apptemplates to Gitlab
+      include_role:
+        name: repository
+      ignore_errors: yes
+      vars:
+        git_username: "root"
+        git_password: "{{ gitlab_password }}"
+        git_domain: "{{ gitlab_domain }}"
+        git_remote: "gitlab"
+        git_org: "{{ gitlab_group }}"
+        git_repo: "{{ gitlab_app_template_repo_name }}"
+        repo_src: "{{ apptemplates_dest }}"
+    - name: Publish Backstage Templates
+      include_role:
+        name: repository
+      ignore_errors: yes
+      vars:
+        git_username: "root"
+        git_password: "{{ gitlab_password }}"
+        git_domain: "{{ gitlab_domain }}"
+        git_remote: "gitlab"
+        git_org: "{{ gitlab_group }}"
+        git_repo: "{{ gitlab_backstage_template_repo_name }}"
+        repo_src: "{{ backstagetemplates_dest }}"
+    - name: Publish Platform to Gitlab
+      include_role:
+        name: repository
+      ignore_errors: yes
+      vars:
+        git_username: "root"
+        git_password: "{{ gitlab_password }}"
+        git_domain: "{{ gitlab_domain }}"
+        git_remote: "gitlab"
+        git_org: "{{ gitlab_group }}"
+        git_repo: "{{ gitlab_platform_repo_name }}"
+        repo_src: "{{ platform_dest }}"
+  rescue:
+    - debug:
+      msg: "GitLab Upload failed but we are continuing"
 
 #
 # Now lets install ArgoCD
