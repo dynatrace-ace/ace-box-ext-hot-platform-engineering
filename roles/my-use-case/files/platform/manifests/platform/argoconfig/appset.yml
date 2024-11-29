@@ -8,7 +8,7 @@ spec:
   generators:
   - scmProvider:
       filters:
-      - repositoryMatch: -cd$
+      - repositoryMatch: ^-cd$
         pathsExist: [argoapp]
       cloneProtocol: https
       gitlab:
