@@ -19,10 +19,10 @@
 - name: Add {{workflow_name}} workflow
   shell: >
     curl -X 'POST' \
-      '{{ extra_vars.dt_environment_url_gen3 }}/platform/automation/v1/workflows' \
+      '{{ extra_vars.dt_environment_url_gen3 }}platform/automation/v1/workflows' \
       -H 'accept: application/json' \
       -H 'Authorization: Bearer {{ dt_oauth_access_token }}' \
-      --data-binary "@/home/$USER/repos/{{path_to_workflow}}"
+      -d @/home/$USER/repos/{{path_to_workflow}}
   register: auth_response_raw
 
 - name: Print Add Workflow output

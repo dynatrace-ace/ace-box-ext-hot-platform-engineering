@@ -320,7 +320,7 @@
         resource_definition:
           type: Opaque
           data:
-            DT_MONACO_TOKEN: "{{ monaco_token | b64encode }}"
+            monacoToken: "{{ monaco_token | b64encode }}"
     - name: Create Monaco Secret in Dynatrace namespace
       kubernetes.core.k8s:
         name: "monaco-secret"
@@ -331,7 +331,7 @@
         resource_definition:
           type: Opaque
           data:
-            DT_MONACO_TOKEN: "{{ monaco_token | b64encode }}"
+            monacoToken: "{{ monaco_token | b64encode }}"
     - name: Create Dynatrace BizEvent Secret
       kubernetes.core.k8s:
         name: "dt-bizevent-oauth-details"
@@ -342,20 +342,14 @@
         resource_definition:
           type: Opaque
           data:
-            TENANT_URL: "{{ dynatrace_tenant_url | b64encode }}"
-            OAUTH_CLIENT_ID: "{{ extra_vars.dt_oauth_client_id | b64encode }}"
-            OAUTH_CLIENT_SECRET: "{{ extra_vars.dt_oauth_client_secret | b64encode }}"
-            ACCOUNT_URN: "{{ extra_vars.dt_oauth_account_urn | b64encode }}"
+            dtTenant: "{{ dynatrace_tenant_url | b64encode }}"
+            oAuthClientID: "{{ extra_vars.dt_oauth_client_id | b64encode }}"
+            oAuthClientSecret: "{{ extra_vars.dt_oauth_client_secret | b64encode }}"
+            accountURN: "{{ extra_vars.dt_oauth_account_urn | b64encode }}"
   rescue:
     - name: Rescue Message
       debug:
         msg: "Creating secrets failed but we continue execution"            
-
-#output = run_command(["kubectl", "-n", "dynatrace", "create", "secret", "generic", "dt-bizevent-oauth-details", f"--from-literal=dtTenant={DT_TENANT_LIVE}", f"--from-literal=oAuthClientID={DT_OAUTH_CLIENT_ID}", f"--from-literal=oAuthClientSecret={DT_OAUTH_CLIENT_SECRET}", f"--from-literal=accountURN={DT_OAUTH_ACCOUNT_URN}"])
-# output = run_command(["kubectl", "-n", "opentelemetry", "create", "secret", "generic", "dt-bizevent-oauth-details", f"--from-literal=dtTenant={DT_TENANT_LIVE}", f"--from-literal=oAuthClientID={DT_OAUTH_CLIENT_ID}", f"--from-literal=oAuthClientSecret={DT_OAUTH_CLIENT_SECRET}", f"--from-literal=accountURN={DT_OAUTH_ACCOUNT_URN}"])
-#output = run_command(["kubectl", "-n", "argocd", "create", "secret", "generic", "argocd-notifications-secret", f"--from-literal=dynatrace-url={DT_TENANT_LIVE}", f"--from-literal=dynatrace-token={DT_ALL_INGEST_TOKEN}"])
-#output = run_command(["kubectl", "-n", "monaco", "create", "secret", "generic", "monaco-secret", f"--from-literal=monacoToken={DT_MONACO_TOKEN}"])
-#output = run_command(["kubectl", "-n", "dynatrace", "create", "secret", "generic", "monaco-secret", f"--from-literal=monacoToken={DT_MONACO_TOKEN}"])
 
 - name: Upload Dynatrace Configuration (notebooks, dashboards, workflows ...)
   block:
