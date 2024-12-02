@@ -253,10 +253,12 @@
     kubectl config set-context --current --namespace=argocd
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     argocd login argo --core
-    
-- name: Get ArgoCD Token
-  shell: argocd account generate-token --account alice
+    argocd account generate-token --account alice
   register: argocd_token
+    
+# - name: Get ArgoCD Token
+#   shell: argocd account generate-token --account alice
+  
 
 #
 # Lets create some secrets that tools like Backstage, Argo Workflows ... need
