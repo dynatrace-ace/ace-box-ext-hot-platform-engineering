@@ -1,6 +1,6 @@
 {
-  "id": "76e01b90-b6ba-44c6-a070-6948616ff328",
-  "title": "Lifecycle Events Workflow",
+  "id": "76e01b90-0000-44c6-a070-6948616ff328",
+  "title": "Lifecycle Events Workflow - TEST",
   "description": "This workflow sends notifications back to ArgoCD Notifications Plugin when a new BizEvent is received from Argo",
   "tasks": {
     "get_global_vars": {

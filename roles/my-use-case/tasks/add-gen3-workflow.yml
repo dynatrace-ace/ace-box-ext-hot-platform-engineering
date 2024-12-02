@@ -21,13 +21,12 @@
     curl -X 'POST' \
       '{{ extra_vars.dt_environment_url_gen3 }}/platform/automation/v1/workflows' \
       -H 'accept: application/json' \
-      -H 'Content-Type: multipart/form-data' \
       -H 'Authorization: Bearer {{ dt_oauth_access_token }}' \
-      --data-binary "json=@/home/$USER/repos/{{path_to_workflow}}"
+      --data-binary "@/home/$USER/repos/{{path_to_workflow}}"
   register: auth_response_raw
 
 - name: Print Add Workflow output
-  debug: "msg='{{ auth_response_raw.stdout }}', err='{{ auth_response_raw.stderr}}'"
+  debug: "msg='{{ auth_response_raw }}'"
 
 - set_fact:
     workflow_id: "{{ (auth_response_raw.stdout | from_json).id }}"
