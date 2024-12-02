@@ -243,20 +243,20 @@
         accounts.alice.enabled: "true"
         statusbadge.enabled: "true"
         context: |
-          argocdUrl: "https://argo.{{ ingress_domain }}"        
+          argocdUrl: "{{ ingress_protocol }}://argo.{{ ingress_domain }}"        
 
 - name: Install ArgoCD CLI
   shell: |
     wget -O argocd https://github.com/argoproj/argo-cd/releases/download/v2.10.5/argocd-linux-amd64
     chmod +x argocd
     sudo mv argocd /usr/bin
-    kubectl config set-context --curent --namespace=argocd
+    kubectl config set-context --current --namespace=argocd
+    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     argocd login argo --core
-
-# - name: Get ArgoCD Token
-#   shell: argocd account generate-token --account alice
-#   register: argocd_token
-
+    
+- name: Get ArgoCD Token
+  shell: argocd account generate-token --account alice
+  register: argocd_token
 
 #
 # Lets create some secrets that tools like Backstage, Argo Workflows ... need
@@ -281,7 +281,7 @@
       type: Opaque
       data:
         GITLAB_TOKEN: "{{ gitlab_personal_access_token | b64encode }}"
-#        ARGOCD_TOKEN: "{{ argocd_token }}"
+        ARGOCD_TOKEN: "{{ argocd_token }}"
         DT_TENANT_LIVE: "{{ dynatrace_tenant_url | b64encode }}"
         DT_TENANT_APPS: "{{ extra_vars.dt_environment_url_gen3 | b64encode }}"
         DT_EVENT_INGEST_TOKEN: "{{ dynatrace_api_token | b64encode }}"
