@@ -23,7 +23,7 @@
       -H 'accept: application/json' \
       -H 'Content-Type: multipart/form-data' \
       -H 'Authorization: Bearer {{ dt_oauth_access_token }}' \
-      -F "json=@/home/$USER/repos/{{path_to_workflow}};type=application/json"
+      --data-binary "json=@/home/$USER/repos/{{path_to_workflow}}"
   register: auth_response_raw
 
 - set_fact:
