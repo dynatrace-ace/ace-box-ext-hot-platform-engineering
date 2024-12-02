@@ -3,7 +3,7 @@ configs:
   config:
     name: "gitlab | platform | healthcheck"
     parameters:
-      baseUrl: "https://gitlab.BASE_DOMAIN"
+      baseUrl: "PROTOCOL_PLACEHOLDER://gitlab.BASE_DOMAIN"
       frequencyMin: "1"
       enabled: "true"
       geoLocation: "GEOLOCATION_PLACEHOLDER"
@@ -18,7 +18,7 @@ configs:
   config:
     name: "backstage | platform | healthcheck"
     parameters:
-      baseUrl: "https://backstage.BASE_DOMAIN"
+      baseUrl: "PROTOCOL_PLACEHOLDER://backstage.BASE_DOMAIN"
       frequencyMin: "1"
       enabled: "true"
       geoLocation: "GEOLOCATION_PLACEHOLDER"
@@ -33,7 +33,7 @@ configs:
   config:
     name: "argo | platform | healthcheck"
     parameters:
-      baseUrl: "https://argo.BASE_DOMAIN"
+      baseUrl: "PROTOCOL_PLACEHOLDER://argo.BASE_DOMAIN"
       frequencyMin: "1"
       enabled: "true"
       geoLocation: "GEOLOCATION_PLACEHOLDER"
@@ -48,7 +48,7 @@ configs:
   config:
     name: "argo workflows | platform | healthcheck"
     parameters:
-      baseUrl: "https://workflows.BASE_DOMAIN"
+      baseUrl: "PROTOCOL_PLACEHOLDER://workflows.BASE_DOMAIN"
       frequencyMin: "1"
       enabled: "true"
       geoLocation: "GEOLOCATION_PLACEHOLDER"

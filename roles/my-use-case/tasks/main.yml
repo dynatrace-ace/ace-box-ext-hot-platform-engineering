@@ -19,6 +19,12 @@
       "usecase_source: {{ usecase_source }}"
       "usecase_dest: {{ usecase_dest }}"
 
+- include_role:
+    name: dt-access-token
+  vars:
+    access_token_var_name: "monaco_token"
+    access_token_scope: [ "settings.read", "settings.write", "slo.read", "slo.write", "DataExport", "ExternalSyntheticIntegration", "ReadConfig", "WriteConfig" ]
+
 #
 # Install K3s
 - include_role:
@@ -44,45 +50,45 @@
 
 #
 # Create the default group1 group
-- name: Gitlab - Ensure Group
-  include_role:
-    name: gitlab
-    tasks_from: ensure-group
-  vars:
-    gitlab_group_name: "{{ gitlab_group }}"
+- name: Configure GitLab
+  block:
+  - name: Gitlab - Ensure Group
+    include_role:
+      name: gitlab
+      tasks_from: ensure-group
+    vars:
+      gitlab_group_name: "{{ gitlab_group }}"
+  - name: Gitlab - Ensure Default Group Vars
+    include_role:
+      name: gitlab
+      tasks_from: ensure-default-group-vars
+    vars:
+      gitlab_group_name: "{{ gitlab_group }}"
+  #
+  # Create GitLab Projects: Backstage Template, App Template & Platform
+  - name: Gitlab - Ensure Backstage Template Project
+    include_role:
+      name: gitlab
+      tasks_from: ensure-project
+    vars:
+      gitlab_prj: "{{ gitlab_backstage_template_repo_name }}"
+      gitlab_prj_namespace_id: "{{ gitlab_group_id }}"
 
-- name: Gitlab - Ensure Default Group Vars
-  include_role:
-    name: gitlab
-    tasks_from: ensure-default-group-vars
-  vars:
-    gitlab_group_name: "{{ gitlab_group }}"
+  - name: Gitlab - Ensure App Template Project
+    include_role:
+      name: gitlab
+      tasks_from: ensure-project
+    vars:
+      gitlab_prj: "{{ gitlab_app_template_repo_name }}"
+      gitlab_prj_namespace_id: "{{ gitlab_group_id }}"
 
-#
-# Create GitLab Projects: Backstage Template, App Template & Platform
-- name: Gitlab - Ensure Backstage Template Project
-  include_role:
-    name: gitlab
-    tasks_from: ensure-project
-  vars:
-    gitlab_prj: "{{ gitlab_backstage_template_repo_name }}"
-    gitlab_prj_namespace_id: "{{ gitlab_group_id }}"
-
-- name: Gitlab - Ensure App Template Project
-  include_role:
-    name: gitlab
-    tasks_from: ensure-project
-  vars:
-    gitlab_prj: "{{ gitlab_app_template_repo_name }}"
-    gitlab_prj_namespace_id: "{{ gitlab_group_id }}"
-
-- name: Gitlab - Ensure Platform Project
-  include_role:
-    name: gitlab
-    tasks_from: ensure-project
-  vars:
-    gitlab_prj: "{{ gitlab_platform_repo_name }}"
-    gitlab_prj_namespace_id: "{{ gitlab_group_id }}"    
+  - name: Gitlab - Ensure Platform Project
+    include_role:
+      name: gitlab
+      tasks_from: ensure-project
+    vars:
+      gitlab_prj: "{{ gitlab_platform_repo_name }}"
+      gitlab_prj_namespace_id: "{{ gitlab_group_id }}"    
 
 - include_role:
     name: gitlab
@@ -244,6 +250,7 @@
     wget -O argocd https://github.com/argoproj/argo-cd/releases/download/v2.10.5/argocd-linux-amd64
     chmod +x argocd
     sudo mv argocd /usr/bin
+    kubectl config set-context --curent --namespace=argocd
     argocd login argo --core
 
 # - name: Get ArgoCD Token
@@ -292,42 +299,45 @@
       metadata:
         name: dynatrace
 
-- name: Create Dynatrace Secret
-  kubernetes.core.k8s:
-    name: "dt-bizevent-oauth-details"
-    api_version: v1
-    kind: Secret
-    state: present
-    namespace: "dynatrace"
-    resource_definition:
-      type: Opaque
-      data:
-        TENANT_URL: "{{ dynatrace_tenant_url | b64encode }}"
-        OAUTH_CLIENT_ID: "{{ extra_vars.dt_oauth_client_id | b64encode }}"
-        OAUTH_CLIENT_SECRET: "{{ extra_vars.dt_oauth_client_secret | b64encode }}"
-        ACCOUNT_URN: "{{ extra_vars.dt_oauth_account_urn | b64encode }}"
 
-# - name: Create Monaco namespace
-#   kubernetes.core.k8s:
-#     state: present
-#     definition:
-#       apiVersion: v1
-#       kind: Namespace
-#       metadata:
-#         name: monaco
-
-- name: Create Monaco Secret
-  kubernetes.core.k8s:
-    name: "monaco-secret"
-    api_version: v1
-    kind: Secret
-    state: present
-    namespace: "argocd"
-    resource_definition:
-      type: Opaque
-      data:
-        DT_MONACO_TOKEN: "{{ dynatrace_api_token | b64encode }}"
-
+- name: Create Monaco Secret in ArgoCD and Dynatrace namespace
+  block:
+    - name: Create Monaco Secret in ArgoCD namespace
+      kubernetes.core.k8s:
+        name: "monaco-secret"
+        api_version: v1
+        kind: Secret
+        state: present
+        namespace: "argocd"
+        resource_definition:
+          type: Opaque
+          data:
+            DT_MONACO_TOKEN: "{{ monaco_token | b64encode }}"
+    - name: Create Monaco Secret in Dynatrace namespace
+      kubernetes.core.k8s:
+        name: "monaco-secret"
+        api_version: v1
+        kind: Secret
+        state: present
+        namespace: "dynatrace"
+        resource_definition:
+          type: Opaque
+          data:
+            DT_MONACO_TOKEN: "{{ monaco_token | b64encode }}"
+    - name: Create Dynatrace BizEvent Secret
+      kubernetes.core.k8s:
+        name: "dt-bizevent-oauth-details"
+        api_version: v1
+        kind: Secret
+        state: present
+        namespace: "dynatrace"
+        resource_definition:
+          type: Opaque
+          data:
+            TENANT_URL: "{{ dynatrace_tenant_url | b64encode }}"
+            OAUTH_CLIENT_ID: "{{ extra_vars.dt_oauth_client_id | b64encode }}"
+            OAUTH_CLIENT_SECRET: "{{ extra_vars.dt_oauth_client_secret | b64encode }}"
+            ACCOUNT_URN: "{{ extra_vars.dt_oauth_account_urn | b64encode }}"
 
 #output = run_command(["kubectl", "-n", "dynatrace", "create", "secret", "generic", "dt-bizevent-oauth-details", f"--from-literal=dtTenant={DT_TENANT_LIVE}", f"--from-literal=oAuthClientID={DT_OAUTH_CLIENT_ID}", f"--from-literal=oAuthClientSecret={DT_OAUTH_CLIENT_SECRET}", f"--from-literal=accountURN={DT_OAUTH_ACCOUNT_URN}"])
 # output = run_command(["kubectl", "-n", "opentelemetry", "create", "secret", "generic", "dt-bizevent-oauth-details", f"--from-literal=dtTenant={DT_TENANT_LIVE}", f"--from-literal=oAuthClientID={DT_OAUTH_CLIENT_ID}", f"--from-literal=oAuthClientSecret={DT_OAUTH_CLIENT_SECRET}", f"--from-literal=accountURN={DT_OAUTH_ACCOUNT_URN}"])
@@ -335,6 +345,12 @@
 #output = run_command(["kubectl", "-n", "monaco", "create", "secret", "generic", "monaco-secret", f"--from-literal=monacoToken={DT_MONACO_TOKEN}"])
 #output = run_command(["kubectl", "-n", "dynatrace", "create", "secret", "generic", "monaco-secret", f"--from-literal=monacoToken={DT_MONACO_TOKEN}"])
 
+- include_tasks:
+    file: add-gen3-workflow.yml
+  vars:
+    path_to_workflow: ace-box-ext-hot-platform-engineering/roles/my-use-case/files/dynatraceassets/workflow/lifecycle-events-workflow.json
+    workflow_name: "test-upload"
+  ignore_errors: yes
 
 #
 # This will connect ArgoCD to the GitLab Platform Repo
@@ -347,7 +363,6 @@
     argocd_appset_repositorymatch: "platform"
     argocd_gitlab_generator_k8s_path: "applications/platform"
     argocd_gitlab_generator_owner: "group1"
-
 
 - include_role:
     name: dashboard

@@ -1,0 +1,39 @@
+- name: Request a DT OAuth access token
+  ansible.builtin.uri:
+    url: "{{ extra_vars.dt_oauth_sso_endpoint }}"
+    method: POST
+    status_code: 200
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+    body_format: form-urlencoded
+    body:
+      grant_type: "client_credentials"
+      client_id: "{{ extra_vars.dt_oauth_client_id }}"
+      client_secret: "{{ extra_vars.dt_oauth_client_secret }}"
+      scope: "automation:workflows:write"
+      resource: "{{ extra_vars.dt_oauth_account_urn }}"
+  register: auth_response_raw
+- set_fact:
+    dt_oauth_access_token: "{{ auth_response_raw.json.access_token }}"
+
+- name: Add {{workflow_name}} workflow
+  shell: >
+    curl -X 'POST' \
+      '{{ extra_vars.dt_environment_url_gen3 }}/platform/automation/v1/workflows' \
+      -H 'accept: application/json' \
+      -H 'Content-Type: multipart/form-data' \
+      -H 'Authorization: Bearer {{ dt_oauth_access_token }}' \
+      -F "json=@/home/$USER/repos/{{path_to_workflow}};type=application/json"
+  register: auth_response_raw
+
+- set_fact:
+    workflow_id: "{{ (auth_response_raw.stdout | from_json).id }}"
+
+- set_fact:
+    workflow_version: "{{ (auth_response_raw.stdout | from_json).version }}"
+
+- name: Print variable
+  debug: "msg='{{ workflow_id }}'"
+
+- name: Print variable
+  debug: "msg='{{ auth_response_raw }}'"
