@@ -348,14 +348,14 @@
 - include_tasks:
     file: add-gen3-workflow.yml
   vars:
-    path_to_workflow: ace-box-ext-hot-platform-engineering/roles/my-use-case/files/dynatraceassets/workflow/lifecycle-events-workflow.json
+    path_to_workflow: ace-box-ext-hot-platform-engineering/roles/my-use-case/files/dynatraceassets/workflows/lifecycle-events-workflow.json
     workflow_name: "test-upload"
   ignore_errors: yes
 
 #
 # This will connect ArgoCD to the GitLab Platform Repo
 # ArgoCD will find the Platform Definition and will start to deploy the Platform (Backstage, Workflows ...)
-- name: Connect ArgoCD to GitLab Platform Repo
+- name: Connect ArgoCD to GitLab Platform Repote
   include_role:
     name: argocd-andi
     tasks_from: ensure-gitlab-application-set
