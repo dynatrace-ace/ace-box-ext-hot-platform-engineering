@@ -26,6 +26,9 @@
       --data-binary "json=@/home/$USER/repos/{{path_to_workflow}}"
   register: auth_response_raw
 
+- name: Print Add Workflow output
+  debug: "msg='{{ auth_response_raw.stdout }}'"
+
 - set_fact:
     workflow_id: "{{ (auth_response_raw.stdout | from_json).id }}"
 
