@@ -32,7 +32,7 @@ spec:
         "deploy",
         "/src/monaco/manifest.yml",
         "--environment",
-        "prod-api-and-oauth",
+        "prod-api-token-only",
         "--project",
         "configure-dt"
       ]
