@@ -246,6 +246,7 @@
           argocdUrl: "{{ ingress_protocol }}://argo.{{ ingress_domain }}"        
 
 - name: Install ArgoCD CLI
+  become_user: root
   shell: |
     wget -O argocd https://github.com/argoproj/argo-cd/releases/download/v2.10.5/argocd-linux-amd64
     chmod +x argocd
