@@ -227,39 +227,44 @@
 - include_role:
     name: argocd-andi
 
-- name: Create Argo Config Map to define user Alice for API Access
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      kind: ConfigMap
-      metadata:
-        name: argocd-cm
-        namespace: argocd
-        labels:
-          app.kubernetes.io/name: argocd-cm
-          app.kubernetes.io/part-of: argocd
-      data:
-        accounts.alice: apiKey, login
-        accounts.alice.enabled: "true"
-        statusbadge.enabled: "true"
-        context: |
-          argocdUrl: "{{ ingress_protocol }}://argo.{{ ingress_domain }}"        
-
-- name: Install ArgoCD CLI
-  become_user: root
-  shell: |
-    wget -O argocd https://github.com/argoproj/argo-cd/releases/download/v2.10.5/argocd-linux-amd64
-    chmod +x argocd
-    sudo mv argocd /usr/bin
-    kubectl config set-context --current --namespace=argocd
-    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-    argocd login argo --core
-    argocd account generate-token --account alice
-  register: argocd_token
-    
-# - name: Get ArgoCD Token
-#   shell: argocd account generate-token --account alice
-  
+- name: Get API Token to ArgoCD
+  block:
+    - name: Create Argo Config Map to define user Alice for API Access
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          kind: ConfigMap
+          metadata:
+            name: argocd-cm
+            namespace: argocd
+            labels:
+              app.kubernetes.io/name: argocd-cm
+              app.kubernetes.io/part-of: argocd
+          data:
+            accounts.alice: apiKey, login
+            accounts.alice.enabled: "true"
+            statusbadge.enabled: "true"
+            context: |
+              argocdUrl: "{{ ingress_protocol }}://argo.{{ ingress_domain }}"        
+    - name: Install ArgoCD CLI
+      become_user: root
+      shell: |
+        wget -O argocd https://github.com/argoproj/argo-cd/releases/download/v2.10.5/argocd-linux-amd64
+        chmod +x argocd
+        sudo mv argocd /usr/bin
+        kubectl config set-context --current --namespace=argocd
+        export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+        argocd login argo --core        
+    - name: Get ArgoCD Token
+      become_user: root
+      shell: argocd account generate-token --account alice
+      register: argocd_token
+  rescue:
+    - name: Rescue Message
+      debug:
+        msg: "Creating Argo CD Token Failed. Fallback!"
+    - set_fact:    
+        argocd_token: "INVALID_TOKEN"
 
 #
 # Lets create some secrets that tools like Backstage, Argo Workflows ... need
