@@ -135,10 +135,10 @@ data:
       environments:
         - name: ${DT_TENANT_NAME}
           url: ${DT_TENANT_APPS}
-          tokenUrl: https://sso.dynatrace.com/sso/oauth2/token
-          accountUrn: ${DT_ACCOUNT_URN}
-          clientId: ${DT_CLIENT_ID}
-          clientSecret: ${DT_CLIENT_SECRET}
+          tokenUrl: "https://sso.dynatrace.com/sso/oauth2/token"
+          accountUrn: ${DT_OAUTH_ACCOUNT_URN}
+          clientId: ${DT_OAUTH_CLIENT_ID}
+          clientSecret: ${DT_OAUTH_CLIENT_SECRET}          
       queries:
       - id: logs
         query: >

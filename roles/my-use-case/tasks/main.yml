@@ -294,9 +294,9 @@
         DT_TENANT_APPS: "{{ extra_vars.dt_environment_url_gen3 | b64encode }}"
         DT_EVENT_INGEST_TOKEN: "{{ dynatrace_api_token | b64encode }}"
         DT_TENANT_NAME: "{{ tenant_id[0] | b64encode }}"
-        DT_CLIENT_ID: "{{ extra_vars.dt_oauth_client_id | b64encode }}"
-        DT_CLIENT_SECRET: "{{ extra_vars.dt_oauth_client_secret | b64encode }}"
-        DT_ACCOUNT_URN: "{{ extra_vars.dt_oauth_account_urn | b64encode }}"
+        DT_OAUTH_CLIENT_ID: "{{ extra_vars.dt_oauth_client_id | b64encode }}"
+        DT_OAUTH_CLIENT_SECRET: "{{ extra_vars.dt_oauth_client_secret | b64encode }}"
+        DT_OAUTH_ACCOUNT_URN: "{{ extra_vars.dt_oauth_account_urn | b64encode }}"
 
 - name: Create Dynatrace namespace
   kubernetes.core.k8s:
