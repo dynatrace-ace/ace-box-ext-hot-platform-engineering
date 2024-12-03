@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
   generateName: wf-monaco-conf-cluster-
-  namespace: dynatrace
+  namespace: argocd
   labels:
     workflows.argoproj.io/archive-strategy: "false"
   annotations:
@@ -20,6 +20,12 @@ spec:
         path: /src
         git:
           repo: FORKED_TEMPLATE_REPO_PLACEHOLDER.git
+          usernameSecret:
+            name: gitlab-creds
+            key: username
+          passwordSecret:
+            name: gitlab-creds
+            key: password          
     container:
       image: dynatrace/dynatrace-configuration-as-code:latest
       args: [

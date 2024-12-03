@@ -354,7 +354,7 @@
             name: opentelemetry
     - name: Create Dynatrace Operator Secret
       kubernetes.core.k8s:
-        name: "platform-engineering-demo"
+        name: "hot-day-platform-engineering"
         api_version: v1
         kind: Secret
         state: present
