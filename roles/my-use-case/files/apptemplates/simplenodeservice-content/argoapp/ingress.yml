@@ -7,9 +7,10 @@ metadata:
   labels:
     dt.owner: "${{ values.teamIdentifier }}"
   annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.entrypoints: "web"
+    ingress.kubernetes.io/ssl-redirect: "false"
+    ingress.kubernetes.io/force-ssl-redirect: "false"    
 spec:
   rules:
     - host: "${{ values.projectName }}-${{ values.teamIdentifier }}-${{ values.releaseStage }}.BASE_DOMAIN_PLACEHOLDER"
