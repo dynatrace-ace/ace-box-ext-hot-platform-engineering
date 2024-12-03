@@ -17,7 +17,8 @@ spec:
         insecure: true
         tokenRef:
           key: token
-          secretName: gitlab-creds        
+          secretName: gitlab-creds
+      requeueAfterSeconds: 60
   template:
     metadata:
       name: "{{ repository }}"

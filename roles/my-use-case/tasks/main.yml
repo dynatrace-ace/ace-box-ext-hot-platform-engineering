@@ -19,11 +19,29 @@
       "usecase_source: {{ usecase_source }}"
       "usecase_dest: {{ usecase_dest }}"
 
-- include_role:
-    name: dt-access-token
-  vars:
-    access_token_var_name: "monaco_token"
-    access_token_scope: [ "settings.read", "settings.write", "slo.read", "slo.write", "DataExport", "ExternalSyntheticIntegration", "ReadConfig", "WriteConfig" ]
+#
+# Creating Some Dynatrace Tokens
+- name: Create all Dynatrace Tokens
+  block:
+    - include_role:
+        name: dt-access-token
+      vars:
+        access_token_var_name: "dt_all_ingest_token"
+        access_token_scope: [ "bizevents.ingest","events.ingest","logs.ingest","metrics.ingest","openTelemetryTrace.ingest","DataExport", "entities.read", "settings.read", "settings.write", "activeGateTokenManagement.create" ]
+    - include_role:
+        name: dt-access-token
+      vars:
+        access_token_var_name: "dt_op_token"
+        access_token_scope: [ "InstallerDownload", "DataExport", "entities.read", "settings.read","settings.write", "activeGateTokenManagement.create" ]
+    - include_role:
+        name: dt-access-token
+      vars:
+        access_token_var_name: "monaco_token"
+        access_token_scope: [ "settings.read", "settings.write", "slo.read", "slo.write", "DataExport", "ExternalSyntheticIntegration", "ReadConfig", "WriteConfig" ]
+  rescue:
+    - name: Rescue Message
+      debug:
+        msg: "Something happened during creating Dynatrace tokens" 
 
 #
 # Install K3s
@@ -32,13 +50,13 @@
 
 #
 # Install Dynatrace Operator
-- include_role:
-    name: dt-operator
+# - include_role:
+#     name: dt-operator
 
 #
 # Install the OTel Collector
-- include_role:
-    name: otel-collector
+# - include_role:
+#     name: otel-collector
 
 #
 # Install GitLab
@@ -49,135 +67,145 @@
     name: private-registry
 
 #
-# Create the default group1 group
+# Configure GitLab: Groups, Variables, Projects ...
 - name: Configure GitLab
   block:
-  - name: Gitlab - Ensure Group
-    include_role:
-      name: gitlab
-      tasks_from: ensure-group
-    vars:
-      gitlab_group_name: "{{ gitlab_group }}"
-  - name: Gitlab - Ensure Default Group Vars
-    include_role:
-      name: gitlab
-      tasks_from: ensure-default-group-vars
-    vars:
-      gitlab_group_name: "{{ gitlab_group }}"
-  #
-  # Create GitLab Projects: Backstage Template, App Template & Platform
-  - name: Gitlab - Ensure Backstage Template Project
-    include_role:
-      name: gitlab
-      tasks_from: ensure-project
-    vars:
-      gitlab_prj: "{{ gitlab_backstage_template_repo_name }}"
-      gitlab_prj_namespace_id: "{{ gitlab_group_id }}"
+    - name: Gitlab - Ensure Group
+      include_role:
+        name: gitlab
+        tasks_from: ensure-group
+      vars:
+        gitlab_group_name: "{{ gitlab_group }}"
+    - name: Gitlab - Ensure Default Group Vars
+      include_role:
+        name: gitlab
+        tasks_from: ensure-default-group-vars
+      vars:
+        gitlab_group_name: "{{ gitlab_group }}"
+    #
+    # Create GitLab Projects: Backstage Template, App Template & Platform
+    - name: Gitlab - Ensure Backstage Template Project
+      include_role:
+        name: gitlab
+        tasks_from: ensure-project
+      vars:
+        gitlab_prj: "{{ gitlab_backstage_template_repo_name }}"
+        gitlab_prj_namespace_id: "{{ gitlab_group_id }}"
 
-  - name: Gitlab - Ensure App Template Project
-    include_role:
-      name: gitlab
-      tasks_from: ensure-project
-    vars:
-      gitlab_prj: "{{ gitlab_app_template_repo_name }}"
-      gitlab_prj_namespace_id: "{{ gitlab_group_id }}"
+    - name: Gitlab - Ensure App Template Project
+      include_role:
+        name: gitlab
+        tasks_from: ensure-project
+      vars:
+        gitlab_prj: "{{ gitlab_app_template_repo_name }}"
+        gitlab_prj_namespace_id: "{{ gitlab_group_id }}"
 
-  - name: Gitlab - Ensure Platform Project
-    include_role:
-      name: gitlab
-      tasks_from: ensure-project
-    vars:
-      gitlab_prj: "{{ gitlab_platform_repo_name }}"
-      gitlab_prj_namespace_id: "{{ gitlab_group_id }}"    
+    - name: Gitlab - Ensure Platform Project
+      include_role:
+        name: gitlab
+        tasks_from: ensure-project
+      vars:
+        gitlab_prj: "{{ gitlab_platform_repo_name }}"
+        gitlab_prj_namespace_id: "{{ gitlab_group_id }}"    
 
-- include_role:
-    name: gitlab
-    tasks_from: source-endpoints-external
-  when: gitlab_external_endpoint is not defined
+    - include_role:
+        name: gitlab
+        tasks_from: source-endpoints-external
+      when: gitlab_external_endpoint is not defined
 
-- include_role:
-    name: gitlab
-    tasks_from: source-secret
-  when: gitlab_personal_access_token is not defined or gitlab_username is not defined or gitlab_password is not defined
+    - include_role:
+        name: gitlab
+        tasks_from: source-secret
+      when: gitlab_personal_access_token is not defined or gitlab_username is not defined or gitlab_password is not defined
 
-- name: Gitlab - Additional Environment Variables
-  include_role:
-    name: gitlab
-    tasks_from: ensure-group-var
-  vars:
-    gitlab_var_key: "{{ item.key }}"
-    gitlab_var_value: "{{ item.value }}"
-  loop:
-    - {
-        key: "DT_PLATFORM_TENANT_URL",
-        value: "{{ extra_vars.dt_environment_url_gen3.rstrip('/') }}",
-      }
-    - {
-        key: "DT_OAUTH_CLIENT_ID",
-        value: "{{ extra_vars.dt_oauth_client_id }}",
-      }
-    - {
-        key: "DT_OAUTH_CLIENT_SECRET",
-        value: "{{ extra_vars.dt_oauth_client_secret }}",
-      }
-    - {
-        key: "DT_OAUTH_SSO_ENDPOINT",
-        value: "{{ extra_vars.dt_oauth_sso_endpoint.rstrip('/') }}",
-      }
-    - {
-        key: "DT_OAUTH_ACCOUNT_URN",
-        value: "{{ extra_vars.dt_oauth_account_urn }}",
-      }
-    - { key: "GITLAB_USERNAME", value: "{{ gitlab_username }}" }
-    - { key: "GITLAB_PASSWORD", value: "{{ gitlab_password }}" }
-    - {
-        key: "GITLAB_PRIVATE_TOKEN",
-        value: "{{ gitlab_personal_access_token }}",
-      }
-    - {
-        key: "GITLAB_EXTERNAL_ENDPOINT",
-        value: "{{ gitlab_external_endpoint }}",
-      }
-    - { key: "DEMO_IDENTIFIER", value: "{{ demo_identifier }}" }
+    - name: Gitlab - Additional Environment Variables
+      include_role:
+        name: gitlab
+        tasks_from: ensure-group-var
+      vars:
+        gitlab_var_key: "{{ item.key }}"
+        gitlab_var_value: "{{ item.value }}"
+      loop:
+        - {
+            key: "DT_PLATFORM_TENANT_URL",
+            value: "{{ extra_vars.dt_environment_url_gen3.rstrip('/') }}",
+          }
+        - {
+            key: "DT_OAUTH_CLIENT_ID",
+            value: "{{ extra_vars.dt_oauth_client_id }}",
+          }
+        - {
+            key: "DT_OAUTH_CLIENT_SECRET",
+            value: "{{ extra_vars.dt_oauth_client_secret }}",
+          }
+        - {
+            key: "DT_OAUTH_SSO_ENDPOINT",
+            value: "{{ extra_vars.dt_oauth_sso_endpoint.rstrip('/') }}",
+          }
+        - {
+            key: "DT_OAUTH_ACCOUNT_URN",
+            value: "{{ extra_vars.dt_oauth_account_urn }}",
+          }
+        - { key: "GITLAB_USERNAME", value: "{{ gitlab_username }}" }
+        - { key: "GITLAB_PASSWORD", value: "{{ gitlab_password }}" }
+        - {
+            key: "GITLAB_PRIVATE_TOKEN",
+            value: "{{ gitlab_personal_access_token }}",
+          }
+        - {
+            key: "GITLAB_EXTERNAL_ENDPOINT",
+            value: "{{ gitlab_external_endpoint }}",
+          }
+        - { key: "DEMO_IDENTIFIER", value: "{{ demo_identifier }}" }
 
-- name: Source Gitlab endpoint
-  include_role:
-    name: gitlab
-    tasks_from: source-endpoints    
+    - name: Source Gitlab endpoint
+      include_role:
+        name: gitlab
+        tasks_from: source-endpoints
+  rescue:
+    - name: Rescue Message
+      debug:
+        msg: "Something happened during setting up GitLab Projects, Groups ..."         
 
 #
 # Copy all files for the 3 GitLab Repos from files to gitlabfiles
 # > then replace PLACEHOLDERS
 # > then upload to gitlab
-- name: Delete Git repo files
-  ansible.builtin.file:
-    path: "{{ usecase_dest }}/"
-    state: absent
+- name: Prepare all GitLab Files we want to upload
+  block:
+    - name: Delete Git repo files
+      ansible.builtin.file:
+        path: "{{ usecase_dest }}/"
+        state: absent
 
-- name: Copy Git repo files
-  ansible.builtin.copy:
-    src: "{{ usecase_source }}/"
-    dest: "{{ usecase_dest }}/"
-    force: true
-    remote_src: yes
-    directory_mode: "u+rwx"
+    - name: Copy Git repo files
+      ansible.builtin.copy:
+        src: "{{ usecase_source }}/"
+        dest: "{{ usecase_dest }}/"
+        force: true
+        remote_src: yes
+        directory_mode: "u+rwx"
 
-- set_fact:    
-    gitlab_repo_base_url: "{{ gitlab_external_endpoint }}/{{ gitlab_group }}"
-    apptemplates_dest: "{{ usecase_dest }}/apptemplates"
-    backstagetemplates_dest: "{{ usecase_dest }}/backstagetemplates"
-    platform_dest: "{{ usecase_dest }}/platform"    
+    - set_fact:    
+        gitlab_repo_base_url: "{{ gitlab_external_endpoint }}/{{ gitlab_group }}"
+        apptemplates_dest: "{{ usecase_dest }}/apptemplates"
+        backstagetemplates_dest: "{{ usecase_dest }}/backstagetemplates"
+        platform_dest: "{{ usecase_dest }}/platform"    
 
-- name: Replace PLACEHOLDERS for template files in git
-  shell: |
-    pwd
-    cd {{ usecase_dest }}
-    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#GEOLOCATION_PLACEHOLDER#{{ dynatrace_geolocation }}#g" {} \;
-    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_LIVE_PLACEHOLDER#{{ dynatrace_tenant_url.rstrip('/') }}#g" {} \;
-    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_APPS_PLACEHOLDER#{{ extra_vars.dt_environment_url_gen3.rstrip('/') }}#g" {} \;
-    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#BASE_DOMAIN_PLACEHOLDER#{{ ingress_domain }}#g" {} \;
-    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#FORKED_TEMPLATE_REPO_PLACEHOLDER#{{ gitlab_repo_base_url }}/platform#g" {} \;
-    find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#PROTOCOL_PLACEHOLDER#{{ ingress_protocol }}#g" {} \;
+    - name: Replace PLACEHOLDERS for template files in git
+      shell: |
+        pwd
+        cd {{ usecase_dest }}
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#GEOLOCATION_PLACEHOLDER#{{ dynatrace_geolocation }}#g" {} \;
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_LIVE_PLACEHOLDER#{{ dynatrace_tenant_url.rstrip('/') }}#g" {} \;
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_TENANT_APPS_PLACEHOLDER#{{ extra_vars.dt_environment_url_gen3.rstrip('/') }}#g" {} \;
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#BASE_DOMAIN_PLACEHOLDER#{{ ingress_domain }}#g" {} \;
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#FORKED_TEMPLATE_REPO_PLACEHOLDER#{{ gitlab_repo_base_url }}/platform#g" {} \;
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#PROTOCOL_PLACEHOLDER#{{ ingress_protocol }}#g" {} \;
+  rescue:
+    - name: Rescue Message
+      debug:
+        msg: "Something happened during prepring GitLab files"        
 
 - name: Publish to Gitlab
   block:
@@ -269,47 +297,85 @@
 #
 # Lets create some secrets that tools like Backstage, Argo Workflows ... need
 # NEEDS TO HAPPEN BEFORE ArgoCD deploys our platform
-- name: Create Backstage namespace
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: backstage
-
-- name: Create Backstage Secret
-  kubernetes.core.k8s:
-    name: "backstage-secrets"
-    api_version: v1
-    kind: Secret
-    state: present
-    namespace: "backstage"
-    resource_definition:
-      type: Opaque
-      data:
-        GITLAB_TOKEN: "{{ gitlab_personal_access_token | b64encode }}"
-        ARGOCD_TOKEN: "{{ argocd_token | b64encode }}"
-        DT_TENANT_LIVE: "{{ dynatrace_tenant_url.rstrip('/') | b64encode }}"
-        DT_TENANT_APPS: "{{ extra_vars.dt_environment_url_gen3.rstrip('/') | b64encode }}"
-        DT_EVENT_INGEST_TOKEN: "{{ dynatrace_api_token | b64encode }}"
-        DT_TENANT_NAME: "{{ tenant_id[0] | b64encode }}"
-        DT_OAUTH_CLIENT_ID: "{{ extra_vars.dt_oauth_client_id | b64encode }}"
-        DT_OAUTH_CLIENT_SECRET: "{{ extra_vars.dt_oauth_client_secret | b64encode }}"
-        DT_OAUTH_ACCOUNT_URN: "{{ extra_vars.dt_oauth_account_urn | b64encode }}"
-
-- name: Create Dynatrace namespace
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: dynatrace
-
-
-- name: Create Monaco Secret in ArgoCD and Dynatrace namespace
+- name: Create Backstage Namespace and Secrets
   block:
+    - name: Create Backstage namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: backstage
+    - name: Create Backstage Secret
+      kubernetes.core.k8s:
+        name: "backstage-secrets"
+        api_version: v1
+        kind: Secret
+        state: present
+        namespace: "backstage"
+        resource_definition:
+          type: Opaque
+          data:
+            GITLAB_TOKEN: "{{ gitlab_personal_access_token | b64encode }}"
+            ARGOCD_TOKEN: "{{ argocd_token | b64encode }}"
+            DT_TENANT_LIVE: "{{ dynatrace_tenant_url.rstrip('/') | b64encode }}"
+            DT_TENANT_APPS: "{{ extra_vars.dt_environment_url_gen3.rstrip('/') | b64encode }}"
+            DT_EVENT_INGEST_TOKEN: "{{ dynatrace_api_token | b64encode }}"
+            DT_TENANT_NAME: "{{ tenant_id[0] | b64encode }}"
+            DT_OAUTH_CLIENT_ID: "{{ extra_vars.dt_oauth_client_id | b64encode }}"
+            DT_OAUTH_CLIENT_SECRET: "{{ extra_vars.dt_oauth_client_secret | b64encode }}"
+            DT_OAUTH_ACCOUNT_URN: "{{ extra_vars.dt_oauth_account_urn | b64encode }}"
+  rescue:
+    - name: Rescue Message
+      debug:
+        msg: "Creating Backstage namespace and secrets failed but we continue"
+
+#
+# For Dynatrace we need to create a several secrets in various namespaces
+# As Dynatrace and OpenTelemetry namepsaces are not yet created also create those namespaces first
+- name: Create Observability Related Namespace and Secrets
+  block:
+    - name: Create Dynatrace namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: dynatrace
+    - name: Create OpenTelemetry namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: opentelemetry
+    - name: Create Dynatrace Operator Secret
+      kubernetes.core.k8s:
+        name: "platform-engineering-demo"
+        api_version: v1
+        kind: Secret
+        state: present
+        namespace: "dynatrace"
+        resource_definition:
+          type: Opaque
+          data:
+            apiToken: "{{ dt_op_token | b64encode }}"
+            dataIngestToken: "{{ dt_all_ingest_token | b64encode }}"
+    - name: Create OTel Operator Secret
+      kubernetes.core.k8s:
+        name: "dt-details"
+        api_version: v1
+        kind: Secret
+        state: present
+        namespace: "opentelemetry"
+        resource_definition:
+          type: Opaque
+          data:
+            DT_URL: "{{ dynatrace_tenant_url.rstrip('/') | b64encode }}"
+            DT_OTEL_ALL_INGEST_TOKEN: "{{ dt_all_ingest_token | b64encode }}"
     - name: Create Monaco Secret in ArgoCD namespace
       kubernetes.core.k8s:
         name: "monaco-secret"
@@ -351,6 +417,8 @@
       debug:
         msg: "Creating secrets failed but we continue execution"            
 
+#
+# Upload Relevant Configs such as notebooks, dashboards, ...
 - name: Upload Dynatrace Configuration (notebooks, dashboards, workflows ...)
   block:
     - include_tasks:
