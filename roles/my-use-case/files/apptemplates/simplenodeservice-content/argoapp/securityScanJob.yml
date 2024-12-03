@@ -3,53 +3,16 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kubeaudit
-  namespace: "${{ values.projectName}}-${{ values.teamIdentifier }}-${{ values.releaseStage}}-cd"
----
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: kubeaudit-namespaces
-rules:
-  - apiGroups: [""]
-    resources:
-      - namespaces
-    verbs: ["list"]
----
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: kubeaudit
-rules:
-  - apiGroups: [""]
-    resources:
-      - pods
-      - podtemplates
-      - replicationcontrollers
-      - serviceaccounts
-    verbs: ["list"]
-  - apiGroups: ["apps"]
-    resources:
-      - daemonsets
-      - statefulsets
-      - deployments
-    verbs: ["list"]
-  - apiGroups: ["batch"]
-    resources:
-      - cronjobs
-    verbs: ["list"]
-  - apiGroups: ["networking.k8s.io"]
-    resources:
-      - networkpolicies
-    verbs: ["list"]
+  namespace: "${{ values.projectName}}-${{ values.teamIdentifier }}-${{ values.releaseStage}}"
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: kubeaudit-namespaces
+  name: kubeaudit-namespaces-${{ values.projectName}}-${{ values.teamIdentifier }}-${{ values.releaseStage}}
 subjects:
   - kind: ServiceAccount
     name: kubeaudit
-    namespace: "${{ values.projectName}}-${{ values.teamIdentifier }}-${{ values.releaseStage}}-cd"
+    namespace: "${{ values.projectName}}-${{ values.teamIdentifier }}-${{ values.releaseStage}}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -59,11 +22,11 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: kubeaudit
-  namespace: "${{ values.projectName}}-${{ values.teamIdentifier }}-${{ values.releaseStage}}-cd"
+  namespace: "${{ values.projectName}}-${{ values.teamIdentifier }}-${{ values.releaseStage}}"
 subjects:
   - kind: ServiceAccount
     name: kubeaudit
-    namespace: "${{ values.projectName}}-${{ values.teamIdentifier }}-${{ values.releaseStage}}-cd"
+    namespace: "${{ values.projectName}}-${{ values.teamIdentifier }}-${{ values.releaseStage}}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -73,7 +36,10 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: kubeaudit
-  namespace: "${{ values.projectName}}-${{ values.teamIdentifier }}-${{ values.releaseStage}}-cd"
+  namespace: "${{ values.projectName}}-${{ values.teamIdentifier }}-${{ values.releaseStage}}"
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    #argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   template:
     spec:
@@ -85,7 +51,7 @@ spec:
       containers:
         - name: kubeaudit
           image: shopify/kubeaudit:v0.11
-          args: ["all", "--exitcode", "0", "--namespace", "${{ values.projectName}}-${{ values.teamIdentifier }}-${{ values.releaseStage}}-cd"]
+          args: ["all", "--exitcode", "0", "--namespace", "${{ values.projectName}}-${{ values.teamIdentifier }}-${{ values.releaseStage}}"]
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
