@@ -283,9 +283,10 @@
         kubectl config set-context --current --namespace=argocd
         export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
         argocd login argo --core        
+        argocd account generate-token --account alice > argotoken.txt
     - name: Get ArgoCD Token
       become_user: root
-      shell: argocd account generate-token --account alice
+      shell: cat argotoken.txt
       register: argocd_token
   rescue:
     - name: Rescue Message
