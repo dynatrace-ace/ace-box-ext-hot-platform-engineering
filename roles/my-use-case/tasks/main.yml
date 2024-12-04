@@ -294,6 +294,10 @@
         msg: "Creating Argo CD Token Failed. Fallback!"
     - set_fact:    
         argocd_token: "INVALID_TOKEN"
+  when: argocd_token != None
+    - name: Extract argocd_token from stdout
+    - set_fact:    
+        argocd_token: "{{ argocd_token.stdout }}"        
 
 #
 # Lets create some secrets that tools like Backstage, Argo Workflows ... need
@@ -319,7 +323,7 @@
           type: Opaque
           data:
             GITLAB_TOKEN: "{{ gitlab_personal_access_token | b64encode }}"
-            ARGOCD_TOKEN: "{{ argocd_token | b64encode }}"
+            ARGOCD_TOKEN: "{{ argocd_token.stdout | b64encode }}"
             DT_TENANT_LIVE: "{{ dynatrace_tenant_url.rstrip('/') | b64encode }}"
             DT_TENANT_APPS: "{{ extra_vars.dt_environment_url_gen3.rstrip('/') | b64encode }}"
             DT_EVENT_INGEST_TOKEN: "{{ dynatrace_api_token | b64encode }}"
