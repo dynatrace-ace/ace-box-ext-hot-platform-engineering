@@ -19,7 +19,7 @@
 - name: Add {{workflow_name}} workflow
   shell: >
     curl -X 'POST' \
-      '{{ extra_vars.dt_environment_url_gen3 }}platform/automation/v1/workflows' \
+      '{{ extra_vars.dt_environment_url_gen3 }}/platform/automation/v1/workflows' \
       -H 'accept: application/json' \
       -H 'Authorization: Bearer {{ dt_oauth_access_token }}' \
       -H 'Content-Type: application/json' \
