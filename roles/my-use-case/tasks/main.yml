@@ -294,10 +294,10 @@
         msg: "Creating Argo CD Token Failed. Fallback!"
     - set_fact:    
         argocd_token: "INVALID_TOKEN"
-  when: argocd_token != None
-    - name: Extract argocd_token from stdout
-    - set_fact:    
-        argocd_token: "{{ argocd_token.stdout }}"        
+
+- set_fact:
+    argocd_token: "{{ argocd_token.stdout }}"
+  when: argocd_token != "INVALID_TOKEN"
 
 #
 # Lets create some secrets that tools like Backstage, Argo Workflows ... need
