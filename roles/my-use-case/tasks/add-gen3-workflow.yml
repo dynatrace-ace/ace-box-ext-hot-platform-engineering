@@ -26,6 +26,9 @@
       -d @/home/$USER/repos/{{path_to_workflow}}
   register: auth_response_raw
 
+- name: Print variable
+  debug: "msg='{{ auth_response_raw }}'"
+
 - set_fact:
     workflow_id: "{{ (auth_response_raw.stdout | from_json).id }}"
 
@@ -34,6 +37,3 @@
 
 - name: Print variable
   debug: "msg='{{ workflow_id }}'"
-
-- name: Print variable
-  debug: "msg='{{ auth_response_raw }}'"
