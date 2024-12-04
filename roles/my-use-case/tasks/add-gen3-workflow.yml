@@ -23,7 +23,7 @@
       -H 'accept: application/json' \
       -H 'Authorization: Bearer {{ dt_oauth_access_token }}' \
       -H 'Content-Type: application/json' \
-      -d @/home/$USER/repos/{{path_to_workflow}}
+      -d @/{{path_to_workflow}}
   register: auth_response_raw
 
 - name: Print variable
