@@ -323,7 +323,7 @@
           type: Opaque
           data:
             GITLAB_TOKEN: "{{ gitlab_personal_access_token | b64encode }}"
-            ARGOCD_TOKEN: "{{ argocd_token.stdout | b64encode }}"
+            ARGOCD_TOKEN: "{{ argocd_token | b64encode }}"
             DT_TENANT_LIVE: "{{ dynatrace_tenant_url.rstrip('/') | b64encode }}"
             DT_TENANT_APPS: "{{ extra_vars.dt_environment_url_gen3.rstrip('/') | b64encode }}"
             DT_EVENT_INGEST_TOKEN: "{{ dynatrace_api_token | b64encode }}"
