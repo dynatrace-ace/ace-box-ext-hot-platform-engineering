@@ -44,6 +44,28 @@
         msg: "Something happened during creating Dynatrace tokens" 
 
 #
+# Configure Dynatrace Tenant, e.g: new K8s Experience
+- name: Configure tenant setting new k8s app
+  shell: >
+    curl -X 'POST' \
+      '{{ dynatrace_tenant_url }}/api/v2/settings/objects?validateOnly=false' \
+      -H 'accept: application/json' \
+      -H 'Content-Type: application/json; charset=utf-8' \
+      -H 'Authorization: Api-Token {{ dt_op_token }}' \
+      -d '[
+            {
+              "schemaId": "builtin:app-transition.kubernetes",
+              "schemaVersion": "1.0.0",
+              "scope": "environment",
+              "value": {  
+                  "kubernetesAppOptions": {
+                    "enableKubernetesApp": true
+                  }
+              }
+            }
+          ]'
+
+#
 # Install K3s
 - include_role:
     name: k3s
@@ -391,6 +413,18 @@
         resource_definition:
           type: Opaque
           data:
+            dynatrace-url: "{{ dynatrace_tenant_url.rstrip('/') | b64encode }}"
+            dynatrace-token: "{{ dt_all_ingest_token | b64encode }}"
+    - name: Create ArgoCD Notifications Secret in ArgoCD namespace
+      kubernetes.core.k8s:
+        name: "monaco-secret"
+        api_version: v1
+        kind: Secret
+        state: present
+        namespace: "argocd"
+        resource_definition:
+          type: Opaque
+          data:
             monacoToken: "{{ monaco_token | b64encode }}"
     - name: Create Monaco Secret in Dynatrace namespace
       kubernetes.core.k8s:
@@ -430,7 +464,7 @@
     - include_tasks:
         file: add-gen3-workflow.yml
       vars:
-        path_to_workflow: "{{usecase_dest}}/dynatraceassets/workflows/lifecycle-events-workflow.json"
+        path_to_workflow: "{{ usecase_dest }}/dynatraceassets/workflows/lifecycle-events-workflow.json"
         workflow_name: "test-upload"
       ignore_errors: yes
   rescue:
