@@ -43,6 +43,20 @@
       debug:
         msg: "Something happened during creating Dynatrace tokens" 
 
+- include_role:
+    name: dt-platform
+    tasks_from: ensure-app
+  vars:
+    dt_app_id: "{{ item.dt_app_id }}"
+    dt_environment_url_gen3: "{{ extra_vars.dt_environment_url_gen3 }}"
+    dt_oauth_sso_endpoint: "{{ extra_vars.dt_oauth_sso_endpoint }}"
+    dt_oauth_client_id: "{{ extra_vars.dt_oauth_client_id }}"
+    dt_oauth_client_secret: "{{ extra_vars.dt_oauth_client_secret }}"
+    dt_oauth_account_urn: "{{ extra_vars.dt_oauth_account_urn }}"
+  loop:
+    - dt_app_id: "dynatrace.davis.problems"
+      dt_app_version: "1.6.0"
+
 #
 # Configure Dynatrace Tenant, e.g: new K8s Experience
 - name: Configure Dynatrace K8s Settings
@@ -66,6 +80,8 @@
                   }
                 }
               ]'
+      register: ps
+    - debug: var=ps.stdout_lines
     - name: Configure Prometheus Exporter Ingest
       shell: >
         curl -X 'POST' \
