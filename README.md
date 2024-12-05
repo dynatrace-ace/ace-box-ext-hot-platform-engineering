@@ -2,12 +2,26 @@
 
 ## Description
 
-Scenario to demonstrate how Dynatrace integrates with platform engineering practices. You can deploy this use case along with the ace-box to use in HoT or demos
+Scenario that demonstrates a reference IDP (Internal Development Platform) that provides self-service onboarding of new applications on a k8s cluster with automated best-practices for Dynatrace observability.
+
+Those best practices include
+- Automatic Synthetic Tests for deployed application
+- Automatic Ownership and Release Metadata on deployed workloads
+- Automatic Deployment Events that allow triggering of an SRG upon a deployment change
+- Automatic Service Level Objectives for new app
+- Automatic push of relevant Dynatrace data back to the engineer, e.g: Backstage, Slack
+
+Here are the tools that make up the reference IDP:
+- Backstage as the IDP
+- GitLab as the Git System with projects for the platform and application templates
+- ArgoCD as the GitOps Operator
+- Keptn to provide additional deployment insights
+- ArgoRollouts for progressive rollouts
+- ArgoWorkflows to trigger Monaco to push Dynatrace configuration
 
 ## Guide
 
-_in progress..._
-
+This is still work in progress and will be delivered for the HOT (Hands-On Training) Day at Perform 2025
 
 ## Version and compatibility
 
@@ -15,14 +29,12 @@ Please add a note pointing out which versions of the external use case are compa
 
 | Release | Verified against ace-box version |
 | --- | --- |
-| 1.0.0 | vx.y.z |
+| v0.9.3 | v1.27.0 |
 
 ## Extra variables
 
-Add notes of the extra vars needed to be configured
+No extra variables needed
 
 ## DTU provisioning
 
 When an ACE-Box with external use case is provisioned by the DTU team, make sure to grant read access to the Github [ace-box-dtu](https://github.com/orgs/dynatrace-ace/teams/ace-box-dtu) team. This allows them to source the use case during their provisioning process.
-
-docker image build . -f packages/backend/Dockerfile --tag 10.43.26.222:5000/backstage:1.0.0
