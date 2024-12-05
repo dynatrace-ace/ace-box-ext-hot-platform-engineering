@@ -16,6 +16,8 @@ data:
     headers:
     - name: Authorization
       value: Api-Token $dynatrace-token
+    - name: Content-Type
+      value: application/json
   template.app-sync-succeeded: |
     webhook:
       dynatrace:
