@@ -71,7 +71,7 @@
           -d '[
                 {
                   "schemaId": "builtin:app-transition.kubernetes",
-                  "schemaVersion": "1.0.0",
+                  "schemaVersion": "1.0.1",
                   "scope": "environment",
                   "value": {  
                       "kubernetesAppOptions": {
