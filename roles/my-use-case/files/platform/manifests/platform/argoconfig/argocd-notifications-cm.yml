@@ -11,11 +11,11 @@ data:
       value: Api-Token $dynatrace-token
     - name: Content-Type
       value: application/json
-  service.webhook.webhooksite: |
-    url: https://webhook.site/0f49aff1-f5ee-48b7-b737-8285f68a58bd
+  service.webhook.dynatracesdlc: |
+    url: $dynatrace-url
     headers:
     - name: Authorization
-      value: somevalue
+      value: Api-Token $dynatrace-token
   template.app-sync-succeeded: |
     webhook:
       dynatrace:
@@ -37,9 +37,9 @@ data:
               "synced_at" : "{{.app.status.operationState.finishedAt}}"
             }
           }
-      webhooksite:
+      dynatracesdlc:
         method: POST
-        path: /
+        path: /platform/ingest/v1/events.sdlc
         body: |
           {
             "action" : "app-sync-succeeded",
@@ -203,3 +203,13 @@ data:
       send:
       - app-sync-succeeded
       when: app.status.operationState != nil and app.status.operationState.phase in ['Succeeded']
+  subscriptions: |
+    - recipients:
+      - dynatrace
+      - dynatracesdlc
+      triggers:
+      - on-sync-succeeded
+      - on-sync-failed
+      - on-deployed
+      - on-health-degraded
+      - on-created

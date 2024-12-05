@@ -27,7 +27,7 @@
         name: dt-access-token
       vars:
         access_token_var_name: "dt_all_ingest_token"
-        access_token_scope: [ "bizevents.ingest","events.ingest","logs.ingest","metrics.ingest","openTelemetryTrace.ingest","DataExport", "entities.read", "settings.read", "settings.write", "activeGateTokenManagement.create" ]
+        access_token_scope: [ "bizevents.ingest","events.ingest","logs.ingest","metrics.ingest","openTelemetryTrace.ingest","DataExport", "entities.read", "settings.read", "settings.write", "activeGateTokenManagement.create", "openpipeline.events.custom", "openpipeline.events", "openpipeline.events_sdlc",  "openpipeline.events_sdlc.custom", "openpipeline.events_security.custom",  ]
     - include_role:
         name: dt-access-token
       vars:
@@ -454,11 +454,10 @@
         resource_definition:
           type: Opaque
           data:
-            dynatrace-url: "{{ dynatrace_tenant_url.rstrip('/') | b64encode }}"
-            dynatrace-token: "{{ dt_all_ingest_token | b64encode }}"
+            monacoToken: "{{ monaco_token | b64encode }}"
     - name: Create ArgoCD Notifications Secret in ArgoCD namespace
       kubernetes.core.k8s:
-        name: "monaco-secret"
+        name: "argocd-notifications-secret"
         api_version: v1
         kind: Secret
         state: present
@@ -466,7 +465,8 @@
         resource_definition:
           type: Opaque
           data:
-            monacoToken: "{{ monaco_token | b64encode }}"
+            dynatrace-url: "{{ dynatrace_tenant_url.rstrip('/') | b64encode }}"
+            dynatrace-token: "{{ dt_all_ingest_token | b64encode }}"
     - name: Create Monaco Secret in Dynatrace namespace
       kubernetes.core.k8s:
         name: "monaco-secret"
