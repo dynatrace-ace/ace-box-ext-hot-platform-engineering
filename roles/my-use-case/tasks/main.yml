@@ -45,25 +45,66 @@
 
 #
 # Configure Dynatrace Tenant, e.g: new K8s Experience
-- name: Configure tenant setting new k8s app
-  shell: >
-    curl -X 'POST' \
-      '{{ dynatrace_tenant_url }}/api/v2/settings/objects?validateOnly=false' \
-      -H 'accept: application/json' \
-      -H 'Content-Type: application/json; charset=utf-8' \
-      -H 'Authorization: Api-Token {{ dt_op_token }}' \
-      -d '[
-            {
-              "schemaId": "builtin:app-transition.kubernetes",
-              "schemaVersion": "1.0.0",
-              "scope": "environment",
-              "value": {  
-                  "kubernetesAppOptions": {
-                    "enableKubernetesApp": true
+- name: Configure Dynatrace K8s Settings
+  block:
+    - name: Configure tenant setting new k8s app
+      shell: >
+        curl -X 'POST' \
+          '{{ dynatrace_tenant_url }}/api/v2/settings/objects?validateOnly=false' \
+          -H 'accept: application/json' \
+          -H 'Content-Type: application/json; charset=utf-8' \
+          -H 'Authorization: Api-Token {{ dt_op_token }}' \
+          -d '[
+                {
+                  "schemaId": "builtin:app-transition.kubernetes",
+                  "schemaVersion": "1.0.0",
+                  "scope": "environment",
+                  "value": {  
+                      "kubernetesAppOptions": {
+                        "enableKubernetesApp": true
+                      }
                   }
-              }
-            }
-          ]'
+                }
+              ]'
+    - name: Configure Prometheus Exporter Ingest
+      shell: >
+        curl -X 'POST' \
+          '{{ dynatrace_tenant_url }}/api/v2/settings/objects?validateOnly=false' \
+          -H 'accept: application/json' \
+          -H 'Content-Type: application/json; charset=utf-8' \
+          -H 'Authorization: Api-Token {{ dt_op_token }}' \
+          -d '[
+                {
+                  "schemaId":"builtin:cloud.kubernetes.monitoring",
+                  "schemaVersion":"1.0.2",
+                  "scope":"environment",
+                  "value": {
+                    "cloudApplicationPipelineEnabled":true,
+                    "openMetricsPipelineEnabled":true,
+                    "openMetricsBuiltinEnabled":true,
+                    "eventProcessingActive":true
+                  }
+                }
+              ]'
+    - name: Enable Outbound Connections
+      shell: >
+        curl -X 'POST' \
+          '{{ dynatrace_tenant_url }}/api/v2/settings/objects?validateOnly=false' \
+          -H 'accept: application/json' \
+          -H 'Content-Type: application/json; charset=utf-8' \
+          -H 'Authorization: Api-Token {{ dt_op_token }}' \
+          -d '[
+                {
+                  "schemaId":"builtin:dt-javascript-runtime.allowed-outbound-connections",
+                  "schemaVersion":"1.0.2",
+                  "scope":"environment",
+                  "value": {
+                    "allowedOutboundConnections":{
+                      "enforced":false
+                    }
+                  }
+                }
+              ]'                     
 
 #
 # Install K3s
