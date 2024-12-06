@@ -518,6 +518,11 @@
 # Doing this from the gitlabfiles directory as this is the one that also includes the PLACEHOLDER replacements
 - name: Upload Dynatrace Configuration (notebooks, dashboards, workflows ...)
   block:
+    - name: Replace PLACEHOLDERS for template files in git
+      shell: |
+        pwd
+        cd {{ usecase_dest }}
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_EVENT_INGEST_TOKEN_PLACEHOLDER#{{ dynatrace_api_token | b64encode }}#g" {} \;
     - include_tasks:
         file: add-gen3-workflow.yml
       vars:
