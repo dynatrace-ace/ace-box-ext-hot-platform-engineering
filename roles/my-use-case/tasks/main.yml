@@ -61,7 +61,7 @@
 
 #
 # Configure Dynatrace Tenant, e.g: new K8s Experience
-- name: Configure Dynatrace K8s Settings
+- name: Configure Dynatrace Settings
   block:
     - name: Configure tenant setting new k8s app
       shell: >
@@ -122,7 +122,11 @@
                     }
                   }
                 }
-              ]' 
+              ]'
+  rescue:
+    - name: Rescue Message
+      debug:
+        msg: "Configure Dynatrace Settings encountered an error, but we continue."
 
 #
 # Install K3s
