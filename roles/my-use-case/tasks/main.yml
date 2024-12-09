@@ -122,25 +122,6 @@
                     }
                   }
                 }
-              ]'
-    - name: Create GitLab Connector Connection Settings Object
-      shell: >
-        curl -X 'POST' \
-          '{{ dynatrace_tenant_url.rstrip('/') }}/api/v2/settings/objects?validateOnly=false' \
-          -H 'accept: application/json' \
-          -H 'Content-Type: application/json; charset=utf-8' \
-          -H 'Authorization: Api-Token {{ monaco_token }}' \
-          -d '[
-                {
-                  "schemaId":"app:dynatrace.gitlab.connector:connection",
-                  "schemaVersion":"1.0.2",
-                  "scope":"environment",
-                  "value": {
-                    "name": "platform-engineering-gitlab",
-                    "url": "{{ gitlab_external_endpoint }}",
-                    "token": "{{ dt_all_ingest_token }}"
-                  }
-                }
               ]' 
 
 #
@@ -262,6 +243,25 @@
       include_role:
         name: gitlab
         tasks_from: source-endpoints
+    - name: Create GitLab Connector Connection Settings Object in Dynatrace
+      shell: >
+        curl -X 'POST' \
+          '{{ dynatrace_tenant_url.rstrip('/') }}/api/v2/settings/objects?validateOnly=false' \
+          -H 'accept: application/json' \
+          -H 'Content-Type: application/json; charset=utf-8' \
+          -H 'Authorization: Api-Token {{ monaco_token }}' \
+          -d '[
+                {
+                  "schemaId":"app:dynatrace.gitlab.connector:connection",
+                  "schemaVersion":"1.0.2",
+                  "scope":"environment",
+                  "value": {
+                    "name": "platform-engineering-gitlab",
+                    "url": "{{ gitlab_external_endpoint }}",
+                    "token": "{{ dt_all_ingest_token }}"
+                  }
+                }
+              ]'
   rescue:
     - name: Rescue Message
       debug:
