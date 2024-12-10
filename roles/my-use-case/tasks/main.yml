@@ -56,10 +56,12 @@
   loop:
     - dt_app_id: "dynatrace.davis.problems"
       dt_app_version: "1.6.0"
+    - dt_app_id: "dynatrace.gitlab.connector"
+      dt_app_version: "1.1.3"
 
 #
 # Configure Dynatrace Tenant, e.g: new K8s Experience
-- name: Configure Dynatrace K8s Settings
+- name: Configure Dynatrace Settings
   block:
     - name: Configure tenant setting new k8s app
       shell: >
@@ -120,7 +122,11 @@
                     }
                   }
                 }
-              ]'                     
+              ]'
+  rescue:
+    - name: Rescue Message
+      debug:
+        msg: "Configure Dynatrace Settings encountered an error, but we continue."
 
 #
 # Install K3s
@@ -241,6 +247,25 @@
       include_role:
         name: gitlab
         tasks_from: source-endpoints
+    - name: Create GitLab Connector Connection Settings Object in Dynatrace
+      shell: >
+        curl -X 'POST' \
+          '{{ dynatrace_tenant_url.rstrip('/') }}/api/v2/settings/objects?validateOnly=false' \
+          -H 'accept: application/json' \
+          -H 'Content-Type: application/json; charset=utf-8' \
+          -H 'Authorization: Api-Token {{ monaco_token }}' \
+          -d '[
+                {
+                  "schemaId":"app:dynatrace.gitlab.connector:connection",
+                  "schemaVersion":"1.0.2",
+                  "scope":"environment",
+                  "value": {
+                    "name": "platform-engineering-gitlab",
+                    "url": "{{ gitlab_external_endpoint }}",
+                    "token": "{{ dt_all_ingest_token }}"
+                  }
+                }
+              ]'
   rescue:
     - name: Rescue Message
       debug:
@@ -281,6 +306,8 @@
         find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#BASE_DOMAIN_PLACEHOLDER#{{ ingress_domain }}#g" {} \;
         find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#FORKED_TEMPLATE_REPO_PLACEHOLDER#{{ gitlab_repo_base_url }}/platform#g" {} \;
         find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#PROTOCOL_PLACEHOLDER#{{ ingress_protocol }}#g" {} \;
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_EVENT_INGEST_TOKEN_PLACEHOLDER#{{ dt_all_ingest_token | b64encode }}#g" {} \;
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#GITLAB_PAT_PLACEHOLDER#{{ gitlab_personal_access_token | b64encode }}#g" {} \;
   rescue:
     - name: Rescue Message
       debug:
@@ -522,7 +549,13 @@
         file: add-gen3-workflow.yml
       vars:
         path_to_workflow: "{{ usecase_dest }}/dynatraceassets/workflows/lifecycle-events-workflow.json"
-        workflow_name: "test-upload"
+        workflow_name: "lifecycle-events"
+      ignore_errors: yes
+    - include_tasks:
+        file: add-gen3-workflow.yml
+      vars:
+        path_to_workflow: "{{ usecase_dest }}/dynatraceassets/workflows/srg-notifications-workflow.json"
+        workflow_name: "srg-notifications"
       ignore_errors: yes
   rescue:
     - name: Rescue Message
