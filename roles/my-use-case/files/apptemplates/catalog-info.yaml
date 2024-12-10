@@ -83,7 +83,7 @@ spec:
           title: "Include Dynatrace Configuration?"
           description: "Include level 1 (basic) Dynatrace Configuration as Code for this application?"
           type: boolean
-          default: false
+          default: true
   steps:
     - id: fetch-base
       name: Fetch Base
@@ -129,7 +129,7 @@ spec:
         gitCommitMessage: "Initial commit from ${{ parameters.teamIdentifier }} for template ${{ parameters.projectName }} in ${{ parameters.releaseStage }}"
         topics: ["${{ parameters.projectName }}", "${{ parameters.releaseStage }}", "${{ parameters.teamIdentifier }}", "from-template", "backstage" ]
     - id: send-sdlcevent-to-dynatrace
-      name: Submit Feedback
+      name: Send SDLC Event
       action: http:backstage:request
       input:
         method: "POST"
@@ -143,9 +143,9 @@ spec:
             "git.remoteUrl": "${{ steps.publish.output.remoteUrl }}",
             "git.projectId": "${{ steps.publish.output.projectId }}",
             "git.commitHash": "${{ steps.publish.output.commitHash }}",
-            "git.AuthorName": "${{ steps.publish.input.gitAuthorName }}",
-            "git.AuthorEmail": "${{ steps.publish.input.gitAuthorEmail }}",
-            "git.CommitMessage": "${{ steps.publish.input.gitCommitMessage }}",
+            "git.AuthorName": "${{ parameters.teamIdentifier }}",
+            "git.AuthorEmail": "${{ parameters.teamIdentifier }}@dynatrace.training",
+            "git.CommitMessage": "Initial commit from ${{ parameters.teamIdentifier }} for template ${{ parameters.projectName }} in ${{ parameters.releaseStage }}",
             "parameters.projectName" : "${{ parameters.projectName }}",
             "parameters.teamIdentifier" : "${{ parameters.teamIdentifier }}",
             "parameters.releaseStage" : "${{ parameters.releaseStage }}",

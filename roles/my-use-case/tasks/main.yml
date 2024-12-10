@@ -532,6 +532,7 @@
           type: Opaque
           data:
             dtTenant: "{{ dynatrace_tenant_url.rstrip('/') | b64encode }}"
+            dtToken: "{{ dt_all_ingest_token | b64encode }}"
             oAuthClientID: "{{ extra_vars.dt_oauth_client_id | b64encode }}"
             oAuthClientSecret: "{{ extra_vars.dt_oauth_client_secret | b64encode }}"
             accountURN: "{{ extra_vars.dt_oauth_account_urn | b64encode }}"
