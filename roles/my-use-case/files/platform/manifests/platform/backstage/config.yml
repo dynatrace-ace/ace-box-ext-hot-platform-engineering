@@ -131,6 +131,12 @@ data:
           headers:
             Content-Type: "application/json; charset=utf-8"
             Authorization: "Api-Token ${DT_EVENT_INGEST_TOKEN}"
+        '/dtsdlceventingest':
+          target: "${DT_TENANT_LIVE}/platform/ingest/v1/events.sdlc"
+          method: "POST"
+          headers:
+            Content-Type: "application/json; charset=utf-8"
+            Authorization: "Api-Token ${DT_EVENT_INGEST_TOKEN}"
     dynatrace:
       environments:
         - name: ${DT_TENANT_NAME}

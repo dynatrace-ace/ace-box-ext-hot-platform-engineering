@@ -75,7 +75,23 @@ data:
               "sync_status" : "{{.app.status.sync.status}}",
               "synced_at" : "{{.app.status.operationState.finishedAt}}"
             }
-          }    
+          }
+      dynatracesdlc:
+        method: POST
+        path: /platform/ingest/v1/events.sdlc
+        body: |
+          {
+            "action" : "app-sync-running",
+            "repo_url": "{{.app.spec.source.repoURL}}",
+            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+            "app_name": "{{.app.metadata.name}}",
+            "source" : "ArgoCD",
+            "sync_status" : "{{.app.status.sync.status}}",
+            "synced_at" : "{{.app.status.operationState.finishedAt}}",
+            "recipient": "{{ .recipient }}"
+          }
   template.app-sync-failed: |
     webhook:
       dynatrace:
@@ -97,6 +113,22 @@ data:
               "synced_at" : "{{.app.status.operationState.finishedAt}}"
             }
           }
+      dynatracesdlc:
+        method: POST
+        path: /platform/ingest/v1/events.sdlc
+        body: |
+          {
+            "action" : "app-sync-failed",
+            "repo_url": "{{.app.spec.source.repoURL}}",
+            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+            "app_name": "{{.app.metadata.name}}",
+            "source" : "ArgoCD",
+            "sync_status" : "{{.app.status.sync.status}}",
+            "synced_at" : "{{.app.status.operationState.finishedAt}}",
+            "recipient": "{{ .recipient }}"
+          }          
   template.app-created: |
     webhook:
       dynatrace:
@@ -118,6 +150,22 @@ data:
               "synced_at" : "{{.app.status.operationState.finishedAt}}"
             }
           }
+      dynatracesdlc:
+        method: POST
+        path: /platform/ingest/v1/events.sdlc
+        body: |
+          {
+            "action" : "app-created",
+            "repo_url": "{{.app.spec.source.repoURL}}",
+            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+            "app_name": "{{.app.metadata.name}}",
+            "source" : "ArgoCD",
+            "sync_status" : "{{.app.status.sync.status}}",
+            "synced_at" : "{{.app.status.operationState.finishedAt}}",
+            "recipient": "{{ .recipient }}"
+          }          
   template.app-deployed: |
     webhook:
       dynatrace:
@@ -139,6 +187,22 @@ data:
               "synced_at" : "{{.app.status.operationState.finishedAt}}"
             }
           }
+      dynatracesdlc:
+        method: POST
+        path: /platform/ingest/v1/events.sdlc
+        body: |
+          {
+            "action" : "app-deployed",
+            "repo_url": "{{.app.spec.source.repoURL}}",
+            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+            "app_name": "{{.app.metadata.name}}",
+            "source" : "ArgoCD",
+            "sync_status" : "{{.app.status.sync.status}}",
+            "synced_at" : "{{.app.status.operationState.finishedAt}}",
+            "recipient": "{{ .recipient }}"
+          }          
   template.app-health-degraded: |
     webhook:
       dynatrace:
@@ -159,7 +223,23 @@ data:
               "sync_status" : "{{.app.status.sync.status}}",
               "synced_at" : "{{.app.status.operationState.finishedAt}}"
             }
-          }                
+          }
+      dynatracesdlc:
+        method: POST
+        path: /platform/ingest/v1/events.sdlc
+        body: |
+          {
+            "action" : "app-health-degraded",
+            "repo_url": "{{.app.spec.source.repoURL}}",
+            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+            "app_name": "{{.app.metadata.name}}",
+            "source" : "ArgoCD",
+            "sync_status" : "{{.app.status.sync.status}}",
+            "synced_at" : "{{.app.status.operationState.finishedAt}}",
+            "recipient": "{{ .recipient }}"
+          }          
   trigger.on-created: |
     - description: Application is created.
       oncePer: app.metadata.name
