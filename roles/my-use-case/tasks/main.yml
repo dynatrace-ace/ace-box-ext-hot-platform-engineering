@@ -257,15 +257,19 @@
           -d '[
                 {
                   "schemaId":"app:dynatrace.gitlab.connector:connection",
-                  "schemaVersion":"0.1.2",
                   "scope":"environment",
                   "value": {
                     "name": "platform-engineering-gitlab",
                     "url": "{{ gitlab_external_endpoint }}",
-                    "token": "{{ dt_all_ingest_token }}"
+                    "token": "{{ gitlab_personal_access_token }}"
                   }
                 }
               ]'
+      register: dt_gitlab_connection_response
+    - name: Capture GitLab Connector Connection Settings Object ID
+      set_fact:
+        dt_gitlab_connection_id: "{{ dt_gitlab_connection_response.stdout | from_json | json_query('[0].objectId') }}"
+      when: dt_gitlab_connection_response is defined
   rescue:
     - name: Rescue Message
       debug:
@@ -308,6 +312,7 @@
         find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#PROTOCOL_PLACEHOLDER#{{ ingress_protocol }}#g" {} \;
         find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_EVENT_INGEST_TOKEN_PLACEHOLDER#{{ dt_all_ingest_token | b64encode }}#g" {} \;
         find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#GITLAB_PAT_PLACEHOLDER#{{ gitlab_personal_access_token | b64encode }}#g" {} \;
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#GITLAB_CONNECTION_PLACEHOLDER#{{ dt_gitlab_connection_id | b64encode }}#g" {} \;
   rescue:
     - name: Rescue Message
       debug:
