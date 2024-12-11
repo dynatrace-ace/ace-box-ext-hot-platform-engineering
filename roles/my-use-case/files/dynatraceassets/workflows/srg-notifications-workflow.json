@@ -112,7 +112,7 @@
         "url": "{{ result(\"js_set_parameters\")['gitlabEndpoint'] }}/api/v4/projects?simple=true",
         "method": "GET",
         "headers": {
-          "PRIVATE-TOKEN": "glpat-RMUGPQLeHzQjmmxvaxEe"
+          "PRIVATE-TOKEN": "{{ result("js_set_parameters")['gitlabToken'] }}"
         },
         "failOnResponseCodes": "400-599"
       },
