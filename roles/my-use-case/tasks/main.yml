@@ -310,9 +310,9 @@
         find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#BASE_DOMAIN_PLACEHOLDER#{{ ingress_domain }}#g" {} \;
         find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#FORKED_TEMPLATE_REPO_PLACEHOLDER#{{ gitlab_repo_base_url }}/platform#g" {} \;
         find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#PROTOCOL_PLACEHOLDER#{{ ingress_protocol }}#g" {} \;
-        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_EVENT_INGEST_TOKEN_PLACEHOLDER#{{ dt_all_ingest_token | b64encode }}#g" {} \;
-        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#GITLAB_PAT_PLACEHOLDER#{{ gitlab_personal_access_token | b64encode }}#g" {} \;
-        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#GITLAB_CONNECTION_PLACEHOLDER#{{ dt_gitlab_connection_id | b64encode }}#g" {} \;
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#DT_EVENT_INGEST_TOKEN_PLACEHOLDER#{{ dt_all_ingest_token }}#g" {} \;
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#GITLAB_PAT_PLACEHOLDER#{{ gitlab_personal_access_token }}#g" {} \;
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#GITLAB_CONNECTION_PLACEHOLDER#{{ dt_gitlab_connection_id }}#g" {} \;
   rescue:
     - name: Rescue Message
       debug:
