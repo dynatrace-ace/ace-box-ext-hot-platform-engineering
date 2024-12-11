@@ -25,7 +25,7 @@
       -H 'Authorization: Bearer {{ dt_oauth_access_token }}' \
       -F 'name={{dashboard_name}}' \
       -F 'type=dashboard' \
-      -F "content=@/home/$USER/repos/{{path_to_dashboard}};type=application/json"
+      -F "content=@{{path_to_dashboard}};type=application/json"
   register: auth_response_raw
 
 - set_fact:

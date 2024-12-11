@@ -563,6 +563,24 @@
         path_to_workflow: "{{ usecase_dest }}/dynatraceassets/workflows/srg-notifications-workflow.json"
         workflow_name: "srg-notifications"
       ignore_errors: yes
+    - include_tasks:
+        file: add-gen3-dashboard.yml
+      vars:
+        path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/ArgoCD Platform Observability.json"
+        dashboard_name: "ArgoCD Platform Observability"
+      ignore_errors: yes
+    - include_tasks:
+        file: add-gen3-dashboard.yml
+      vars:
+        path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/Platform Observability Cockpit.json"
+        dashboard_name: "Platform Observability Cockpit"
+      ignore_errors: yes
+    - include_tasks:
+        file: add-gen3-dashboard.yml
+      vars:
+        path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/GitLAB.json"
+        dashboard_name: "GitLAB"
+      ignore_errors: yes
   rescue:
     - name: Rescue Message
       debug:
