@@ -266,9 +266,6 @@
                 }
               ]'
       register: dt_gitlab_connection_response
-    - name: Output GitLab Connector Response
-      debug:
-        msg: "{{ dt_gitlab_connection_response }}"
     - name: Capture GitLab Connector Connection Settings Object ID
       set_fact:
         dt_gitlab_connection_id: "{{ dt_gitlab_connection_response.stdout | from_json | json_query('[0].objectId') }}"
