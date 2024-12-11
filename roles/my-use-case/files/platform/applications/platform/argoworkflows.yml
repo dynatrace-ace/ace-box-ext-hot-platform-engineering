@@ -5,6 +5,11 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
   labels:
     dt.owner: "platform_team"
+    app_name: "argo-workflows"
+    proj_name: "platform"
+    stage: "production"
+    owner: "platform_team"    
+    version: "1.0"    
   name: workflows
   namespace: argocd
 spec:

@@ -5,6 +5,11 @@ metadata:
   namespace: argocd
   labels:
     dt.owner: "platform_team"
+    app_name: "platform"
+    proj_name: "platform"
+    stage: "production"
+    owner: "platform_team"    
+    version: "1.0"    
 spec:
   source:
     path: applications/platform

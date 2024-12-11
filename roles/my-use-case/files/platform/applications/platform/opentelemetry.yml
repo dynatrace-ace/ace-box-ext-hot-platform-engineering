@@ -5,6 +5,11 @@ metadata:
     argocd.argoproj.io/sync-wave: "3"
   labels:
     dt.owner: "platform_team"
+    app_name: "opentelemetry"
+    proj_name: "platform"
+    stage: "production"
+    owner: "platform_team"    
+    version: "1.0"    
   name: opentelemetry
   namespace: argocd
 spec:

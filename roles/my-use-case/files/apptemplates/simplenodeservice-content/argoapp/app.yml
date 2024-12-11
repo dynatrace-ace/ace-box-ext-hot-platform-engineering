@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  name: "${{ values.projectName }}-${{ values.teamIdentifier }}"
+  namespace: "argocd"
+  labels:
+    app_name: "${{ values.projectName }}-${{ values.teamIdentifier }}"
+    proj_name: "${{ values.projectName }}"
+    stage: "${{ values.releaseStage }}"
+    owner: "${{ values.teamIdentifier }}"    
+    version: "${{ values.appVersion }}"
+spec:
+  source:
+    repoURL: 'PROTOCOL_PLACEHOLDER://gitlab.BASE_DOMAIN_PLACEHOLDER/group1/${{ values.projectName }}-${{ values.teamIdentifier }}-${{ values.releaseStage }}-cd.git'
+    targetRevision: main
+    path: "manifests"
+  destination:
+    namespace: "${{ values.projectName }}-${{ values.teamIdentifier }}-${{ values.releaseStage }}-cd"
+    server: 'https://kubernetes.default.svc'
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        maxDuration: 3m0s
+        factor: 2
