@@ -157,6 +157,51 @@ data:
             "synced_at" : "{{.app.status.operationState.finishedAt}}",            
             "recipient": "{{ .recipient }}"            
           }          
+  template.app-sync-status-unknown: |
+    webhook:
+      dynatrace:
+        method: POST
+        path: /api/v2/events/ingest
+        body: |
+          {
+            "eventType" : "CUSTOM_INFO",
+            "title": "ArgoCD: app-sync-status-unknown: {{.app.metadata.name}}",
+            "properties": {
+              "action" : "app-sync-status-unknown",
+              "repo_url": "{{.app.spec.source.repoURL}}",
+              "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
+              "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+              "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",
+              "app_name": "{{.app.metadata.name}}",
+              "source" : "ArgoCD",
+              "sync_status" : "{{.app.status.sync.status}}",
+              "synced_at" : "{{.app.status.operationState.finishedAt}}"
+            }
+          }
+      dynatracesdlc:
+        method: POST
+        path: /platform/ingest/v1/events.sdlc
+        body: |
+          {
+            "event.type" : "app-sync-status-unknown",
+            "repo_url": "{{.app.spec.source.repoURL}}",
+            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",
+            "app_name": "{{.app.metadata.name}}",
+            "proj_name" : "{{.app.metadata.labels.proj_name }}",
+            "owner" : "{{.app.metadata.labels.owner }}",
+            "version" : "{{.app.metadata.labels.version }}",
+            "stage" : "{{.app.metadata.labels.stage }}",
+            "labels" : {{.app.metadata.labels| toJson }},
+            "context" : {{.context | toJson }},
+            "app" : {{.app | toJson }},
+            "serviceType" : "{{.serviceType}}",
+            "source" : "ArgoCD",
+            "sync_status" : "{{.app.status.sync.status}}",
+            "synced_at" : "{{.app.status.operationState.finishedAt}}",            
+            "recipient": "{{ .recipient }}"
+          }
   template.app-created: |
     webhook:
       dynatrace:
@@ -184,6 +229,51 @@ data:
         body: |
           {
             "event.type" : "app-created",
+            "repo_url": "{{.app.spec.source.repoURL}}",
+            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",
+            "app_name": "{{.app.metadata.name}}",
+            "proj_name" : "{{.app.metadata.labels.proj_name }}",
+            "owner" : "{{.app.metadata.labels.owner }}",
+            "version" : "{{.app.metadata.labels.version }}",
+            "stage" : "{{.app.metadata.labels.stage }}",
+            "labels" : {{.app.metadata.labels| toJson }},
+            "context" : {{.context | toJson }},
+            "app" : {{.app | toJson }},
+            "serviceType" : "{{.serviceType}}",
+            "source" : "ArgoCD",
+            "sync_status" : "{{.app.status.sync.status}}",
+            "synced_at" : "{{.app.status.operationState.finishedAt}}",            
+            "recipient": "{{ .recipient }}"            
+          }          
+  template.app-deleted: |
+    webhook:
+      dynatrace:
+        method: POST
+        path: /api/v2/events/ingest
+        body: |
+          {
+            "eventType" : "CUSTOM_INFO",
+            "title": "ArgoCD: app-deleted: {{.app.metadata.name}}",
+            "properties": {
+              "action" : "app-deleted",
+              "repo_url": "{{.app.spec.source.repoURL}}",
+              "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
+              "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+              "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",
+              "app_name": "{{.app.metadata.name}}",
+              "source" : "ArgoCD",
+              "sync_status" : "{{.app.status.sync.status}}",
+              "synced_at" : "{{.app.status.operationState.finishedAt}}"
+            }
+          }
+      dynatracesdlc:
+        method: POST
+        path: /platform/ingest/v1/events.sdlc
+        body: |
+          {
+            "event.type" : "app-deleted",
             "repo_url": "{{.app.spec.source.repoURL}}",
             "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
             "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
@@ -296,12 +386,12 @@ data:
       send:
       - app-created
       when: "true"
-#  trigger.on-deleted: |
-#    - description: Application is deleted.
-#      oncePer: app.metadata.name
-#      send:
-#      - app-deleted
-#      when: app.metadata.deletionTimestamp != nil
+  trigger.on-deleted: |
+    - description: Application is deleted.
+      oncePer: app.metadata.name
+      send:
+      - app-deleted
+      when: app.metadata.deletionTimestamp != nil
   trigger.on-deployed: |
     - description: Application is synced and healthy. Triggered once per commit.
       oncePer: app.status.operationState?.syncResult?.revision
@@ -325,11 +415,11 @@ data:
       send:
       - app-sync-running
       when: app.status.operationState != nil and app.status.operationState.phase in ['Running']
-#  trigger.on-sync-status-unknown: |
-#    - description: Application status is 'Unknown'
-#      send:
-#      - app-sync-status-unknown
-#      when: app.status.sync.status == 'Unknown'
+  trigger.on-sync-status-unknown: |
+    - description: Application status is 'Unknown'
+      send:
+      - app-sync-status-unknown
+      when: app.status.sync.status == 'Unknown'
   trigger.on-sync-succeeded: |
     - description: Application syncing has succeeded
       send:
@@ -341,7 +431,10 @@ data:
       - dynatracesdlc
       triggers:
       - on-sync-succeeded
+      - on-sync-running
+      - on-sync-status-unknown
       - on-sync-failed
       - on-deployed
       - on-health-degraded
       - on-created
+      - on-deleted

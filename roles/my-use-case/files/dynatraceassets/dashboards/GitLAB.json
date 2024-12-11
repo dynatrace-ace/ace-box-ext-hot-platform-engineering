@@ -1,5 +1,5 @@
 {
-    "version": 11,
+    "version": 16,
     "variables": [],
     "tiles": {
         "2": {
@@ -10,6 +10,7 @@
             "visualizationSettings": {
                 "thresholds": [],
                 "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
                     "gapPolicy": "connect",
                     "circleChartSettings": {
                         "groupingThresholdType": "relative",
@@ -20,15 +21,42 @@
                     "legend": {
                         "hidden": false,
                         "position": "bottom"
-                    }
+                    },
+                    "truncationMode": "middle",
+                    "categoricalBarChartSettings": {
+                        "categoryAxis": [
+                            "toString(contentjson[status])"
+                        ],
+                        "categoryAxisLabel": "toString(contentjson[status])",
+                        "valueAxis": [
+                            "interval"
+                        ],
+                        "valueAxisLabel": "interval",
+                        "tooltipVariant": "single"
+                    },
+                    "xAxisLabel": "timeframe",
+                    "xAxisIsLabelVisible": false,
+                    "valueRepresentation": "absolute",
+                    "hiddenLegendFields": [],
+                    "fieldMapping": {
+                        "timestamp": "timeframe",
+                        "leftAxisValues": [
+                            "count()"
+                        ]
+                    },
+                    "leftYAxisSettings": {}
                 },
                 "singleValue": {
                     "showLabel": true,
-                    "label": "",
+                    "label": "toString(contentjson[status])",
                     "prefixIcon": "",
                     "autoscale": true,
                     "alignment": "center",
-                    "isBackgroundThresholdActive": false
+                    "recordField": "toString(contentjson[status])",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    }
                 },
                 "table": {
                     "rowDensity": "condensed",
@@ -60,9 +88,61 @@
                         "[\"log.iostream\"]": 128.09375,
                         "[\"logtag\"]": 88.5,
                         "[\"time\"]": 236.484375
-                    }
+                    },
+                    "columnTypeOverrides": [
+                        {
+                            "fields": [
+                                "count()"
+                            ],
+                            "value": "sparkline",
+                            "id": 1733929288056
+                        }
+                    ]
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [
+                        "toString(contentjson[status])"
+                    ],
+                    "dataMappings": {
+                        "value": "toString(contentjson[status])"
+                    },
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [
+                        {
+                            "valueAxis": "interval",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": [
+                        "toString(contentjson[status])"
+                    ]
                 }
-            }
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            },
+            "davis": {}
         },
         "3": {
             "type": "data",
@@ -88,11 +168,15 @@
                 },
                 "singleValue": {
                     "showLabel": true,
-                    "label": "",
+                    "label": "contentjson.meta.user",
                     "prefixIcon": "",
                     "autoscale": true,
                     "alignment": "center",
-                    "isBackgroundThresholdActive": false
+                    "recordField": "contentjson.meta.user",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    }
                 },
                 "table": {
                     "rowDensity": "condensed",
@@ -128,7 +212,47 @@
                         "[\"contentjson[meta.user_id]\"]": 217.296875,
                         "[\"contentjson[path]\"]": 468.09375,
                         "[\"contentjson[remote_ip]\"]": 199
-                    }
+                    },
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [
+                        "contentjson.meta.user",
+                        "contentjson.path",
+                        "contentjson.remote_ip"
+                    ],
+                    "dataMappings": {
+                        "value": "contentjson.meta.user_id"
+                    },
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "blue"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [
+                        {
+                            "valueAxis": "contentjson.meta.user_id",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": [
+                        "contentjson.meta.user",
+                        "contentjson.path",
+                        "contentjson.remote_ip"
+                    ]
                 },
                 "unitsOverrides": [
                     {
@@ -142,12 +266,20 @@
                         "added": 1703063409560
                     }
                 ]
-            }
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            },
+            "davis": {}
         },
         "4": {
             "type": "data",
             "title": "CPU Usage",
-            "query": "timeseries avg(dt.containers.cpu.usage_percent), by:{Container}, {filter: k8s.namespace.name == \"gitlab\"}",
+            "query": "timeseries avg(dt.kubernetes.container.cpu_usage), by:{Container}, {filter: k8s.namespace.name == \"gitlab\"}",
             "davis": {
                 "enabled": false,
                 "davisVisualization": {
@@ -158,35 +290,109 @@
             "visualizationSettings": {
                 "thresholds": [],
                 "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
                     "gapPolicy": "connect",
                     "circleChartSettings": {
                         "groupingThresholdType": "relative",
                         "groupingThresholdValue": 0,
                         "valueType": "relative"
                     },
-                    "categoryOverrides": {}
+                    "categoryOverrides": {},
+                    "categoricalBarChartSettings": {
+                        "categoryAxis": [
+                            "interval"
+                        ],
+                        "valueAxis": [
+                            "interval"
+                        ],
+                        "categoryAxisLabel": "interval",
+                        "valueAxisLabel": "interval",
+                        "tooltipVariant": "single"
+                    },
+                    "fieldMapping": {
+                        "timestamp": "timeframe",
+                        "leftAxisValues": [
+                            "avg(dt.kubernetes.container.cpu_usage)"
+                        ]
+                    },
+                    "truncationMode": "middle",
+                    "xAxisLabel": "timeframe",
+                    "xAxisIsLabelVisible": false,
+                    "valueRepresentation": "absolute",
+                    "hiddenLegendFields": [],
+                    "leftYAxisSettings": {
+                        "isLabelVisible": true,
+                        "label": "Kubernetes: Container - CPU usage"
+                    }
                 },
                 "singleValue": {
                     "showLabel": true,
-                    "label": "",
                     "prefixIcon": "",
                     "autoscale": true,
                     "alignment": "center",
-                    "isBackgroundThresholdActive": false
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    }
                 },
                 "table": {
                     "rowDensity": "condensed",
                     "enableSparklines": false,
                     "hiddenColumns": [],
                     "lineWrapIds": [],
-                    "columnWidths": {}
+                    "columnWidths": {},
+                    "columnTypeOverrides": [
+                        {
+                            "fields": [
+                                "avg(dt.kubernetes.container.cpu_usage)"
+                            ],
+                            "value": "sparkline",
+                            "id": 1733929393687
+                        }
+                    ]
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [],
+                    "dataMappings": {},
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [
+                        {
+                            "valueAxis": "interval",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": []
                 }
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
             }
         },
         "5": {
             "type": "data",
             "title": "Memory Usage",
-            "query": "timeseries avg(dt.containers.memory.usage_percent), by:{Container}, {filter: k8s.namespace.name == \"gitlab\"}",
+            "query": "timeseries avg(dt.kubernetes.container.memory_working_set), by:{Container}, {filter: k8s.namespace.name == \"gitlab\"}",
             "davis": {
                 "enabled": false,
                 "davisVisualization": {
@@ -197,29 +403,103 @@
             "visualizationSettings": {
                 "thresholds": [],
                 "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
                     "gapPolicy": "connect",
                     "circleChartSettings": {
                         "groupingThresholdType": "relative",
                         "groupingThresholdValue": 0,
                         "valueType": "relative"
                     },
-                    "categoryOverrides": {}
+                    "categoryOverrides": {},
+                    "categoricalBarChartSettings": {
+                        "categoryAxis": [
+                            "interval"
+                        ],
+                        "valueAxis": [
+                            "interval"
+                        ],
+                        "categoryAxisLabel": "interval",
+                        "valueAxisLabel": "interval",
+                        "tooltipVariant": "single"
+                    },
+                    "fieldMapping": {
+                        "timestamp": "timeframe",
+                        "leftAxisValues": [
+                            "avg(dt.kubernetes.container.memory_working_set)"
+                        ]
+                    },
+                    "truncationMode": "middle",
+                    "xAxisLabel": "timeframe",
+                    "xAxisIsLabelVisible": false,
+                    "valueRepresentation": "absolute",
+                    "hiddenLegendFields": [],
+                    "leftYAxisSettings": {
+                        "isLabelVisible": true,
+                        "label": "Kubernetes: Container - working set memory"
+                    }
                 },
                 "singleValue": {
                     "showLabel": true,
-                    "label": "",
                     "prefixIcon": "",
                     "autoscale": true,
                     "alignment": "center",
-                    "isBackgroundThresholdActive": false
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    }
                 },
                 "table": {
                     "rowDensity": "condensed",
                     "enableSparklines": false,
                     "hiddenColumns": [],
                     "lineWrapIds": [],
-                    "columnWidths": {}
+                    "columnWidths": {},
+                    "columnTypeOverrides": [
+                        {
+                            "fields": [
+                                "avg(dt.kubernetes.container.memory_working_set)"
+                            ],
+                            "value": "sparkline",
+                            "id": 1733929501319
+                        }
+                    ]
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [],
+                    "dataMappings": {},
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [
+                        {
+                            "valueAxis": "interval",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": []
                 }
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
             }
         },
         "6": {
@@ -245,21 +525,25 @@
                     },
                     "fieldMapping": {
                         "timestamp": "timestamp",
-                        "fields": [
-                            "content"
-                        ],
-                        "values": [
+                        "leftAxisValues": [
                             "contentjson.duration_ms"
+                        ],
+                        "leftAxisDimensions": [
+                            "content"
                         ]
                     }
                 },
                 "singleValue": {
                     "showLabel": true,
-                    "label": "",
+                    "label": "timestamp",
                     "prefixIcon": "",
                     "autoscale": true,
                     "alignment": "center",
-                    "isBackgroundThresholdActive": false
+                    "recordField": "timestamp",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    }
                 },
                 "table": {
                     "rowDensity": "condensed",
@@ -291,9 +575,44 @@
                         "[\"log.iostream\"]": 128.09375,
                         "[\"logtag\"]": 88.5,
                         "[\"time\"]": 236.484375
-                    }
+                    },
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [],
+                    "dataMappings": {},
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": [
+                        "k8s.container.name"
+                    ]
                 }
-            }
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            },
+            "davis": {}
         },
         "7": {
             "type": "data",
@@ -318,15 +637,29 @@
                     },
                     "leftYAxisSettings": {
                         "scale": "linear"
+                    },
+                    "xAxisLabel": "timeframe",
+                    "xAxisIsLabelVisible": false,
+                    "valueRepresentation": "absolute",
+                    "hiddenLegendFields": [],
+                    "fieldMapping": {
+                        "timestamp": "timeframe",
+                        "leftAxisValues": [
+                            "count()"
+                        ]
                     }
                 },
                 "singleValue": {
                     "showLabel": true,
-                    "label": "",
+                    "label": "contentjson[meta.project]",
                     "prefixIcon": "",
                     "autoscale": true,
                     "alignment": "center",
-                    "isBackgroundThresholdActive": false
+                    "recordField": "contentjson[meta.project]",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    }
                 },
                 "table": {
                     "rowDensity": "condensed",
@@ -358,9 +691,61 @@
                         "[\"log.iostream\"]": 128.09375,
                         "[\"logtag\"]": 88.5,
                         "[\"time\"]": 236.484375
-                    }
+                    },
+                    "columnTypeOverrides": [
+                        {
+                            "fields": [
+                                "count()"
+                            ],
+                            "value": "sparkline",
+                            "id": 1733929287809
+                        }
+                    ]
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [
+                        "contentjson[meta.project]"
+                    ],
+                    "dataMappings": {
+                        "value": "contentjson[meta.project]"
+                    },
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [
+                        {
+                            "valueAxis": "interval",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": [
+                        "contentjson[meta.project]"
+                    ]
                 }
-            }
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            },
+            "davis": {}
         },
         "8": {
             "type": "data",
@@ -391,32 +776,70 @@
                     },
                     "fieldMapping": {
                         "timestamp": "timestamp",
-                        "fields": [
-                            "content"
-                        ],
-                        "values": [
+                        "leftAxisValues": [
                             "contentjson.duration_ms"
+                        ],
+                        "leftAxisDimensions": [
+                            "content"
                         ]
                     }
                 },
                 "singleValue": {
                     "showLabel": false,
-                    "label": "",
+                    "label": "countDistinct(contentjson.meta.project)",
                     "prefixIcon": "",
                     "autoscale": true,
                     "alignment": "center",
                     "trend": {
-                        "isVisible": false
+                        "isVisible": false,
+                        "trendType": "auto"
                     },
-                    "isBackgroundThresholdActive": false
+                    "recordField": "countDistinct(contentjson.meta.project)"
                 },
                 "table": {
                     "rowDensity": "condensed",
                     "enableSparklines": false,
                     "hiddenColumns": [],
                     "lineWrapIds": [],
-                    "columnWidths": {}
+                    "columnWidths": {},
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [],
+                    "dataMappings": {},
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [
+                        {
+                            "valueAxis": "countDistinct(contentjson.meta.project)",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": []
                 }
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
             }
         },
         "9": {
@@ -448,38 +871,76 @@
                     },
                     "fieldMapping": {
                         "timestamp": "timestamp",
-                        "fields": [
-                            "content"
-                        ],
-                        "values": [
+                        "leftAxisValues": [
                             "contentjson.duration_ms"
+                        ],
+                        "leftAxisDimensions": [
+                            "content"
                         ]
                     }
                 },
                 "singleValue": {
                     "showLabel": false,
-                    "label": "",
+                    "label": "countDistinct(contentjson.meta.group)",
                     "prefixIcon": "",
                     "autoscale": true,
                     "alignment": "center",
                     "trend": {
-                        "isVisible": false
+                        "isVisible": false,
+                        "trendType": "auto"
                     },
-                    "isBackgroundThresholdActive": false
+                    "recordField": "countDistinct(contentjson.meta.group)"
                 },
                 "table": {
                     "rowDensity": "condensed",
                     "enableSparklines": false,
                     "hiddenColumns": [],
                     "lineWrapIds": [],
-                    "columnWidths": {}
+                    "columnWidths": {},
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [],
+                    "dataMappings": {},
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [
+                        {
+                            "valueAxis": "countDistinct(contentjson.meta.group)",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": []
                 }
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
             }
         },
         "10": {
             "type": "markdown",
             "title": "",
-            "content": "## GitLAB Dashboard"
+            "content": "## GitLab Dashboard"
         },
         "11": {
             "type": "data",
@@ -510,21 +971,25 @@
                     },
                     "fieldMapping": {
                         "timestamp": "timestamp",
-                        "fields": [
-                            "content"
-                        ],
-                        "values": [
+                        "leftAxisValues": [
                             "contentjson.catfile.duration_ms"
+                        ],
+                        "leftAxisDimensions": [
+                            "content"
                         ]
                     }
                 },
                 "singleValue": {
                     "showLabel": true,
-                    "label": "",
+                    "label": "timestamp",
                     "prefixIcon": "",
                     "autoscale": true,
                     "alignment": "center",
-                    "isBackgroundThresholdActive": false
+                    "recordField": "timestamp",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    }
                 },
                 "table": {
                     "rowDensity": "condensed",
@@ -535,8 +1000,100 @@
                             "content"
                         ]
                     ],
-                    "columnWidths": {}
+                    "columnWidths": {},
+                    "columnTypeOverrides": [
+                        {
+                            "fields": [
+                                "content"
+                            ],
+                            "id": 1733929286786,
+                            "value": "log-content"
+                        }
+                    ]
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [
+                        "content",
+                        "dt.entity.cloud_application_instance",
+                        "dt.security_context",
+                        "dt.source_entity",
+                        "event.type",
+                        "k8s.cluster.name",
+                        "k8s.container.name",
+                        "k8s.deployment.name",
+                        "k8s.namespace.name",
+                        "k8s.pod.name",
+                        "k8s.pod.uid",
+                        "loglevel",
+                        "status",
+                        "dt.auth.origin",
+                        "dynatrace.otel.collector",
+                        "k8s.container.restart_count",
+                        "k8s.node.name",
+                        "k8s.pod.start_time",
+                        "log.file.path",
+                        "log.iostream",
+                        "logtag",
+                        "telemetry.sdk.name",
+                        "time",
+                        "k8s.statefulset.name"
+                    ],
+                    "dataMappings": {
+                        "value": "content"
+                    },
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": [
+                        "content",
+                        "dt.entity.cloud_application_instance",
+                        "dt.security_context",
+                        "dt.source_entity",
+                        "event.type",
+                        "k8s.cluster.name",
+                        "k8s.container.name",
+                        "k8s.deployment.name",
+                        "k8s.namespace.name",
+                        "k8s.pod.name",
+                        "k8s.pod.uid",
+                        "loglevel",
+                        "status",
+                        "dt.auth.origin",
+                        "dynatrace.otel.collector",
+                        "k8s.container.restart_count",
+                        "k8s.node.name",
+                        "k8s.pod.start_time",
+                        "log.file.path",
+                        "log.iostream",
+                        "logtag",
+                        "telemetry.sdk.name",
+                        "time",
+                        "k8s.statefulset.name"
+                    ]
                 }
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
             }
         },
         "13": {
@@ -547,21 +1104,37 @@
             "visualizationSettings": {
                 "thresholds": [],
                 "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
                     "gapPolicy": "connect",
                     "circleChartSettings": {
                         "groupingThresholdType": "relative",
                         "groupingThresholdValue": 0,
                         "valueType": "relative"
                     },
-                    "categoryOverrides": {}
+                    "categoryOverrides": {},
+                    "truncationMode": "middle",
+                    "categoricalBarChartSettings": {
+                        "categoryAxis": [
+                            "entity.name",
+                            "id"
+                        ],
+                        "categoryAxisLabel": "entity.name,id",
+                        "valueAxis": [],
+                        "valueAxisLabel": "",
+                        "tooltipVariant": "single"
+                    }
                 },
                 "singleValue": {
                     "showLabel": true,
-                    "label": "",
+                    "label": "entity.name",
                     "prefixIcon": "",
                     "autoscale": true,
                     "alignment": "center",
-                    "isBackgroundThresholdActive": false
+                    "recordField": "entity.name",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    }
                 },
                 "table": {
                     "rowDensity": "condensed",
@@ -571,9 +1144,50 @@
                     "columnWidths": {
                         "[\"entity.name\"]": 375.765625,
                         "[\"id\"]": 278.109375
-                    }
+                    },
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [
+                        "entity.name",
+                        "id"
+                    ],
+                    "dataMappings": {
+                        "value": "entity.name"
+                    },
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": [
+                        "entity.name",
+                        "id"
+                    ]
                 }
-            }
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            },
+            "davis": {}
         },
         "14": {
             "type": "data",
@@ -589,29 +1203,103 @@
             "visualizationSettings": {
                 "thresholds": [],
                 "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
                     "gapPolicy": "connect",
                     "circleChartSettings": {
                         "groupingThresholdType": "relative",
                         "groupingThresholdValue": 0,
                         "valueType": "relative"
                     },
-                    "categoryOverrides": {}
+                    "categoryOverrides": {},
+                    "truncationMode": "middle",
+                    "categoricalBarChartSettings": {
+                        "categoryAxis": [
+                            "interval"
+                        ],
+                        "categoryAxisLabel": "interval",
+                        "valueAxis": [
+                            "interval"
+                        ],
+                        "valueAxisLabel": "interval",
+                        "tooltipVariant": "single"
+                    },
+                    "xAxisLabel": "timeframe",
+                    "xAxisIsLabelVisible": false,
+                    "valueRepresentation": "absolute",
+                    "hiddenLegendFields": [],
+                    "fieldMapping": {
+                        "timestamp": "timeframe",
+                        "leftAxisValues": [
+                            "sum(workqueue_depth)"
+                        ]
+                    },
+                    "leftYAxisSettings": {
+                        "isLabelVisible": true,
+                        "label": "workqueue_depth"
+                    }
                 },
                 "singleValue": {
                     "showLabel": true,
-                    "label": "",
                     "prefixIcon": "",
                     "autoscale": true,
                     "alignment": "center",
-                    "isBackgroundThresholdActive": false
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    }
                 },
                 "table": {
                     "rowDensity": "condensed",
                     "enableSparklines": false,
                     "hiddenColumns": [],
                     "lineWrapIds": [],
-                    "columnWidths": {}
+                    "columnWidths": {},
+                    "columnTypeOverrides": [
+                        {
+                            "fields": [
+                                "sum(workqueue_depth)"
+                            ],
+                            "value": "sparkline",
+                            "id": 1733929323806
+                        }
+                    ]
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [],
+                    "dataMappings": {},
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [
+                        {
+                            "valueAxis": "interval",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": []
                 }
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
             }
         },
         "15": {
@@ -628,21 +1316,38 @@
             "visualizationSettings": {
                 "thresholds": [],
                 "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
                     "gapPolicy": "connect",
                     "circleChartSettings": {
                         "groupingThresholdType": "relative",
                         "groupingThresholdValue": 0,
                         "valueType": "relative"
                     },
-                    "categoryOverrides": {}
+                    "categoryOverrides": {},
+                    "truncationMode": "middle",
+                    "categoricalBarChartSettings": {
+                        "categoryAxis": [
+                            "count()"
+                        ],
+                        "categoryAxisLabel": "count()",
+                        "valueAxis": [
+                            "count()"
+                        ],
+                        "valueAxisLabel": "count()",
+                        "tooltipVariant": "single"
+                    }
                 },
                 "singleValue": {
                     "showLabel": false,
-                    "label": "",
+                    "label": "count()",
                     "prefixIcon": "",
                     "autoscale": true,
                     "alignment": "center",
-                    "isBackgroundThresholdActive": false
+                    "recordField": "count()",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    }
                 },
                 "table": {
                     "rowDensity": "condensed",
@@ -653,8 +1358,45 @@
                             "content"
                         ]
                     ],
-                    "columnWidths": {}
+                    "columnWidths": {},
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [],
+                    "dataMappings": {},
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [
+                        {
+                            "valueAxis": "count()",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": []
                 }
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
             }
         },
         "16": {
@@ -749,5 +1491,6 @@
             "h": 2
         }
     },
-    "refreshRate": 300000
+    "importedWithCode": false,
+    "settings": {}
 }
