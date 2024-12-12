@@ -48,24 +48,27 @@ data:
         path: /platform/ingest/v1/events.sdlc
         body: |
           {
-            "event.type" : "app-sync-succeeded",
-            "repo_url": "{{.app.spec.source.repoURL}}",
-            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
-            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
-            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",
+            "event.kind" : "SDLC_EVENT",
+            "event.provider" : "argocd",
+            "event.category" : "task",
+            "event.type" : "app-sync",
+            "event.status" : "succeeded",
+            "vcs.repository.ref.revision" : "{{.app.status.operationState.operation.sync.revision}}",
+            "vcs.repository.ref.name" : "{{.app.spec.source.targetRevision}}",
+            "vcs.repository.url.full" : "{{.app.spec.source.repoURL}}",            
             "app_name": "{{.app.metadata.name}}",
+            "targetNamespace" : "{{.app.metadata.namespace}}",
+            "resourceVersion" : "{{.app.metadata.resourceVersion}}",
             "proj_name" : "{{.app.metadata.labels.proj_name }}",
             "owner" : "{{.app.metadata.labels.owner }}",
             "version" : "{{.app.metadata.labels.version }}",
             "stage" : "{{.app.metadata.labels.stage }}",
-            "labels" : {{.app.metadata.labels| toJson }},
-            "context" : {{.context | toJson }},
-            "app" : {{.app | toJson }},
-            "serviceType" : "{{.serviceType}}",            
-            "source" : "ArgoCD",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",            
+            "source" : "argocd",
             "sync_status" : "{{.app.status.sync.status}}",
             "synced_at" : "{{.app.status.operationState.finishedAt}}",
-            "recipient": "{{ .recipient }}"
+            "recipient" : "{{ .recipient }}"
           }
   template.app-sync-running: |
     webhook:
@@ -93,24 +96,27 @@ data:
         path: /platform/ingest/v1/events.sdlc
         body: |
           {
-            "event.type" : "app-sync-running",
-            "repo_url": "{{.app.spec.source.repoURL}}",
-            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
-            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
-            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",
+            "event.kind" : "SDLC_EVENT",
+            "event.provider" : "argocd",
+            "event.category" : "task",
+            "event.type" : "app-sync",
+            "event.status" : "started",
+            "vcs.repository.ref.revision" : "{{.app.status.operationState.operation.sync.revision}}",
+            "vcs.repository.ref.name" : "{{.app.spec.source.targetRevision}}",
+            "vcs.repository.url.full" : "{{.app.spec.source.repoURL}}",            
             "app_name": "{{.app.metadata.name}}",
+            "targetNamespace" : "{{.app.metadata.namespace}}",
+            "resourceVersion" : "{{.app.metadata.resourceVersion}}",
             "proj_name" : "{{.app.metadata.labels.proj_name }}",
             "owner" : "{{.app.metadata.labels.owner }}",
             "version" : "{{.app.metadata.labels.version }}",
             "stage" : "{{.app.metadata.labels.stage }}",
-            "labels" : {{.app.metadata.labels| toJson }},
-            "context" : {{.context | toJson }},
-            "app" : {{.app | toJson }},
-            "serviceType" : "{{.serviceType}}",
-            "source" : "ArgoCD",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",            
+            "source" : "argocd",
             "sync_status" : "{{.app.status.sync.status}}",
-            "synced_at" : "{{.app.status.operationState.finishedAt}}",            
-            "recipient": "{{ .recipient }}"
+            "synced_at" : "{{.app.status.operationState.finishedAt}}",
+            "recipient" : "{{ .recipient }}"
           }
   template.app-sync-failed: |
     webhook:
@@ -138,24 +144,27 @@ data:
         path: /platform/ingest/v1/events.sdlc
         body: |
           {
-            "event.type" : "app-sync-failed",
-            "repo_url": "{{.app.spec.source.repoURL}}",
-            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
-            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
-            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",
+            "event.kind" : "SDLC_EVENT",
+            "event.provider" : "argocd",
+            "event.category" : "task",
+            "event.type" : "app-sync",
+            "event.status" : "failed",
+            "vcs.repository.ref.revision" : "{{.app.status.operationState.operation.sync.revision}}",
+            "vcs.repository.ref.name" : "{{.app.spec.source.targetRevision}}",
+            "vcs.repository.url.full" : "{{.app.spec.source.repoURL}}",            
             "app_name": "{{.app.metadata.name}}",
+            "targetNamespace" : "{{.app.metadata.namespace}}",
+            "resourceVersion" : "{{.app.metadata.resourceVersion}}",
             "proj_name" : "{{.app.metadata.labels.proj_name }}",
             "owner" : "{{.app.metadata.labels.owner }}",
             "version" : "{{.app.metadata.labels.version }}",
             "stage" : "{{.app.metadata.labels.stage }}",
-            "labels" : {{.app.metadata.labels| toJson }},
-            "context" : {{.context | toJson }},
-            "app" : {{.app | toJson }},
-            "serviceType" : "{{.serviceType}}",
-            "source" : "ArgoCD",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",            
+            "source" : "argocd",
             "sync_status" : "{{.app.status.sync.status}}",
-            "synced_at" : "{{.app.status.operationState.finishedAt}}",            
-            "recipient": "{{ .recipient }}"            
+            "synced_at" : "{{.app.status.operationState.finishedAt}}",
+            "recipient" : "{{ .recipient }}"
           }          
   template.app-sync-status-unknown: |
     webhook:
@@ -183,24 +192,27 @@ data:
         path: /platform/ingest/v1/events.sdlc
         body: |
           {
-            "event.type" : "app-sync-status-unknown",
-            "repo_url": "{{.app.spec.source.repoURL}}",
-            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
-            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
-            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",
+            "event.kind" : "SDLC_EVENT",
+            "event.provider" : "argocd",
+            "event.category" : "task",
+            "event.type" : "app-sync",
+            "event.status" : "unknown",
+            "vcs.repository.ref.revision" : "{{.app.status.operationState.operation.sync.revision}}",
+            "vcs.repository.ref.name" : "{{.app.spec.source.targetRevision}}",
+            "vcs.repository.url.full" : "{{.app.spec.source.repoURL}}",            
             "app_name": "{{.app.metadata.name}}",
+            "targetNamespace" : "{{.app.metadata.namespace}}",
+            "resourceVersion" : "{{.app.metadata.resourceVersion}}",
             "proj_name" : "{{.app.metadata.labels.proj_name }}",
             "owner" : "{{.app.metadata.labels.owner }}",
             "version" : "{{.app.metadata.labels.version }}",
             "stage" : "{{.app.metadata.labels.stage }}",
-            "labels" : {{.app.metadata.labels| toJson }},
-            "context" : {{.context | toJson }},
-            "app" : {{.app | toJson }},
-            "serviceType" : "{{.serviceType}}",
-            "source" : "ArgoCD",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",            
+            "source" : "argocd",
             "sync_status" : "{{.app.status.sync.status}}",
-            "synced_at" : "{{.app.status.operationState.finishedAt}}",            
-            "recipient": "{{ .recipient }}"
+            "synced_at" : "{{.app.status.operationState.finishedAt}}",
+            "recipient" : "{{ .recipient }}"
           }
   template.app-created: |
     webhook:
@@ -228,24 +240,27 @@ data:
         path: /platform/ingest/v1/events.sdlc
         body: |
           {
+            "event.kind" : "SDLC_EVENT",
+            "event.provider" : "argocd",
+            "event.category" : "task",
             "event.type" : "app-created",
-            "repo_url": "{{.app.spec.source.repoURL}}",
-            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
-            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
-            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",
+            "event.status" : "created",
+            "vcs.repository.ref.revision" : "{{.app.status.operationState.operation.sync.revision}}",
+            "vcs.repository.ref.name" : "{{.app.spec.source.targetRevision}}",
+            "vcs.repository.url.full" : "{{.app.spec.source.repoURL}}",            
             "app_name": "{{.app.metadata.name}}",
+            "targetNamespace" : "{{.app.metadata.namespace}}",
+            "resourceVersion" : "{{.app.metadata.resourceVersion}}",
             "proj_name" : "{{.app.metadata.labels.proj_name }}",
             "owner" : "{{.app.metadata.labels.owner }}",
             "version" : "{{.app.metadata.labels.version }}",
             "stage" : "{{.app.metadata.labels.stage }}",
-            "labels" : {{.app.metadata.labels| toJson }},
-            "context" : {{.context | toJson }},
-            "app" : {{.app | toJson }},
-            "serviceType" : "{{.serviceType}}",
-            "source" : "ArgoCD",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",            
+            "source" : "argocd",
             "sync_status" : "{{.app.status.sync.status}}",
-            "synced_at" : "{{.app.status.operationState.finishedAt}}",            
-            "recipient": "{{ .recipient }}"            
+            "synced_at" : "{{.app.status.operationState.finishedAt}}",
+            "recipient" : "{{ .recipient }}"
           }          
   template.app-deleted: |
     webhook:
@@ -273,24 +288,27 @@ data:
         path: /platform/ingest/v1/events.sdlc
         body: |
           {
+            "event.kind" : "SDLC_EVENT",
+            "event.provider" : "argocd",
+            "event.category" : "task",
             "event.type" : "app-deleted",
-            "repo_url": "{{.app.spec.source.repoURL}}",
-            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
-            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
-            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",
+            "event.status" : "deleted",
+            "vcs.repository.ref.revision" : "{{.app.status.operationState.operation.sync.revision}}",
+            "vcs.repository.ref.name" : "{{.app.spec.source.targetRevision}}",
+            "vcs.repository.url.full" : "{{.app.spec.source.repoURL}}",            
             "app_name": "{{.app.metadata.name}}",
+            "targetNamespace" : "{{.app.metadata.namespace}}",
+            "resourceVersion" : "{{.app.metadata.resourceVersion}}",
             "proj_name" : "{{.app.metadata.labels.proj_name }}",
             "owner" : "{{.app.metadata.labels.owner }}",
             "version" : "{{.app.metadata.labels.version }}",
             "stage" : "{{.app.metadata.labels.stage }}",
-            "labels" : {{.app.metadata.labels| toJson }},
-            "context" : {{.context | toJson }},
-            "app" : {{.app | toJson }},
-            "serviceType" : "{{.serviceType}}",
-            "source" : "ArgoCD",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",            
+            "source" : "argocd",
             "sync_status" : "{{.app.status.sync.status}}",
-            "synced_at" : "{{.app.status.operationState.finishedAt}}",            
-            "recipient": "{{ .recipient }}"            
+            "synced_at" : "{{.app.status.operationState.finishedAt}}",
+            "recipient" : "{{.recipient}}"
           }          
   template.app-deployed: |
     webhook:
@@ -318,23 +336,27 @@ data:
         path: /platform/ingest/v1/events.sdlc
         body: |
           {
+            "event.kind" : "SDLC_EVENT",
+            "event.provider" : "argocd",
+            "event.category" : "task",
             "event.type" : "app-deployed",
-            "repo_url": "{{.app.spec.source.repoURL}}",
-            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
-            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
-            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",
+            "event.status" : "successful",
+            "vcs.repository.ref.revision" : "{{.app.status.operationState.operation.sync.revision}}",
+            "vcs.repository.ref.name" : "{{.app.spec.source.targetRevision}}",
+            "vcs.repository.url.full" : "{{.app.spec.source.repoURL}}",            
             "app_name": "{{.app.metadata.name}}",
+            "targetNamespace" : "{{.app.metadata.namespace}}",
+            "resourceVersion" : "{{.app.metadata.resourceVersion}}",
             "proj_name" : "{{.app.metadata.labels.proj_name }}",
             "owner" : "{{.app.metadata.labels.owner }}",
             "version" : "{{.app.metadata.labels.version }}",
             "stage" : "{{.app.metadata.labels.stage }}",
-            "labels" : {{.app.metadata.labels| toJson }},
-            "context" : {{.context | toJson }},
-            "app" : {{.app | toJson }},
-            "source" : "ArgoCD",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",            
+            "source" : "argocd",
             "sync_status" : "{{.app.status.sync.status}}",
-            "synced_at" : "{{.app.status.operationState.finishedAt}}",            
-            "recipient": "{{ .recipient }}"            
+            "synced_at" : "{{.app.status.operationState.finishedAt}}",
+            "recipient" : "{{ .recipient }}"
           }          
   template.app-health-degraded: |
     webhook:
@@ -362,24 +384,28 @@ data:
         path: /platform/ingest/v1/events.sdlc
         body: |
           {
-            "event.type" : "app-health-degraded",
-            "repo_url": "{{.app.spec.source.repoURL}}",
-            "revisions" : "{{.app.status.operationState.operation.sync.revision}}",
-            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
-            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",
+            "event.kind" : "SDLC_EVENT",
+            "event.provider" : "argocd",
+            "event.category" : "task",
+            "event.type" : "app-health",
+            "event.status" : "degraded",
+            "vcs.repository.ref.revision" : "{{.app.status.operationState.operation.sync.revision}}",
+            "vcs.repository.ref.name" : "{{.app.spec.source.targetRevision}}",
+            "vcs.repository.url.full" : "{{.app.spec.source.repoURL}}",            
             "app_name": "{{.app.metadata.name}}",
+            "targetNamespace" : "{{.app.metadata.namespace}}",
+            "resourceVersion" : "{{.app.metadata.resourceVersion}}",
             "proj_name" : "{{.app.metadata.labels.proj_name }}",
             "owner" : "{{.app.metadata.labels.owner }}",
             "version" : "{{.app.metadata.labels.version }}",
             "stage" : "{{.app.metadata.labels.stage }}",
-            "labels" : {{.app.metadata.labels| toJson }},
-            "context" : {{.context | toJson }},
-            "app" : {{.app | toJson }},
-            "source" : "ArgoCD",
+            "commit_url" : "{{.app.spec.source.repoURL}}/-/commit/{{.app.status.operationState.operation.sync.revision}}",
+            "target_url" : "{{.context.argocdUrl}}/applications/{{.app.metadata.namespace}}/{{.app.metadata.name}}",            
+            "source" : "argocd",
             "sync_status" : "{{.app.status.sync.status}}",
-            "synced_at" : "{{.app.status.operationState.finishedAt}}",            
-            "recipient": "{{ .recipient }}"            
-          }          
+            "synced_at" : "{{.app.status.operationState.finishedAt}}",
+            "recipient" : "{{ .recipient }}"
+          }           
   trigger.on-created: |
     - description: Application is created.
       oncePer: app.metadata.name

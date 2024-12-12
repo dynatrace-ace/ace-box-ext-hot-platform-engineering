@@ -5,7 +5,7 @@
             "key": "application",
             "type": "query",
             "visible": true,
-            "input": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter source == \"ArgoCD\"\n| filter isNotNull(app_name)\n| summarize cnt=count(), by:{app_name}\n| fieldsRemove cnt\n| sort app_name",
+            "input": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.provider == \"argocd\"\n| filter isNotNull(app_name)\n| summarize cnt=count(), by:{app_name}\n| fieldsRemove cnt\n| sort app_name",
             "multiple": false
         }
     ],
@@ -13,12 +13,12 @@
         "0": {
             "type": "markdown",
             "title": "",
-            "content": "# Dynatrace Platform Engineering Observability Cockpit\nPick your team from the variable"
+            "content": "## Dynatrace Platform Engineering Observability Cockpit\nThis dashboard gives the Platform Engineering team an overview of how active and successful the platform is. Data comes primarily from **SDLC (Software Delivery Lifecycle)** Events that are [sent from Backstage, GitLab and ArgoCD to Dynatrace](https://docs.dynatrace.com/docs/deliver/sdlc-events).\n\n#### Platform Adoption & Success Metrics (Created Projects, Deployed Apps, Given Feedback)"
         },
         "1": {
             "type": "data",
-            "title": "ArgoCD Sync Events per Argo Application",
-            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter source == \"ArgoCD\"\n| filter contains(event.type, \"app-sync-succeeded\")\n| makeTimeseries count(), by:{app_name}\n",
+            "title": "ArgoCD Notifications across all deployed Applications",
+            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.provider == \"argocd\"\n| filter contains(event.type, \"app-sync\")\n| makeTimeseries count(), by:{app_name}\n",
             "davis": {
                 "enabled": false
             },
@@ -82,7 +82,7 @@
                                 "count()"
                             ],
                             "value": "sparkline",
-                            "id": 1733926690990
+                            "id": 1734005963123
                         }
                     ]
                 },
@@ -130,105 +130,10 @@
                 "enableSampling": false
             }
         },
-        "2": {
-            "type": "data",
-            "title": "ArgoCD Sync Events for selected team",
-            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter source == \"ArgoCD\"\n| filter app_name == $application\n| filter contains(event.type, \"app-sync-succeeded\")\n| summarize count()\n",
-            "davis": {
-                "enabled": false
-            },
-            "visualization": "singleValue",
-            "visualizationSettings": {
-                "thresholds": [],
-                "chartSettings": {
-                    "xAxisScaling": "analyzedTimeframe",
-                    "gapPolicy": "connect",
-                    "circleChartSettings": {
-                        "groupingThresholdType": "relative",
-                        "groupingThresholdValue": 0,
-                        "valueType": "relative"
-                    },
-                    "categoryOverrides": {},
-                    "categoricalBarChartSettings": {
-                        "categoryAxis": [
-                            "count()"
-                        ],
-                        "categoryAxisLabel": "count()",
-                        "valueAxis": [
-                            "count()"
-                        ],
-                        "valueAxisLabel": "count()",
-                        "tooltipVariant": "single"
-                    },
-                    "truncationMode": "middle",
-                    "xAxisLabel": "timeframe",
-                    "xAxisIsLabelVisible": false,
-                    "valueRepresentation": "absolute",
-                    "hiddenLegendFields": [],
-                    "leftYAxisSettings": {}
-                },
-                "singleValue": {
-                    "showLabel": true,
-                    "label": "Sync Events for selected application",
-                    "prefixIcon": "CheckCircleIcon",
-                    "autoscale": true,
-                    "alignment": "center",
-                    "recordField": "count()",
-                    "trend": {
-                        "trendType": "auto",
-                        "isVisible": true
-                    }
-                },
-                "table": {
-                    "rowDensity": "condensed",
-                    "enableSparklines": false,
-                    "hiddenColumns": [],
-                    "lineWrapIds": [],
-                    "columnWidths": {},
-                    "columnTypeOverrides": []
-                },
-                "honeycomb": {
-                    "shape": "hexagon",
-                    "legend": {
-                        "hidden": false,
-                        "position": "auto"
-                    },
-                    "displayedFields": [],
-                    "dataMappings": {},
-                    "truncationMode": "middle",
-                    "colorMode": "color-palette",
-                    "colorPalette": "categorical"
-                },
-                "histogram": {
-                    "legend": "auto",
-                    "yAxis": {
-                        "label": "Frequency",
-                        "scale": "linear"
-                    },
-                    "colorPalette": "categorical",
-                    "dataMappings": [
-                        {
-                            "valueAxis": "count()",
-                            "rangeAxis": ""
-                        }
-                    ],
-                    "variant": "single",
-                    "truncationMode": "middle",
-                    "displayedFields": []
-                }
-            },
-            "querySettings": {
-                "maxResultRecords": 1000,
-                "defaultScanLimitGbytes": 500,
-                "maxResultMegaBytes": 100,
-                "defaultSamplingRatio": 10,
-                "enableSampling": false
-            }
-        },
         "3": {
             "type": "data",
-            "title": "ArgoCD Sync Events for selected team",
-            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter source == \"ArgoCD\"\n| filter app_name == $application\n| fields timestamp, event.type, app_name, proj_name, stage, owner\n| sort timestamp asc",
+            "title": "All ArgoCD Notification Events for Selected Application",
+            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.provider == \"argocd\"\n| filter app_name == $application\n| fields timestamp, event.type, event.status, app_name, proj_name, stage, version, owner,target_url,commit_url\n| fieldsAdd commit_url=replaceString(replaceString(commit_url, \".git\", \"\"), \"/-/commit/<no value>\", \"\")\n| fieldsAdd ArgoDrillDown = concat(app_name,\"[](\", target_url ,\")\")\n| fieldsAdd CommitDrillDown = concat(app_name,\"[](\", commit_url ,\")\")\n| fieldsRemove target_url,commit_url\n| sort timestamp asc",
             "davis": {
                 "enabled": false
             },
@@ -247,12 +152,16 @@
                     "categoricalBarChartSettings": {
                         "categoryAxis": [
                             "event.type",
+                            "event.status",
                             "app_name",
                             "proj_name",
                             "stage",
-                            "owner"
+                            "version",
+                            "owner",
+                            "ArgoDrillDown",
+                            "CommitDrillDown"
                         ],
-                        "categoryAxisLabel": "event.type,app_name,proj_name,stage,owner",
+                        "categoryAxisLabel": "event.type,event.status,app_name,proj_name,stage,version,owner,ArgoDrillDown,CommitDrillDown",
                         "valueAxis": [],
                         "valueAxisLabel": "",
                         "tooltipVariant": "single"
@@ -279,9 +188,25 @@
                     "columnWidths": {
                         "[\"timestamp\"]": 186,
                         "[\"event.name\"]": 517,
-                        "[\"k8s.namespace.name\"]": 187
+                        "[\"k8s.namespace.name\"]": 187,
+                        "[\"event.type\"]": 132.953125,
+                        "[\"app_name\"]": 202.59375,
+                        "[\"commit_url\"]": 549,
+                        "[\"event.status\"]": 117.484375
                     },
-                    "columnTypeOverrides": []
+                    "columnTypeOverrides": [
+                        {
+                            "id": 2188722.5,
+                            "fields": [
+                                "ArgoDrillDown",
+                                "CommitDrillDown"
+                            ],
+                            "value": "markdown"
+                        }
+                    ],
+                    "linewrapEnabled": false,
+                    "monospacedFontEnabled": false,
+                    "monospacedFontColumns": []
                 },
                 "honeycomb": {
                     "shape": "hexagon",
@@ -291,10 +216,14 @@
                     },
                     "displayedFields": [
                         "event.type",
+                        "event.status",
                         "app_name",
                         "proj_name",
                         "stage",
-                        "owner"
+                        "version",
+                        "owner",
+                        "ArgoDrillDown",
+                        "CommitDrillDown"
                     ],
                     "dataMappings": {
                         "value": "event.type"
@@ -314,10 +243,13 @@
                     "variant": "single",
                     "truncationMode": "middle",
                     "displayedFields": [
+                        "event.type",
+                        "event.status",
                         "app_name",
+                        "stage",
                         "owner",
-                        "proj_name",
-                        "stage"
+                        "ArgoDrillDown",
+                        "CommitDrillDown"
                     ]
                 }
             },
@@ -332,7 +264,7 @@
         "5": {
             "type": "data",
             "title": "",
-            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter source == \"ArgoCD\"\n| filter contains(event.type, \"app-created\")\n| summarize count()\n",
+            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.provider == \"backstage\"\n| filter contains(event.type, \"create-component\")\n| summarize count()\n",
             "davis": {
                 "enabled": false
             },
@@ -363,7 +295,7 @@
                 },
                 "singleValue": {
                     "showLabel": true,
-                    "label": "Applications Added",
+                    "label": "Repos Created",
                     "prefixIcon": "WhatsNewIcon",
                     "autoscale": false,
                     "alignment": "center",
@@ -417,7 +349,7 @@
                         "baseUnit": "none",
                         "displayUnit": null,
                         "decimals": 0,
-                        "suffix": " new applications",
+                        "suffix": "",
                         "delimiter": false,
                         "added": 1701411053862
                     }
@@ -434,7 +366,7 @@
         "6": {
             "type": "data",
             "title": "",
-            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter source == \"ArgoCD\"\n| filter contains(event.type, \"app-health-degraded\")\n| summarize count()\n",
+            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.provider == \"argocd\"\n| filter contains(event.type, \"app-deleted\") and contains(event.status,\"deleted\")\n| summarize count()\n",
             "davis": {
                 "enabled": false
             },
@@ -465,8 +397,8 @@
                 },
                 "singleValue": {
                     "showLabel": true,
-                    "label": "Applications Degraded",
-                    "prefixIcon": "ChevronDownIcon",
+                    "label": "Apps Deleted",
+                    "prefixIcon": "DeleteIcon",
                     "autoscale": false,
                     "alignment": "center",
                     "recordField": "count()",
@@ -519,7 +451,7 @@
                         "baseUnit": "none",
                         "displayUnit": null,
                         "decimals": 0,
-                        "suffix": " new applications",
+                        "suffix": "",
                         "delimiter": false,
                         "added": 1701411053862
                     }
@@ -532,11 +464,6 @@
                 "defaultSamplingRatio": 10,
                 "enableSampling": false
             }
-        },
-        "7": {
-            "type": "markdown",
-            "title": "",
-            "content": "## Platform Adoption Overview"
         },
         "8": {
             "type": "data",
@@ -574,7 +501,7 @@
                 },
                 "singleValue": {
                     "showLabel": true,
-                    "label": "New Feature Ideas",
+                    "label": "Feature Ideas",
                     "prefixIcon": "IdeaIcon",
                     "autoscale": false,
                     "alignment": "center",
@@ -628,7 +555,7 @@
                         "baseUnit": "none",
                         "displayUnit": null,
                         "decimals": 0,
-                        "suffix": " new applications",
+                        "suffix": "",
                         "delimiter": false,
                         "added": 1701411053862
                     }
@@ -779,7 +706,7 @@
                 },
                 "singleValue": {
                     "showLabel": true,
-                    "label": "Improvement Suggestions",
+                    "label": "Improvements",
                     "prefixIcon": "ArrowUpRightIcon",
                     "autoscale": false,
                     "alignment": "center",
@@ -833,7 +760,7 @@
                         "baseUnit": "none",
                         "displayUnit": null,
                         "decimals": 0,
-                        "suffix": " new applications",
+                        "suffix": "",
                         "delimiter": false,
                         "added": 1701411053862
                     }
@@ -937,7 +864,7 @@
                         "baseUnit": "none",
                         "displayUnit": null,
                         "decimals": 0,
-                        "suffix": " new applications",
+                        "suffix": "",
                         "delimiter": false,
                         "added": 1701411053862
                     }
@@ -1059,7 +986,432 @@
                         "baseUnit": "none",
                         "displayUnit": null,
                         "decimals": 0,
-                        "suffix": " new applications",
+                        "suffix": "",
+                        "delimiter": false,
+                        "added": 1701411053862
+                    }
+                ]
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            }
+        },
+        "14": {
+            "type": "data",
+            "title": "",
+            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.provider == \"argocd\"\n| filter contains(event.type, \"app-created\")\n| summarize count()\n",
+            "davis": {
+                "enabled": false
+            },
+            "visualization": "singleValue",
+            "visualizationSettings": {
+                "thresholds": [],
+                "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
+                    "gapPolicy": "connect",
+                    "circleChartSettings": {
+                        "groupingThresholdType": "relative",
+                        "groupingThresholdValue": 0,
+                        "valueType": "relative"
+                    },
+                    "categoryOverrides": {},
+                    "categoricalBarChartSettings": {
+                        "categoryAxis": [
+                            "count()"
+                        ],
+                        "categoryAxisLabel": "count()",
+                        "valueAxis": [
+                            "count()"
+                        ],
+                        "valueAxisLabel": "count()",
+                        "tooltipVariant": "single"
+                    },
+                    "truncationMode": "middle"
+                },
+                "singleValue": {
+                    "showLabel": true,
+                    "label": "Apps Created",
+                    "prefixIcon": "ApplicationsIcon",
+                    "autoscale": false,
+                    "alignment": "center",
+                    "recordField": "count()",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    }
+                },
+                "table": {
+                    "rowDensity": "condensed",
+                    "enableSparklines": false,
+                    "hiddenColumns": [],
+                    "lineWrapIds": [],
+                    "columnWidths": {},
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [],
+                    "dataMappings": {},
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [
+                        {
+                            "valueAxis": "count()",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": []
+                },
+                "unitsOverrides": [
+                    {
+                        "identifier": "count()",
+                        "unitCategory": "unspecified",
+                        "baseUnit": "none",
+                        "displayUnit": null,
+                        "decimals": 0,
+                        "suffix": "",
+                        "delimiter": false,
+                        "added": 1701411053862
+                    }
+                ]
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            }
+        },
+        "15": {
+            "type": "markdown",
+            "title": "",
+            "content": "#### SDLC Insights: Overall and for a specific app"
+        },
+        "16": {
+            "type": "data",
+            "title": "",
+            "query": "fetch events, from:now()-7d, to:now()\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.provider == \"argocd\"\n| filter event.type == \"app-sync\"\n| summarize {\n  started = takeMin(if(event.status == \"started\", toTimestamp(start_time))),\n  finished = takeMax(if(event.status == \"succeeded\", toTimestamp(end_time)))\n}, by: {vcs.repository.ref.revision}\n| fieldsAdd duration = finished - started\n| summarize avg_sync_duration = avg(duration)",
+            "davis": {
+                "enabled": false,
+                "davisVisualization": {
+                    "isAvailable": true
+                }
+            },
+            "visualization": "singleValue",
+            "visualizationSettings": {
+                "thresholds": [],
+                "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
+                    "gapPolicy": "gap",
+                    "circleChartSettings": {
+                        "groupingThresholdType": "relative",
+                        "groupingThresholdValue": 0,
+                        "valueType": "relative"
+                    },
+                    "categoryOverrides": {},
+                    "curve": "linear",
+                    "pointsDisplay": "auto",
+                    "categoricalBarChartSettings": {
+                        "layout": "horizontal",
+                        "categoryAxisTickLayout": "horizontal",
+                        "scale": "absolute",
+                        "groupMode": "stacked",
+                        "colorPaletteMode": "multi-color",
+                        "categoryAxis": [
+                            "avg_sync_duration"
+                        ],
+                        "categoryAxisLabel": "avg_sync_duration",
+                        "valueAxis": [
+                            "avg_sync_duration"
+                        ],
+                        "valueAxisLabel": "avg_sync_duration",
+                        "tooltipVariant": "single"
+                    },
+                    "colorPalette": "categorical",
+                    "valueRepresentation": "absolute",
+                    "truncationMode": "middle"
+                },
+                "singleValue": {
+                    "showLabel": true,
+                    "label": "Avg Sync Time",
+                    "prefixIcon": "ClockIcon",
+                    "recordField": "avg_sync_duration",
+                    "autoscale": true,
+                    "alignment": "center",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    },
+                    "colorThresholdTarget": "value",
+                    "isIconVisible": true
+                },
+                "table": {
+                    "rowDensity": "condensed",
+                    "enableSparklines": false,
+                    "hiddenColumns": [],
+                    "linewrapEnabled": false,
+                    "lineWrapIds": [],
+                    "monospacedFontEnabled": false,
+                    "monospacedFontColumns": [],
+                    "columnWidths": {},
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [],
+                    "dataMappings": {},
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [
+                        {
+                            "valueAxis": "avg_sync_duration",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": []
+                },
+                "autoSelectVisualization": false
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 1,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            }
+        },
+        "17": {
+            "type": "data",
+            "title": "",
+            "query": "fetch events, from:now()-7d, to:now()\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.provider == \"argocd\"\n| filter event.type == \"app-sync\"\n| filter app_name == $application\n| summarize {\n  started = takeMin(if(event.status == \"started\", toTimestamp(start_time))),\n  finished = takeMax(if(event.status == \"succeeded\", toTimestamp(end_time)))\n}, by: {vcs.repository.ref.revision}\n| fieldsAdd duration = finished - started\n| summarize avg_sync_duration = avg(duration)",
+            "davis": {
+                "enabled": false,
+                "davisVisualization": {
+                    "isAvailable": true
+                }
+            },
+            "visualization": "singleValue",
+            "visualizationSettings": {
+                "thresholds": [],
+                "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
+                    "gapPolicy": "gap",
+                    "circleChartSettings": {
+                        "groupingThresholdType": "relative",
+                        "groupingThresholdValue": 0,
+                        "valueType": "relative"
+                    },
+                    "categoryOverrides": {},
+                    "curve": "linear",
+                    "pointsDisplay": "auto",
+                    "categoricalBarChartSettings": {
+                        "layout": "horizontal",
+                        "categoryAxisTickLayout": "horizontal",
+                        "scale": "absolute",
+                        "groupMode": "stacked",
+                        "colorPaletteMode": "multi-color",
+                        "categoryAxis": [
+                            "avg_sync_duration"
+                        ],
+                        "categoryAxisLabel": "avg_sync_duration",
+                        "valueAxis": [
+                            "avg_sync_duration"
+                        ],
+                        "valueAxisLabel": "avg_sync_duration",
+                        "tooltipVariant": "single"
+                    },
+                    "colorPalette": "categorical",
+                    "valueRepresentation": "absolute",
+                    "truncationMode": "middle"
+                },
+                "singleValue": {
+                    "showLabel": true,
+                    "label": "App Avg Sync Time",
+                    "prefixIcon": "ClockIcon",
+                    "recordField": "avg_sync_duration",
+                    "autoscale": true,
+                    "alignment": "center",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    },
+                    "colorThresholdTarget": "value",
+                    "isIconVisible": true
+                },
+                "table": {
+                    "rowDensity": "condensed",
+                    "enableSparklines": false,
+                    "hiddenColumns": [],
+                    "linewrapEnabled": false,
+                    "lineWrapIds": [],
+                    "monospacedFontEnabled": false,
+                    "monospacedFontColumns": [],
+                    "columnWidths": {},
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [],
+                    "dataMappings": {},
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [
+                        {
+                            "valueAxis": "avg_sync_duration",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": []
+                },
+                "autoSelectVisualization": false
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 1,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            }
+        },
+        "18": {
+            "type": "data",
+            "title": "",
+            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.provider == \"argocd\"\n| filter contains(event.type, \"app-sync\") and contains(event.status,\"succeeded\")\n| summarize count()\n",
+            "davis": {
+                "enabled": false
+            },
+            "visualization": "singleValue",
+            "visualizationSettings": {
+                "thresholds": [],
+                "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
+                    "gapPolicy": "connect",
+                    "circleChartSettings": {
+                        "groupingThresholdType": "relative",
+                        "groupingThresholdValue": 0,
+                        "valueType": "relative"
+                    },
+                    "categoryOverrides": {},
+                    "categoricalBarChartSettings": {
+                        "categoryAxis": [
+                            "count()"
+                        ],
+                        "categoryAxisLabel": "count()",
+                        "valueAxis": [
+                            "count()"
+                        ],
+                        "valueAxisLabel": "count()",
+                        "tooltipVariant": "single"
+                    },
+                    "truncationMode": "middle"
+                },
+                "singleValue": {
+                    "showLabel": true,
+                    "label": "Apps Synced",
+                    "prefixIcon": "SyncDoneIcon",
+                    "autoscale": false,
+                    "alignment": "center",
+                    "recordField": "count()",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    }
+                },
+                "table": {
+                    "rowDensity": "condensed",
+                    "enableSparklines": false,
+                    "hiddenColumns": [],
+                    "lineWrapIds": [],
+                    "columnWidths": {},
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [],
+                    "dataMappings": {},
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [
+                        {
+                            "valueAxis": "count()",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": []
+                },
+                "unitsOverrides": [
+                    {
+                        "identifier": "count()",
+                        "unitCategory": "unspecified",
+                        "baseUnit": "none",
+                        "displayUnit": null,
+                        "decimals": 0,
+                        "suffix": "",
                         "delimiter": false,
                         "added": 1701411053862
                     }
@@ -1078,74 +1430,92 @@
         "0": {
             "x": 0,
             "y": 0,
-            "w": 24,
-            "h": 2
+            "w": 23,
+            "h": 3
         },
         "1": {
             "x": 0,
-            "y": 11,
+            "y": 8,
             "w": 23,
-            "h": 6
-        },
-        "2": {
-            "x": 0,
-            "y": 17,
-            "w": 7,
-            "h": 6
+            "h": 4
         },
         "3": {
-            "x": 7,
-            "y": 17,
-            "w": 16,
-            "h": 6
+            "x": 3,
+            "y": 12,
+            "w": 20,
+            "h": 4
         },
         "5": {
             "x": 0,
             "y": 3,
-            "w": 6,
-            "h": 4
+            "w": 3,
+            "h": 2
         },
         "6": {
-            "x": 6,
+            "x": 3,
             "y": 3,
-            "w": 5,
-            "h": 4
-        },
-        "7": {
-            "x": 0,
-            "y": 2,
-            "w": 23,
-            "h": 1
+            "w": 3,
+            "h": 2
         },
         "8": {
             "x": 11,
             "y": 3,
             "w": 3,
-            "h": 4
+            "h": 2
         },
         "9": {
-            "x": 0,
-            "y": 7,
-            "w": 23,
-            "h": 4
+            "x": 11,
+            "y": 5,
+            "w": 12,
+            "h": 2
         },
         "10": {
             "x": 14,
             "y": 3,
             "w": 3,
-            "h": 4
+            "h": 2
         },
         "11": {
             "x": 17,
             "y": 3,
             "w": 3,
-            "h": 4
+            "h": 2
         },
         "12": {
             "x": 20,
             "y": 3,
             "w": 3,
+            "h": 2
+        },
+        "14": {
+            "x": 0,
+            "y": 5,
+            "w": 3,
+            "h": 2
+        },
+        "15": {
+            "x": 0,
+            "y": 7,
+            "w": 23,
+            "h": 1
+        },
+        "16": {
+            "x": 6,
+            "y": 3,
+            "w": 5,
             "h": 4
+        },
+        "17": {
+            "x": 0,
+            "y": 12,
+            "w": 3,
+            "h": 4
+        },
+        "18": {
+            "x": 3,
+            "y": 5,
+            "w": 3,
+            "h": 2
         }
     },
     "importedWithCode": false,
