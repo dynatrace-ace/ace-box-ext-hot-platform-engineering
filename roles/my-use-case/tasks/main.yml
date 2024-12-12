@@ -100,7 +100,7 @@
                     "cloudApplicationPipelineEnabled":true,
                     "openMetricsPipelineEnabled":true,
                     "openMetricsBuiltinEnabled":true,
-                    "eventProcessingActive":true
+                    "eventProcessingActive":false
                   }
                 }
               ]'
