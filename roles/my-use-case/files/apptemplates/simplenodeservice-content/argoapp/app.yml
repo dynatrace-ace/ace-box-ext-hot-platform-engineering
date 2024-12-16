@@ -3,10 +3,10 @@ kind: Application
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "10"
-  name: "${{ values.projectName }}-${{ values.teamIdentifier }}"
+  name: "${{ values.projectName }}-${{ values.teamIdentifier }}-${{ values.releaseStage }}"
   namespace: "argocd"
   labels:
-    app_name: "${{ values.projectName }}-${{ values.teamIdentifier }}"
+    app_name: "${{ values.projectName }}-${{ values.teamIdentifier }}-${{ values.releaseStage }}"
     proj_name: "${{ values.projectName }}"
     stage: "${{ values.releaseStage }}"
     owner: "${{ values.teamIdentifier }}"    
