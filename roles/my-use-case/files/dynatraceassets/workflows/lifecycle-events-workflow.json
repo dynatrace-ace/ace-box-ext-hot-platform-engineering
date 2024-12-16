@@ -161,13 +161,13 @@
   "trigger": {
     "eventTrigger": {
       "isActive": true,
-      "filterQuery": "event.provider == \"argocd\" and event.provider == \"argocd\" and isNotNull(event.type) and isNotNull(owner) and isNotNull(proj_name) and isNotNull(stage) and isNotNull(result)",
+      "filterQuery": "event.kind == \"SDLC_EVENT\" and\nevent.provider == \"ArgoCD\" and \nisNotNull(event.type) and \n(isNotNull(owner) and not matchesValue(owner,\"<no value>\") and not matchesValue(owner,\"platform_team\")) and \n(isNotNull(proj_name) and not matchesValue(owner,\"<no value>\")) and \n(isNotNull(stage) and not matchesValue(owner,\"<no value>\"))",
       "uniqueExpression": null,
       "triggerConfiguration": {
         "type": "event",
         "value": {
-          "query": "event.provider == \"argocd\" and event.provider == \"argocd\" and isNotNull(event.type) and isNotNull(owner) and isNotNull(proj_name) and isNotNull(stage) and isNotNull(result)",
-          "eventType": "bizevents"
+          "query": "event.kind == \"SDLC_EVENT\" and\nevent.provider == \"ArgoCD\" and \nisNotNull(event.type) and \n(isNotNull(owner) and not matchesValue(owner,\"<no value>\") and not matchesValue(owner,\"platform_team\")) and \n(isNotNull(proj_name) and not matchesValue(owner,\"<no value>\")) and \n(isNotNull(stage) and not matchesValue(owner,\"<no value>\"))",
+          "eventType": "events"
         }
       }
     }
