@@ -47,7 +47,7 @@ spec:
         - name: DT_CUSTOM_PROP
           value: "owner=${{ values.teamIdentifier }} project=${{ values.projectName }} stage=${{ values.releaseStage }}"
         - name: DT_TAGS
-          value: "dt.owner=${{ values.teamIdentifier }}"
+          value: "dt.owner=${{ values.teamIdentifier }} dt.cost.costcenter=${{ values.teamIdentifier }} dt.cost.product=${{ values.projectName }}-${{ values.releaseStage }}"
         ports:
         - name: http
           containerPort: 8080
