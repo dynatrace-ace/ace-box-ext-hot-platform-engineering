@@ -161,12 +161,12 @@
   "trigger": {
     "eventTrigger": {
       "isActive": true,
-      "filterQuery": "event.kind == \"SDLC_EVENT\" and\nevent.provider == \"ArgoCD\" and \nisNotNull(event.type) and \n(isNotNull(owner) and not matchesValue(owner,\"<no value>\") and not matchesValue(owner,\"platform_team\")) and \n(isNotNull(proj_name) and not matchesValue(owner,\"<no value>\")) and \n(isNotNull(stage) and not matchesValue(owner,\"<no value>\"))",
+      "filterQuery": "event.kind == \"SDLC_EVENT\" and\nevent.provider == \"argocd\" and \nisNotNull(event.type) and \n(isNotNull(owner) and not matchesValue(owner,\"<no value>\") and not matchesValue(owner,\"platform_team\")) and \n(isNotNull(proj_name) and not matchesValue(owner,\"<no value>\")) and \n(isNotNull(stage) and not matchesValue(owner,\"<no value>\"))",
       "uniqueExpression": null,
       "triggerConfiguration": {
         "type": "event",
         "value": {
-          "query": "event.kind == \"SDLC_EVENT\" and\nevent.provider == \"ArgoCD\" and \nisNotNull(event.type) and \n(isNotNull(owner) and not matchesValue(owner,\"<no value>\") and not matchesValue(owner,\"platform_team\")) and \n(isNotNull(proj_name) and not matchesValue(owner,\"<no value>\")) and \n(isNotNull(stage) and not matchesValue(owner,\"<no value>\"))",
+          "query": "event.kind == \"SDLC_EVENT\" and\nevent.provider == \"argocd\" and \nisNotNull(event.type) and \n(isNotNull(owner) and not matchesValue(owner,\"<no value>\") and not matchesValue(owner,\"platform_team\")) and \n(isNotNull(proj_name) and not matchesValue(owner,\"<no value>\")) and \n(isNotNull(stage) and not matchesValue(owner,\"<no value>\"))",
           "eventType": "events"
         }
       }
