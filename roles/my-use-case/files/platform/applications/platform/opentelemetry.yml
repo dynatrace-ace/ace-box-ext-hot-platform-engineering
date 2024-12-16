@@ -18,7 +18,7 @@ spec:
       targetRevision: main
       path: "manifests/platform/opentelemetry"
     - repoURL: 'https://open-telemetry.github.io/opentelemetry-helm-charts'
-      targetRevision: 0.71.0
+      targetRevision: 0.75.1
       chart: opentelemetry-collector
       helm:
         values: |
