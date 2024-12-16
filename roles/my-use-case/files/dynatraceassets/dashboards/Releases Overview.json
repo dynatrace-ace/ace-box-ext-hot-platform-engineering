@@ -1,0 +1,774 @@
+{
+    "version": 17,
+    "variables": [
+        {
+            "key": "Product",
+            "type": "query",
+            "visible": true,
+            "input": "fetch dt.entity.process_group_instance, from:now() - 2h\n| fields releasesProduct\n| filter isNotNull(releasesProduct)\n| dedup releasesProduct\n| sort releasesProduct asc",
+            "multiple": false
+        }
+    ],
+    "tiles": {
+        "0": {
+            "type": "data",
+            "title": "",
+            "query": "fetch dt.entity.process_group_instance, from:now() - 2h\n| fields entity.name, releasesVersion, process_group = instance_of[dt.entity.process_group], releasesBuildVersion, releasesProduct, releasesStage\n| filter isNotNull(releasesVersion)\n| filter releasesProduct  == $Product\n| fieldsAdd releaseVersion = parse(releasesVersion,\"\"\" \"ReleaseVersionInfo{version='\"LD:version\"'\"LD \"\"\")\n| summarize entity.name = takeAny(entity.name), by:{\n               process_group,\n               releaseVersion,\n               releasesBuildVersion,\n          //     releasesProduct,\n               releasesStage\n             }\n| sort lower(entity.name) asc\n| fields Name=entity.name, Version=releaseVersion,\n Stage=releasesStage \n //, Product=releasesProduct",
+            "davis": {
+                "enabled": false,
+                "davisVisualization": {
+                    "isAvailable": true
+                }
+            },
+            "visualizationSettings": {
+                "thresholds": [],
+                "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
+                    "gapPolicy": "gap",
+                    "circleChartSettings": {
+                        "groupingThresholdType": "relative",
+                        "groupingThresholdValue": 0,
+                        "valueType": "relative"
+                    },
+                    "categoryOverrides": {},
+                    "curve": "linear",
+                    "pointsDisplay": "auto",
+                    "categoricalBarChartSettings": {
+                        "layout": "horizontal",
+                        "categoryAxisTickLayout": "horizontal",
+                        "scale": "absolute",
+                        "groupMode": "stacked",
+                        "colorPaletteMode": "multi-color",
+                        "categoryAxis": [
+                            "Name",
+                            "Version",
+                            "Stage"
+                        ],
+                        "categoryAxisLabel": "Name,Version,Stage",
+                        "valueAxis": [],
+                        "valueAxisLabel": "",
+                        "tooltipVariant": "single"
+                    },
+                    "colorPalette": "categorical",
+                    "valueRepresentation": "absolute",
+                    "truncationMode": "middle"
+                },
+                "singleValue": {
+                    "showLabel": true,
+                    "label": "Name",
+                    "prefixIcon": "",
+                    "recordField": "Name",
+                    "autoscale": true,
+                    "alignment": "center",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    },
+                    "colorThresholdTarget": "value"
+                },
+                "table": {
+                    "rowDensity": "condensed",
+                    "enableSparklines": false,
+                    "hiddenColumns": [],
+                    "linewrapEnabled": false,
+                    "lineWrapIds": [],
+                    "monospacedFontEnabled": false,
+                    "monospacedFontColumns": [],
+                    "columnWidths": {
+                        "[\"Name\"]": 378
+                    },
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [
+                        "Name",
+                        "Version",
+                        "Stage"
+                    ],
+                    "dataMappings": {
+                        "value": "Name"
+                    },
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": [
+                        "Name",
+                        "Version",
+                        "Stage"
+                    ]
+                },
+                "autoSelectVisualization": false
+            },
+            "visualization": "table",
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 1,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            }
+        },
+        "1": {
+            "type": "markdown",
+            "title": "",
+            "content": "## ✨ Deployment Inventory"
+        },
+        "4": {
+            "type": "data",
+            "title": "Guardian Validations",
+            "query": "fetch bizEvents\n| filter event.type == \"guardian.validation.finished\" \n// | filter guardian.variables \n| fields timestamp, Guardian=guardian.name, Descr=guardian.description,Status=validation.status, ObjectiveSummary=validation.summary, trigger=validation.workflow.trigger_type",
+            "davis": {
+                "enabled": false,
+                "davisVisualization": {
+                    "isAvailable": true
+                }
+            },
+            "visualization": "table",
+            "visualizationSettings": {
+                "thresholds": [],
+                "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
+                    "gapPolicy": "connect",
+                    "circleChartSettings": {
+                        "groupingThresholdType": "relative",
+                        "groupingThresholdValue": 0,
+                        "valueType": "relative"
+                    },
+                    "categoryOverrides": {},
+                    "truncationMode": "middle",
+                    "categoricalBarChartSettings": {
+                        "categoryAxis": [
+                            "Guardian",
+                            "Status",
+                            "ObjectiveSummary",
+                            "trigger",
+                            "Descr"
+                        ],
+                        "categoryAxisLabel": "Guardian,Status,ObjectiveSummary,trigger,Descr",
+                        "valueAxis": [],
+                        "valueAxisLabel": "",
+                        "tooltipVariant": "single"
+                    }
+                },
+                "singleValue": {
+                    "showLabel": true,
+                    "label": "timestamp",
+                    "prefixIcon": "",
+                    "autoscale": true,
+                    "alignment": "center",
+                    "recordField": "timestamp",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    }
+                },
+                "table": {
+                    "rowDensity": "condensed",
+                    "enableSparklines": false,
+                    "hiddenColumns": [],
+                    "lineWrapIds": [],
+                    "columnWidths": {
+                        "[\"timestamp\"]": 148,
+                        "[\"Guardian\"]": 123,
+                        "[\"Status\"]": 91,
+                        "[\"ObjectiveSummary\"]": 347,
+                        "[\"trigger\"]": 267.234375,
+                        "[\"Descr\"]": 162.015625
+                    },
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "square",
+                    "dataMappings": {
+                        "value": "Guardian"
+                    },
+                    "displayedFields": [
+                        "Guardian",
+                        "Status",
+                        "ObjectiveSummary",
+                        "trigger",
+                        "Descr"
+                    ],
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "dataMappings": [],
+                    "variant": "single",
+                    "displayedFields": [
+                        "Guardian",
+                        "Status",
+                        "ObjectiveSummary",
+                        "trigger",
+                        "Descr"
+                    ]
+                }
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            }
+        },
+        "5": {
+            "type": "data",
+            "title": "Guardian Validation Results",
+            "query": "fetch bizEvents\n| filter event.type == \"guardian.validation.finished\"\n// | filter guardian.variables \n| summarize count(), by:{validation.status}",
+            "davis": {
+                "enabled": false,
+                "davisVisualization": {
+                    "isAvailable": true
+                }
+            },
+            "visualization": "donutChart",
+            "visualizationSettings": {
+                "thresholds": [],
+                "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
+                    "gapPolicy": "connect",
+                    "circleChartSettings": {
+                        "groupingThresholdType": "relative",
+                        "groupingThresholdValue": 0,
+                        "valueType": "relative",
+                        "showTotalValue": true
+                    },
+                    "categoryOverrides": {
+                        "error": {
+                            "color": "var(--dt-colors-charts-security-risk-level-critical-default, #8a0012)",
+                            "added": 1702478740370
+                        },
+                        "pass": {
+                            "color": "var(--dt-colors-charts-categorical-color-09-default, #649438)",
+                            "added": 1702478745186
+                        }
+                    },
+                    "categoricalBarChartSettings": {
+                        "categoryAxis": [
+                            "validation.status"
+                        ],
+                        "categoryAxisLabel": "validation.status",
+                        "valueAxis": [
+                            "count()"
+                        ],
+                        "valueAxisLabel": "count()",
+                        "tooltipVariant": "single"
+                    },
+                    "colorPalette": "categorical",
+                    "legend": {
+                        "position": "right",
+                        "hidden": false
+                    },
+                    "truncationMode": "middle"
+                },
+                "singleValue": {
+                    "showLabel": true,
+                    "label": "validation.status",
+                    "prefixIcon": "",
+                    "autoscale": true,
+                    "alignment": "center",
+                    "recordField": "validation.status",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    }
+                },
+                "table": {
+                    "rowDensity": "condensed",
+                    "enableSparklines": false,
+                    "hiddenColumns": [],
+                    "lineWrapIds": [],
+                    "columnWidths": {},
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "square",
+                    "dataMappings": {
+                        "value": "count()"
+                    },
+                    "displayedFields": [
+                        "validation.status"
+                    ],
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "colorMode": "color-palette",
+                    "colorPalette": "blue"
+                },
+                "histogram": {
+                    "dataMappings": [
+                        {
+                            "valueAxis": "count()",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "displayedFields": [
+                        "validation.status"
+                    ]
+                }
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 100,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            }
+        },
+        "6": {
+            "type": "data",
+            "title": "",
+            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter deployment.release_product == $Product",
+            "davis": {
+                "enabled": false,
+                "davisVisualization": {
+                    "isAvailable": true
+                }
+            },
+            "visualizationSettings": {
+                "thresholds": [],
+                "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
+                    "gapPolicy": "gap",
+                    "circleChartSettings": {
+                        "groupingThresholdType": "relative",
+                        "groupingThresholdValue": 0,
+                        "valueType": "relative"
+                    },
+                    "categoryOverrides": {},
+                    "curve": "linear",
+                    "pointsDisplay": "auto",
+                    "categoricalBarChartSettings": {
+                        "layout": "horizontal",
+                        "categoryAxisTickLayout": "horizontal",
+                        "scale": "absolute",
+                        "groupMode": "stacked",
+                        "colorPaletteMode": "multi-color",
+                        "categoryAxis": [
+                            "deployment.release_build_version",
+                            "deployment.release_cluster",
+                            "deployment.release_environment",
+                            "deployment.release_health",
+                            "deployment.release_namespace",
+                            "deployment.release_product",
+                            "deployment.release_stage",
+                            "deployment.release_sync_status",
+                            "deployment.release_version",
+                            "dt.ingest.endpoint",
+                            "dt.openpipeline.source",
+                            "end_time",
+                            "event.category",
+                            "event.id",
+                            "event.kind",
+                            "event.provider",
+                            "event.status",
+                            "event.type",
+                            "event.version",
+                            "ownership.development",
+                            "start_time",
+                            "task.id",
+                            "task.name",
+                            "task.outcome"
+                        ],
+                        "categoryAxisLabel": "deployment.release_build_version,deployment.release_cluster,deployment.release_environment,deployment.release_health,deployment.release_namespace,deployment.release_product,deployment.release_stage,deployment.release_sync_status,deployment.release_version,dt.ingest.endpoint,dt.openpipeline.source,end_time,event.category,event.id,event.kind,event.provider,event.status,event.type,event.version,ownership.development,start_time,task.id,task.name,task.outcome",
+                        "valueAxis": [],
+                        "valueAxisLabel": "",
+                        "tooltipVariant": "single"
+                    },
+                    "colorPalette": "categorical",
+                    "valueRepresentation": "absolute",
+                    "truncationMode": "middle"
+                },
+                "singleValue": {
+                    "showLabel": true,
+                    "label": "timestamp",
+                    "prefixIcon": "",
+                    "recordField": "timestamp",
+                    "autoscale": true,
+                    "alignment": "center",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    },
+                    "colorThresholdTarget": "value"
+                },
+                "table": {
+                    "rowDensity": "condensed",
+                    "enableSparklines": false,
+                    "hiddenColumns": [
+                        [
+                            "deployment.release_build_version"
+                        ],
+                        [
+                            "deployment.release_cluster"
+                        ],
+                        [
+                            "deployment.release_health"
+                        ],
+                        [
+                            "deployment.release_namespace"
+                        ],
+                        [
+                            "deployment.release_product"
+                        ],
+                        [
+                            "deployment.release_stage"
+                        ],
+                        [
+                            "deployment.release_sync_status"
+                        ],
+                        [
+                            "dt.ingest.endpoint"
+                        ],
+                        [
+                            "dt.openpipeline.pipelines"
+                        ],
+                        [
+                            "dt.openpipeline.source"
+                        ],
+                        [
+                            "end_time"
+                        ],
+                        [
+                            "event.category"
+                        ],
+                        [
+                            "event.id"
+                        ],
+                        [
+                            "event.kind"
+                        ],
+                        [
+                            "event.provider"
+                        ],
+                        [
+                            "event.status"
+                        ],
+                        [
+                            "event.type"
+                        ],
+                        [
+                            "event.version"
+                        ],
+                        [
+                            "ownership.development"
+                        ],
+                        [
+                            "start_time"
+                        ],
+                        [
+                            "task.id"
+                        ],
+                        [
+                            "task.name"
+                        ],
+                        [
+                            "task.outcome"
+                        ]
+                    ],
+                    "linewrapEnabled": true,
+                    "lineWrapIds": [],
+                    "monospacedFontEnabled": false,
+                    "monospacedFontColumns": [],
+                    "columnWidths": {
+                        "[\"deployment.release_environment\"]": 112.703125,
+                        "[\"deployment.release_stage\"]": 65.25
+                    },
+                    "columnTypeOverrides": [],
+                    "colorThresholdTarget": "value",
+                    "enableThresholdInRow": false,
+                    "sortBy": {
+                        "columnId": "[\"timestamp\"]",
+                        "direction": "descending"
+                    }
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [
+                        "deployment.release_build_version",
+                        "deployment.release_cluster",
+                        "deployment.release_environment",
+                        "deployment.release_health",
+                        "deployment.release_namespace",
+                        "deployment.release_product",
+                        "deployment.release_stage",
+                        "deployment.release_sync_status",
+                        "deployment.release_version",
+                        "dt.ingest.endpoint",
+                        "dt.openpipeline.source",
+                        "end_time",
+                        "event.category",
+                        "event.id",
+                        "event.kind",
+                        "event.provider",
+                        "event.status",
+                        "event.type",
+                        "event.version",
+                        "ownership.development",
+                        "start_time",
+                        "task.id",
+                        "task.name",
+                        "task.outcome"
+                    ],
+                    "dataMappings": {
+                        "value": "deployment.release_build_version"
+                    },
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": []
+                },
+                "autoSelectVisualization": false
+            },
+            "visualization": "table",
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 1,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            },
+            "description": "SDLC Events for the selected Product"
+        },
+        "7": {
+            "type": "markdown",
+            "title": "",
+            "content": "## Lifecycle Events "
+        },
+        "8": {
+            "type": "data",
+            "title": "",
+            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter deployment.release_product == $Product\n| makeTimeseries count = count()",
+            "davis": {
+                "enabled": false,
+                "davisVisualization": {
+                    "isAvailable": true
+                }
+            },
+            "visualizationSettings": {
+                "thresholds": [],
+                "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
+                    "gapPolicy": "gap",
+                    "circleChartSettings": {
+                        "groupingThresholdType": "relative",
+                        "groupingThresholdValue": 0,
+                        "valueType": "relative"
+                    },
+                    "categoryOverrides": {},
+                    "curve": "linear",
+                    "pointsDisplay": "auto",
+                    "categoricalBarChartSettings": {
+                        "layout": "horizontal",
+                        "categoryAxisTickLayout": "horizontal",
+                        "scale": "absolute",
+                        "groupMode": "stacked",
+                        "colorPaletteMode": "multi-color",
+                        "categoryAxis": [
+                            "interval"
+                        ],
+                        "valueAxis": [
+                            "interval"
+                        ],
+                        "categoryAxisLabel": "interval",
+                        "valueAxisLabel": "interval",
+                        "tooltipVariant": "single"
+                    },
+                    "colorPalette": "categorical",
+                    "valueRepresentation": "absolute",
+                    "truncationMode": "middle",
+                    "fieldMapping": {
+                        "timestamp": "timeframe",
+                        "leftAxisValues": [
+                            "count"
+                        ]
+                    },
+                    "xAxisLabel": "timeframe",
+                    "xAxisIsLabelVisible": false,
+                    "hiddenLegendFields": [
+                        "task",
+                        "dt.entity.process_group_instance",
+                        "event",
+                        "dt.entity.cloud_application_instance",
+                        "dt.entity.cloud_application_namespace",
+                        "dt.entity.kubernetes_cluster",
+                        "dt.entity.kubernetes_node",
+                        "dt.kubernetes.cluster",
+                        "dt.kubernetes.event.involved_object",
+                        "dt.kubernetes.node",
+                        "dt.kubernetes.workload",
+                        "k8sspace.name",
+                        "k8s.node",
+                        "k8s.pod",
+                        "k8s.workload",
+                        "dt.entity.cloud_application",
+                        "k8s.statefulset",
+                        "k8s.deployment",
+                        "k8s.daemonset",
+                        "k8s.cronjob",
+                        "promotion.changeCount",
+                        "promotion.prId",
+                        "dt.davis.timeout",
+                        "interval"
+                    ],
+                    "leftYAxisSettings": {},
+                    "legend": {
+                        "hidden": true
+                    }
+                },
+                "singleValue": {
+                    "showLabel": true,
+                    "prefixIcon": "",
+                    "autoscale": true,
+                    "alignment": "center",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    },
+                    "colorThresholdTarget": "value",
+                    "recordField": "promotion.changeCount",
+                    "label": "promotion.changeCount"
+                },
+                "table": {
+                    "rowDensity": "condensed",
+                    "enableSparklines": false,
+                    "hiddenColumns": [],
+                    "linewrapEnabled": false,
+                    "lineWrapIds": [],
+                    "monospacedFontEnabled": false,
+                    "monospacedFontColumns": [],
+                    "columnWidths": {},
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [],
+                    "dataMappings": {},
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "blue"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": []
+                },
+                "autoSelectVisualization": false
+            },
+            "visualization": "barChart",
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 1,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            }
+        },
+        "9": {
+            "type": "markdown",
+            "title": "",
+            "content": "## Activity Trend"
+        }
+    },
+    "layouts": {
+        "0": {
+            "x": 0,
+            "y": 5,
+            "w": 12,
+            "h": 7
+        },
+        "1": {
+            "x": 0,
+            "y": 4,
+            "w": 12,
+            "h": 1
+        },
+        "4": {
+            "x": 4,
+            "y": 12,
+            "w": 16,
+            "h": 5
+        },
+        "5": {
+            "x": 0,
+            "y": 12,
+            "w": 4,
+            "h": 5
+        },
+        "6": {
+            "x": 12,
+            "y": 5,
+            "w": 8,
+            "h": 7
+        },
+        "7": {
+            "x": 12,
+            "y": 4,
+            "w": 5,
+            "h": 1
+        },
+        "8": {
+            "x": 0,
+            "y": 1,
+            "w": 20,
+            "h": 3
+        },
+        "9": {
+            "x": 0,
+            "y": 0,
+            "w": 19,
+            "h": 1
+        }
+    },
+    "importedWithCode": false,
+    "settings": {}
+}

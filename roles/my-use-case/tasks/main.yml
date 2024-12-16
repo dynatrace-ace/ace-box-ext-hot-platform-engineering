@@ -581,6 +581,24 @@
         path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/GitLAB.json"
         dashboard_name: "GitLAB"
       ignore_errors: yes
+    - include_tasks:
+        file: add-gen3-dashboard.yml
+      vars:
+        path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/Release Overview.json"
+        dashboard_name: "Release Overview"
+      ignore_errors: yes
+    - include_tasks:
+        file: add-gen3-dashboard.yml
+      vars:
+        path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/Team Ownership Dashboard.json"
+        dashboard_name: "Team Ownership Dashboard"
+      ignore_errors: yes
+    - include_tasks:
+        file: add-gen3-dashboard.yml
+      vars:
+        path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/Backstage Error Analysis.json"
+        dashboard_name: "Backstage Error Analysis"
+      ignore_errors: yes      
   rescue:
     - name: Rescue Message
       debug:
