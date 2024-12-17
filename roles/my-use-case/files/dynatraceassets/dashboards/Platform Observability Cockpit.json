@@ -5,7 +5,7 @@
             "key": "application",
             "type": "query",
             "visible": true,
-            "input": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.provider == \"argocd\"\n| filter isNotNull(app_name)\n| summarize cnt=count(), by:{app_name}\n| fieldsRemove cnt\n| sort app_name",
+            "input": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.provider == \"argocd\"\n| filter isNotNull(app_name) and not endsWith(app_name, \"-cd\")\n| summarize cnt=count(), by:{app_name}\n| fieldsRemove cnt\n| sort app_name",
             "multiple": false
         }
     ],
@@ -133,7 +133,7 @@
         "3": {
             "type": "data",
             "title": "All ArgoCD Notification Events for Selected Application",
-            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.provider == \"argocd\"\n| filter app_name == $application\n| fields timestamp, event.type, event.status, app_name, proj_name, stage, version, owner,target_url,commit_url\n| fieldsAdd commit_url=replaceString(replaceString(commit_url, \".git\", \"\"), \"/-/commit/<no value>\", \"\")\n| fieldsAdd ArgoDrillDown = concat(app_name,\"[](\", target_url ,\")\")\n| fieldsAdd CommitDrillDown = concat(app_name,\"[](\", commit_url ,\")\")\n| fieldsRemove target_url,commit_url\n| sort timestamp asc",
+            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n// | filter event.provider == \"argocd\" \n| filter app_name == $application\n| fields timestamp, event.type, event.status, app_name, proj_name, stage, version, owner,target_url,commit_url,deployment.externalURL\n| fieldsAdd commit_url=replaceString(replaceString(commit_url, \".git\", \"\"), \"/-/commit/<no value>\", \"\")\n| fieldsAdd Argo = if(isnull(target_url), \"\", else: concat(\"[ArgoCD](\", target_url ,\")\"))\n| fieldsAdd Commit = if(isnull(commit_url), \"\", else: concat(\"[GitLab](\", commit_url ,\")\"))\n| fieldsAdd Deployment = if(isnull(deployment.externalURL), \"\", else: concat(\"[App](\", deployment.externalURL ,\")\"))\n| fieldsRemove target_url,commit_url,deployment.externalURL\n| sort timestamp asc",
             "davis": {
                 "enabled": false
             },
@@ -158,10 +158,11 @@
                             "stage",
                             "version",
                             "owner",
-                            "ArgoDrillDown",
-                            "CommitDrillDown"
+                            "Argo",
+                            "Commit",
+                            "Deployment"
                         ],
-                        "categoryAxisLabel": "event.type,event.status,app_name,proj_name,stage,version,owner,ArgoDrillDown,CommitDrillDown",
+                        "categoryAxisLabel": "event.type,event.status,app_name,proj_name,stage,version,owner,Argo,Commit,Deployment",
                         "valueAxis": [],
                         "valueAxisLabel": "",
                         "tooltipVariant": "single"
@@ -189,17 +190,18 @@
                         "[\"timestamp\"]": 186,
                         "[\"event.name\"]": 517,
                         "[\"k8s.namespace.name\"]": 187,
-                        "[\"event.type\"]": 132.953125,
+                        "[\"event.type\"]": 174.953125,
                         "[\"app_name\"]": 202.59375,
                         "[\"commit_url\"]": 549,
-                        "[\"event.status\"]": 117.484375
+                        "[\"event.status\"]": 171.484375
                     },
                     "columnTypeOverrides": [
                         {
                             "id": 2188722.5,
                             "fields": [
-                                "ArgoDrillDown",
-                                "CommitDrillDown"
+                                "Argo",
+                                "Commit",
+                                "Deployment"
                             ],
                             "value": "markdown"
                         }
@@ -222,8 +224,9 @@
                         "stage",
                         "version",
                         "owner",
-                        "ArgoDrillDown",
-                        "CommitDrillDown"
+                        "Argo",
+                        "Commit",
+                        "Deployment"
                     ],
                     "dataMappings": {
                         "value": "event.type"
@@ -246,10 +249,13 @@
                         "event.type",
                         "event.status",
                         "app_name",
+                        "proj_name",
                         "stage",
+                        "version",
                         "owner",
-                        "ArgoDrillDown",
-                        "CommitDrillDown"
+                        "Argo",
+                        "Commit",
+                        "Deployment"
                     ]
                 }
             },
@@ -653,13 +659,7 @@
                     "dataMappings": [],
                     "variant": "single",
                     "truncationMode": "middle",
-                    "displayedFields": [
-                        "event.name",
-                        "feedback",
-                        "stay-informed",
-                        "type",
-                        "user"
-                    ]
+                    "displayedFields": []
                 }
             },
             "querySettings": {
@@ -1519,5 +1519,13 @@
         }
     },
     "importedWithCode": false,
-    "settings": {}
+    "settings": {
+        "defaultTimeframe": {
+            "value": {
+                "from": "now()-4h",
+                "to": "now()"
+            },
+            "enabled": true
+        }
+    }
 }

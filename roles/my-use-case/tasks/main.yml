@@ -584,8 +584,8 @@
     - include_tasks:
         file: add-gen3-dashboard.yml
       vars:
-        path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/Release Overview.json"
-        dashboard_name: "Release Overview"
+        path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/Releases Overview.json"
+        dashboard_name: "Releases Overview"
       ignore_errors: yes
     - include_tasks:
         file: add-gen3-dashboard.yml
