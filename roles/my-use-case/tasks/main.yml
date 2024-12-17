@@ -503,6 +503,8 @@
           type: Opaque
           data:
             monacoToken: "{{ monaco_token | b64encode }}"
+            oAuthClientID: "{{ extra_vars.dt_oauth_client_id | b64encode }}"
+            oAuthClientSecret: "{{ extra_vars.dt_oauth_client_secret | b64encode }}"
     - name: Create ArgoCD Notifications Secret in ArgoCD namespace
       kubernetes.core.k8s:
         name: "argocd-notifications-secret"
