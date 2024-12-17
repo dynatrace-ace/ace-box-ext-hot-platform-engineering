@@ -7,7 +7,7 @@
       "action": "dynatrace.automations:http-function",
       "description": "Query GitLab API for Projects",
       "input": {
-        "url": "{{ result(\"js_set_parameters\")['gitlabEndpoint'] }}/api/v4/projects?simple=true&search={{result(\"js_process_messages\")[\"gitlab_project\"]}}",
+        "url": "{{ result(\"js_set_parameters\")['gitlabEndpoint'] }}/api/v4/projects?simple=true&search={{result(\"js_process_messages\")['gitlab_project']}}",
         "method": "GET",
         "headers": {
           "PRIVATE-TOKEN": "{{ result(\"js_set_parameters\")['gitlabToken'] }}"
@@ -132,7 +132,7 @@
       "action": "dynatrace.automations:execute-dql-query",
       "description": "Query and process the objective events with DQL",
       "input": {
-        "query": "fetch bizevents, from: now()-60m\n| filter event.provider == \"dynatrace.site.reliability.guardian\" and event.type == \"guardian.validation.objective\"\n| filter validation.id == \"{{ event()[\"validation.id\"] }}\"\n| parse guardian.objective, \"JSON:objective\"\n| fieldsFlatten objective\n| fields validation.id, event.id, name = objective.name, operator = objective.comparisonOperator, target = objective.target, warning = objective.warning, status = objective.status, value = objective.value"
+        "query": "fetch bizevents, from: now()-120m\n| filter event.provider == \"dynatrace.site.reliability.guardian\" and event.type == \"guardian.validation.objective\"\n| filter validation.id == \"{{ event()[\"validation.id\"] }}\"\n| parse guardian.objective, \"JSON:objective\"\n| fieldsFlatten objective\n| fields validation.id, event.id, name = objective.name, operator = objective.comparisonOperator, target = objective.target, warning = objective.warning, status = objective.status, value = objective.value"
       },
       "position": {
         "x": -1,
@@ -144,6 +144,32 @@
       "conditions": {
         "states": {
           "dql_process_evaluation": "SUCCESS"
+        }
+      }
+    },
+    "update_merge_request_1": {
+      "name": "update_merge_request_1",
+      "action": "dynatrace.automations:http-function",
+      "description": "Issue an HTTP request to any API",
+      "input": {
+        "url": "{{ result(\"js_set_parameters\")['gitlabEndpoint'] }}/api/v4/projects/{{result(\"js_merge_request_note\")['gitlab_project_id']}}/merge_requests/{{result(\"js_merge_request_note\")['gitlab_merge_request_id']}}/notes?body={{result(\"js_process_messages\")['gitlab_message']}}",
+        "method": "POST",
+        "headers": {
+          "PRIVATE-TOKEN": "{{ result(\"js_set_parameters\")['gitlabToken'] }}"
+        },
+        "payload": "",
+        "failOnResponseCodes": "400-599"
+      },
+      "position": {
+        "x": 1,
+        "y": 9
+      },
+      "predecessors": [
+        "js_merge_request_note"
+      ],
+      "conditions": {
+        "states": {
+          "js_merge_request_note": "OK"
         }
       }
     },
