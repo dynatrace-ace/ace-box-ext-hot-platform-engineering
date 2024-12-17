@@ -1,0 +1,86 @@
+{
+    "name": "{{ .name }}",
+    "description": null,
+    "tags": [
+        "notify:true",
+        "stage:{{ .stage }}",
+        "proj_name:{{ .proj_name }}",
+        "owner:{{ .owner }}"
+    ],
+    "variables": [
+        {
+            "name": "owner",
+            "definition": "{{ .owner }}"
+        },
+        {
+            "name": "proj_name",
+            "definition": "{{ .proj_name }}"
+        },
+        {
+            "name": "stage",
+            "definition": "{{ .stage }}"
+        }
+    ],
+    "objectives": [
+        {
+            "name": "pod availability",
+            "description": null,
+            "objectiveType": "DQL",
+            "dqlQuery": "timeseries {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}, by: {dt.entity.cloud_application}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application,\"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.$proj_name-$owner-$stage\"\n| fieldsAdd sli = (active[]/desired[]) * 100\n| summarize sli = avg(arrayAvg(sli))",
+            "autoAdaptiveThresholdEnabled": null,
+            "comparisonOperator": "GREATER_THAN_OR_EQUAL",
+            "target": 98,
+            "warning": 99
+        },
+        {
+            "name": "synthetic availability",
+            "description": null,
+            "objectiveType": "DQL",
+            "dqlQuery": "timeseries {\n  total = sum(dt.synthetic.http.executions, default: 0),\n  pass = sum(dt.synthetic.http.executions, default: 0), filter: { matchesValue(http_monitor.result.status, \"HEALTHY\") }\n  },by: { dt.entity.http_check }\n| fieldsAdd name = entityName(dt.entity.http_check)\n| filter name == \"Healthcheck $proj_name-$owner-$stage\"\n| fieldsAdd sli=(((pass[])/total[])*(100))\n| fieldsRemove total, pass\n| summarize sli = avg(arrayAvg(sli))",
+            "autoAdaptiveThresholdEnabled": false,
+            "comparisonOperator": "GREATER_THAN_OR_EQUAL",
+            "target": 98,
+            "warning": 99
+        },
+        {
+            "name": "service performance",
+            "description": null,
+            "objectiveType": "DQL",
+            "dqlQuery": "timeseries total=avg(dt.service.request.response_time, default: 0), by: { dt.entity.service }\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.$proj_name-$owner-$stage\")\n| fieldsAdd high=iCollectArray(if(total[]> (1000 * 500), total[]))\n| fieldsAdd low=iCollectArray(if(total[]<= (1000 * 500), total[]))\n| fieldsAdd highRespTimes=iCollectArray(if(isNull(high[]),0,else:1))\n| fieldsAdd lowRespTimes=iCollectArray(if(isNull(low[]),0,else:1))\n| fieldsAdd sli=100*(lowRespTimes[]/(lowRespTimes[]+highRespTimes[]))\n| fieldsRemove total, high, low, highRespTimes, lowRespTimes\n| summarize sli = avg(arrayAvg(sli))",
+            "autoAdaptiveThresholdEnabled": false,
+            "comparisonOperator": "GREATER_THAN_OR_EQUAL",
+            "target": 98,
+            "warning": 99
+        },
+        {
+            "name": "service availability",
+            "description": null,
+            "objectiveType": "DQL",
+            "dqlQuery": "timeseries { total=sum(dt.service.request.count, default: 0) ,failures=sum(dt.service.request.failure_count, default: 0) }, by: { dt.entity.service }\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.$proj_name-$owner-$stage\")\n| fieldsAdd sli=(((total[]-failures[])/total[])*(100))\n| fieldsRemove total, failures\n| summarize sli = avg(arrayAvg(sli))",
+            "autoAdaptiveThresholdEnabled": false,
+            "comparisonOperator": "GREATER_THAN_OR_EQUAL",
+            "target": 98,
+            "warning": 99
+        },
+        {
+            "name": "container logs",
+            "description": null,
+            "objectiveType": "DQL",
+            "dqlQuery": "fetch logs\n| filter k8s.namespace.name == \"$proj_name-$owner-$stage\" and k8s.container.name == \"rollouts-demo\"\n| makeTimeseries {non_info = countIf(in(status,{\"ERROR\",\"WARN\"}), default:0)}\n| fieldsAdd sli = if(non_info[] \041= 0, 0, else: 1)\n| fieldsAdd sli = (sli[] / 1) * 100\n| fieldsRemove non_info\n| summarize sli = avg(arrayAvg(sli))",
+            "autoAdaptiveThresholdEnabled": false,
+            "comparisonOperator": "GREATER_THAN_OR_EQUAL",
+            "target": 98,
+            "warning": 99
+        },
+        {
+            "name": "service throughput",
+            "description": null,
+            "objectiveType": "DQL",
+            "dqlQuery": "timeseries {count = sum(dt.service.request.count, default: 0)}, by: {dt.entity.service}\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.$proj_name-$owner-$stage\")\n| fieldsAdd traffic = if(count[] == 0, 0, else: 1)\n| fieldsAdd sli = (traffic[] / 1) * 100\n| fieldsRemove traffic, count\n| summarize sli = avg(arrayAvg(sli))",
+            "autoAdaptiveThresholdEnabled": false,
+            "comparisonOperator": "GREATER_THAN_OR_EQUAL",
+            "target": null,
+            "warning": null
+        }
+    ]
+}
