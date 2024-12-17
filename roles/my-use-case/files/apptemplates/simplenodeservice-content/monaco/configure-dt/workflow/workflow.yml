@@ -14,4 +14,4 @@ type:
       configType: app:dynatrace.site.reliability.guardian:guardians
       configId: ${{ values.projectName }}-${{ values.teamIdentifier }}-${{ values.releaseStage}}_validation
       property: id
-  skip: false
+  skip: true
