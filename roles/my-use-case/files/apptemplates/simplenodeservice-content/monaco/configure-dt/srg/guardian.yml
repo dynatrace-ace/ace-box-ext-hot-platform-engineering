@@ -1,0 +1,14 @@
+configs:
+- id: ${{ values.projectName }}-${{ values.teamIdentifier }}-${{ values.releaseStage}}_validation
+  type:
+    settings:
+      schema: app:dynatrace.site.reliability.guardian:guardians
+      scope: environment
+  config:
+    name: ${{ values.projectName }}-${{ values.teamIdentifier }}-${{ values.releaseStage}} Validation
+    template: guardian.json
+    parameters:
+      owner: ${{ values.teamIdentifier }}
+      proj_name: ${{ values.projectName }}
+      stage: ${{ values.releaseStage }}      
+    skip: false
