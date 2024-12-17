@@ -42,14 +42,14 @@ spec:
           secretKeyRef:
             name: monaco-secret
             key: monacoToken
-      # - name: MONACO_OAUTH_CLIENT_ID
-      #   valueFrom:
-      #     secretKeyRef:
-      #       name: srg-oauth-details
-      #       key: oAuthClientID
-      # - name: MONACO_OAUTH_CLIENT_SECRET
-      #   valueFrom:
-      #     secretKeyRef:
-      #       name: srg-oauth-details
-      #       key: oAuthClientSecret
+      - name: MONACO_OAUTH_CLIENT_ID
+        valueFrom:
+          secretKeyRef:
+            name: dt-bizevent-oauth-details
+            key: oAuthClientID
+      - name: MONACO_OAUTH_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: dt-bizevent-oauth-details
+            key: oAuthClientSecret
       workingDir: /src
