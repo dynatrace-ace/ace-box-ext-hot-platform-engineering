@@ -32,7 +32,7 @@ spec:
         "deploy",
         "/src/monaco/manifest.yml",
         "--environment",
-        "prod-api-token-only",
+        "prod-api-and-oauth",
         "--project",
         "configure-dt"
       ]
@@ -45,11 +45,11 @@ spec:
       - name: MONACO_OAUTH_CLIENT_ID
         valueFrom:
           secretKeyRef:
-            name: dt-bizevent-oauth-details
+            name: monaco-secret
             key: oAuthClientID
       - name: MONACO_OAUTH_CLIENT_SECRET
         valueFrom:
           secretKeyRef:
-            name: dt-bizevent-oauth-details
+            name: monaco-secret
             key: oAuthClientSecret
       workingDir: /src
