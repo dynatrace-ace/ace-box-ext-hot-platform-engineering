@@ -2,6 +2,53 @@
   "id": "8af1f7b8-c097-4456-bfb3-abeaeeb177bb",
   "title": "SRG Notification Workflow",
   "tasks": {
+    "http_get_projects": {
+      "name": "http_get_projects",
+      "action": "dynatrace.automations:http-function",
+      "description": "Query GitLab API for Projects",
+      "input": {
+        "url": "{{ result(\"js_set_parameters\")['gitlabEndpoint'] }}/api/v4/projects?simple=true&search={{result(\"js_process_messages\")[\"gitlab_project\"]}}",
+        "method": "GET",
+        "headers": {
+          "PRIVATE-TOKEN": "{{ result(\"js_set_parameters\")['gitlabToken'] }}"
+        },
+        "failOnResponseCodes": "400-599"
+      },
+      "position": {
+        "x": 1,
+        "y": 5
+      },
+      "predecessors": [
+        "js_process_messages"
+      ],
+      "conditions": {
+        "states": {
+          "js_process_messages": "SUCCESS"
+        },
+        "custom": "{{ result(\"js_process_messages\")['notify'] == true and result(\"js_process_messages\")['gitlab_project'] is defined }}"
+      }
+    },
+    "js_get_project_id": {
+      "name": "js_get_project_id",
+      "action": "dynatrace.automations:run-javascript",
+      "description": "Parse GitLab Projects and find relevant Project Id",
+      "input": {
+        "script": "import { execution } from '@dynatrace-sdk/automation-utils';\n\nconst PARAMETERS_TASK = 'js_set_parameters';\nconst PROJECTS_TASK = 'http_get_projects';\nconst MESSAGES_TASK = 'js_process_messages';\n\nexport default async function ({ execution_id }) {\n  \n  // get parameters from previous tasks\n  // execution\n  const ex = await execution(execution_id);\n  // parameters\n  const parameters = await ex.result(PARAMETERS_TASK);\n\n  // declare new variables to easily access the parameters within this task\n  // const PARAMETER = parameters['PARAMETER'];\n\n  // projects payload from previous task\n  const projects_result = await ex.result(PROJECTS_TASK);\n  const projects_array = projects_result['json'];\n\n  // project name from previous task\n  const messages_result = await ex.result(MESSAGES_TASK);\n  const gitlab_project = messages_result['gitlab_project'];\n\n  // find the project id using the project name\n  function findIdByName(items: [], targetName: string): number | undefined {\n    const item = items.find(item => item.name === targetName);\n    return item?.id;\n  }\n  const id = findIdByName(projects_array, gitlab_project);\n  \n  return {\n    gitlab_project: gitlab_project,\n    gitlab_project_id: id,\n  }\n\n  \n}"
+      },
+      "position": {
+        "x": 1,
+        "y": 6
+      },
+      "predecessors": [
+        "http_get_projects"
+      ],
+      "conditions": {
+        "states": {
+          "http_get_projects": "SUCCESS"
+        },
+        "custom": "{{ result(\"http_get_projects\")[\"json\"] | length > 0 }}"
+      }
+    },
     "js_set_parameters": {
       "name": "js_set_parameters",
       "action": "dynatrace.automations:run-javascript",
@@ -14,6 +61,50 @@
         "y": 1
       },
       "predecessors": []
+    },
+    "js_process_messages": {
+      "name": "js_process_messages",
+      "action": "dynatrace.automations:run-javascript",
+      "description": "Process the evaluation details to get message details",
+      "input": {
+        "script": "import { execution } from '@dynatrace-sdk/automation-utils';\nimport { getEnvironmentId, getEnvironmentUrl } from '@dynatrace-sdk/app-environment';\n\nconst PARAMETERS_TASK = 'js_set_parameters';\nconst EVALUATION_TASK = 'dql_process_evaluation';\nconst OBJECTIVES_TASK = 'dql_process_objectives';\n\nexport default async function ({ execution_id }) {\n  \n  // get parameters from previous tasks\n  // execution\n  const ex = await execution(execution_id);\n  // parameters\n  const parameters = await ex.result(PARAMETERS_TASK);\n\n  // declare new variables to easily access the parameters within this task\n  // const PARAMETER = parameters['PARAMETER'];\n\n  // evaluation query records\n  const evaluation_result = await ex.result(EVALUATION_TASK);\n  const evaluation_record = evaluation_result.records[0];\n\n  // objective query records\n  const objectives_result = await ex.result(OBJECTIVES_TASK);\n  const objectives_record = objectives_result.records;\n\n  // notify boolean flag\n  const notify = evaluation_record['notify'];\n\n  // message for backstage notification, summary info only\n  const backstage_message = \"Dynatrace Site Reliability Guardian evaluation completed for '\" + evaluation_record['context.component_name'] + \"'.  \" +\n                            \"Guardian '\" + evaluation_record['guardian.name'] + \"' \" +\n                            \"completed with a status of '\" + evaluation_record['validation.status'] + \"'. \" +\n                            \"See more details here: \" + getEnvironmentUrl() + \"/ui/apps/dynatrace.site.reliability.guardian/analysis/\" + evaluation_record['guardian.id'] + \"?validationId=\" + evaluation_record['validation.id'];\n  \n  const backstage_channel = evaluation_record['context.owner'];\n\n  // message for gitlab merge request note\n  const gitlab_project = evaluation_record['context.component_name'] + \"-cd\";\n\n  const gitlab_message = backstage_message;\n  \n  return {\n    notify: notify,\n    backstage_message: backstage_message,\n    backstage_channel: backstage_channel,\n    gitlab_project: gitlab_project,\n    gitlab_message: gitlab_message,\n  }\n}"
+      },
+      "position": {
+        "x": 0,
+        "y": 4
+      },
+      "predecessors": [
+        "dql_process_evaluation",
+        "dql_process_objectives"
+      ],
+      "conditions": {
+        "states": {
+          "dql_process_evaluation": "SUCCESS",
+          "dql_process_objectives": "SUCCESS"
+        },
+        "custom": "{{ result(\"dql_process_evaluation\")[\"records\"] | length > 0 }}"
+      }
+    },
+    "js_merge_request_note": {
+      "name": "js_merge_request_note",
+      "action": "dynatrace.automations:run-javascript",
+      "description": "Placeholder for merge request note",
+      "input": {
+        "script": "import { execution } from '@dynatrace-sdk/automation-utils';\n\nconst PARAMETERS_TASK = 'js_set_parameters';\nconst MERGE_REQUESTS_TASK = 'gitlab_list_merge_requests';\n\nexport default async function ({ execution_id }) {\n  \n  // get parameters from previous tasks\n  // execution\n  const ex = await execution(execution_id);\n  // parameters\n  const parameters = await ex.result(PARAMETERS_TASK);\n\n  // declare new variables to easily access the parameters within this task\n  // const PARAMETER = parameters['PARAMETER'];\n\n  // merge requests for project\n  const merge_requests_result = await ex.result(MERGE_REQUESTS_TASK);\n  const merge_request = merge_requests_result['mergeRequests'][0];\n  \n  return {\n    gitlab_project_id: merge_request['project_id'],\n    gitlab_merge_request_id: merge_request['id'],\n    gitlab_merge_request_sha: merge_request['sha'],\n  }\n  \n}"
+      },
+      "position": {
+        "x": 1,
+        "y": 8
+      },
+      "predecessors": [
+        "gitlab_list_merge_requests"
+      ],
+      "conditions": {
+        "states": {
+          "gitlab_list_merge_requests": "SUCCESS"
+        },
+        "custom": "{{ result(\"gitlab_list_merge_requests\")[\"mergeRequests\"] | length > 0 }}"
+      }
     },
     "dql_process_evaluation": {
       "name": "dql_process_evaluation",
@@ -56,27 +147,28 @@
         }
       }
     },
-    "js_process_messages": {
-      "name": "js_process_messages",
-      "action": "dynatrace.automations:run-javascript",
-      "description": "Process the evaluation details to get message details",
+    "gitlab_list_merge_requests": {
+      "name": "gitlab_list_merge_requests",
+      "action": "dynatrace.gitlab.connector:gitlab-list-merge-requests",
+      "description": "List merge requests for GitLab Project",
       "input": {
-        "script": "import { execution } from '@dynatrace-sdk/automation-utils';\nimport { getEnvironmentId, getEnvironmentUrl } from '@dynatrace-sdk/app-environment';\n\nconst PARAMETERS_TASK = 'js_set_parameters';\nconst EVALUATION_TASK = 'dql_process_evaluation';\nconst OBJECTIVES_TASK = 'dql_process_objectives';\n\nexport default async function ({ execution_id }) {\n  \n  // get parameters from previous tasks\n  // execution\n  const ex = await execution(execution_id);\n  // parameters\n  const parameters = await ex.result(PARAMETERS_TASK);\n\n  // declare new variables to easily access the parameters within this task\n  // const PARAMETER = parameters['PARAMETER'];\n\n  // evaluation query records\n  const evaluation_result = await ex.result(EVALUATION_TASK);\n  const evaluation_record = evaluation_result.records[0];\n\n  // objective query records\n  const objectives_result = await ex.result(OBJECTIVES_TASK);\n  const objectives_record = objectives_result.records;\n\n  // notify boolean flag\n  const notify = evaluation_record['notify'];\n\n  // message for backstage notification, summary info only\n  const backstage_message = \"Dynatrace Site Reliability Guardian evaluation completed for '\" + evaluation_record['context.component_name'] + \"'.  \" +\n                            \"Guardian '\" + evaluation_record['guardian.name'] + \"' \" +\n                            \"completed with a status of '\" + evaluation_record['validation.status'] + \"'. \" +\n                            \"See more details here: \" + getEnvironmentUrl() + \"/ui/apps/dynatrace.site.reliability.guardian/analysis/\" + evaluation_record['guardian.id'] + \"?validationId=\" + evaluation_record['validation.id'];\n  \n  const backstage_channel = evaluation_record['context.owner'];\n\n  // message for gitlab merge request note\n  const gitlab_project = evaluation_record['context.component_name'] + \"-cd\";\n\n  const gitlab_message = backstage_message;\n  \n  return {\n    notify: notify,\n    backstage_message: backstage_message,\n    backstage_channel: backstage_channel,\n    gitlab_project: gitlab_project,\n    gitlab_message: gitlab_message,\n  }\n}"
+        "state": "merged",
+        "authorId": "",
+        "projectId": "{{ result(\"js_get_project_id\")['gitlab_project_id'] }}",
+        "connection": "vu9U3hXa3q0AAAABAClhcHA6ZHluYXRyYWNlLmdpdGxhYi5jb25uZWN0b3I6Y29ubmVjdGlvbgAGdGVuYW50AAZ0ZW5hbnQAJDNhYzVkNzU5LTRjM2QtM2ZkOC1hMTBiLTEzZWZlMWJmNjk4Zr7vVN4V2t6t"
       },
+      "active": true,
       "position": {
-        "x": 0,
-        "y": 4
+        "x": 1,
+        "y": 7
       },
       "predecessors": [
-        "dql_process_evaluation",
-        "dql_process_objectives"
+        "js_get_project_id"
       ],
       "conditions": {
         "states": {
-          "dql_process_evaluation": "SUCCESS",
-          "dql_process_objectives": "SUCCESS"
-        },
-        "custom": "{{ result(\"dql_process_evaluation\")[\"records\"] | length > 0 }}"
+          "js_get_project_id": "SUCCESS"
+        }
       }
     },
     "http_notify_backstage_eval": {
@@ -102,98 +194,6 @@
           "js_process_messages": "SUCCESS"
         },
         "custom": "{{ result(\"js_process_messages\")['notify'] == true and result(\"js_process_messages\")['backstage_channel'] is defined and result(\"js_process_messages\")['backstage_message'] is defined }}"
-      }
-    },
-    "http_get_projects": {
-      "name": "http_get_projects",
-      "action": "dynatrace.automations:http-function",
-      "description": "Query GitLab API for Projects",
-      "input": {
-        "url": "{{ result(\"js_set_parameters\")['gitlabEndpoint'] }}/api/v4/projects?simple=true",
-        "method": "GET",
-        "headers": {
-          "PRIVATE-TOKEN": "{{ result(\"js_set_parameters\")['gitlabToken'] }}"
-        },
-        "failOnResponseCodes": "400-599"
-      },
-      "position": {
-        "x": 1,
-        "y": 5
-      },
-      "predecessors": [
-        "js_process_messages"
-      ],
-      "conditions": {
-        "states": {
-          "js_process_messages": "SUCCESS"
-        },
-        "custom": "{{ result(\"js_process_messages\")['notify'] == true and result(\"js_process_messages\")['gitlab_project'] is defined }}"
-      }
-    },
-    "js_get_project_id": {
-      "name": "js_get_project_id",
-      "action": "dynatrace.automations:run-javascript",
-      "description": "Parse GitLab Projects and find relevant Project Id",
-      "input": {
-        "script": "import { execution } from '@dynatrace-sdk/automation-utils';\n\nconst PARAMETERS_TASK = 'js_set_parameters';\nconst PROJECTS_TASK = 'http_get_projects';\nconst MESSAGES_TASK = 'js_process_messages';\n\nexport default async function ({ execution_id }) {\n  \n  // get parameters from previous tasks\n  // execution\n  const ex = await execution(execution_id);\n  // parameters\n  const parameters = await ex.result(PARAMETERS_TASK);\n\n  // declare new variables to easily access the parameters within this task\n  // const PARAMETER = parameters['PARAMETER'];\n\n  // projects payload from previous task\n  const projects_result = await ex.result(PROJECTS_TASK);\n  const projects_array = projects_result['json'];\n\n  // project name from previous task\n  const messages_result = await ex.result(MESSAGES_TASK);\n  const gitlab_project = messages_result['gitlab_project'];\n\n  // find the project id using the project name\n  function findIdByName(items: [], targetName: string): number | undefined {\n    const item = items.find(item => item.name === targetName);\n    return item?.id;\n  }\n  const id = findIdByName(projects_array, gitlab_project);\n  \n  return {\n    gitlab_project: gitlab_project,\n    gitlab_project_id: id,\n  }\n\n  \n}"
-      },
-      "position": {
-        "x": 1,
-        "y": 6
-      },
-      "predecessors": [
-        "http_get_projects"
-      ],
-      "conditions": {
-        "states": {
-          "http_get_projects": "SUCCESS"
-        },
-        "custom": "{{ result(\"http_get_projects\")[\"json\"] | length > 0 }}"
-      }
-    },
-    "gitlab_list_merge_requests": {
-      "name": "gitlab_list_merge_requests",
-      "action": "dynatrace.gitlab.connector:gitlab-list-merge-requests",
-      "description": "List merge requests for GitLab Project",
-      "input": {
-        "state": "merged",
-        "authorId": "",
-        "projectId": "{{ result(\"js_get_project_id\")['gitlab_project_id'] }}",
-        "connection": "GITLAB_CONNECTION_PLACEHOLDER"
-      },
-      "active": true,
-      "position": {
-        "x": 1,
-        "y": 7
-      },
-      "predecessors": [
-        "js_get_project_id"
-      ],
-      "conditions": {
-        "states": {
-          "js_get_project_id": "SUCCESS"
-        }
-      }
-    },
-    "js_merge_request_note": {
-      "name": "js_merge_request_note",
-      "action": "dynatrace.automations:run-javascript",
-      "description": "Placeholder for merge request note",
-      "input": {
-        "script": "import { execution } from '@dynatrace-sdk/automation-utils';\n\nconst PARAMETERS_TASK = 'js_set_parameters';\nconst MERGE_REQUESTS_TASK = 'gitlab_list_merge_requests';\n\nexport default async function ({ execution_id }) {\n  \n  // get parameters from previous tasks\n  // execution\n  const ex = await execution(execution_id);\n  // parameters\n  const parameters = await ex.result(PARAMETERS_TASK);\n\n  // declare new variables to easily access the parameters within this task\n  // const PARAMETER = parameters['PARAMETER'];\n\n  // merge requests for project\n  const merge_requests_result = await ex.result(MERGE_REQUESTS_TASK);\n  const merge_request = merge_requests_result['mergeRequests'][0];\n  \n  return {\n    gitlab_project_id: merge_request['project_id'],\n    gitlab_merge_request_id: merge_request['id'],\n    gitlab_merge_request_sha: merge_request['sha'],\n  }\n  \n}"
-      },
-      "position": {
-        "x": 1,
-        "y": 8
-      },
-      "predecessors": [
-        "gitlab_list_merge_requests"
-      ],
-      "conditions": {
-        "states": {
-          "gitlab_list_merge_requests": "SUCCESS"
-        },
-        "custom": "{{ result(\"gitlab_list_merge_requests\")[\"mergeRequests\"] | length > 0 }}"
       }
     }
   },
