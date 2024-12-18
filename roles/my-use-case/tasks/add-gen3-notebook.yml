@@ -1,0 +1,55 @@
+- name: Request a DT OAuth access token
+  ansible.builtin.uri:
+    url: "{{ extra_vars.dt_oauth_sso_endpoint }}"
+    method: POST
+    status_code: 200
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+    body_format: form-urlencoded
+    body:
+      grant_type: "client_credentials"
+      client_id: "{{ extra_vars.dt_oauth_client_id }}"
+      client_secret: "{{ extra_vars.dt_oauth_client_secret }}"
+      scope: "document:documents:write document:documents:read"
+      resource: "{{ extra_vars.dt_oauth_account_urn }}"
+  register: auth_response_raw
+- set_fact:
+    dt_oauth_access_token: "{{ auth_response_raw.json.access_token }}"
+
+- name: Add {{notebook_name}} notebook
+  shell: >
+    curl -X 'POST' \
+      '{{ extra_vars.dt_environment_url_gen3 }}/platform/document/v1/documents' \
+      -H 'accept: application/json' \
+      -H 'Content-Type: multipart/form-data' \
+      -H 'Authorization: Bearer {{ dt_oauth_access_token }}' \
+      -F 'name={{notebook_name}}' \
+      -F 'type=notebook' \
+      -F "content=@{{path_to_notebook}};type=application/json"
+  register: auth_response_raw
+
+- set_fact:
+    notebook_id: "{{ (auth_response_raw.stdout | from_json).id }}"
+
+- set_fact:
+    notebook_version: "{{ (auth_response_raw.stdout | from_json).version }}"
+
+- name: Print variable
+  debug: "msg='{{ notebook_id }}'"
+
+- name: Patch {{notebook_name}} notebook to make it public
+  shell: >
+    curl -X 'PATCH' \
+      '{{ extra_vars.dt_environment_url_gen3 }}/platform/document/v1/documents/{{notebook_id}}?optimistic-locking-version={{notebook_version}}&create-snapshot=false' \
+      -H 'accept: application/json' \
+      -H 'Content-Type: multipart/form-data' \
+      -H 'Authorization: Bearer {{ dt_oauth_access_token }}' \
+      -F 'name={{notebook_name}}' \
+      -F 'type=notebook' \
+      -F 'description=appsec notebook public' \
+      -F 'snapshotDescription=make notebook public' \
+      -F 'isPrivate=false'
+  register: auth_response_raw
+
+- name: Print variable
+  debug: "msg='{{ auth_response_raw }}'"

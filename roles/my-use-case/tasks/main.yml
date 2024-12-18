@@ -605,6 +605,12 @@
         path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/Backstage Error Analysis.json"
         dashboard_name: "Backstage Error Analysis"
       ignore_errors: yes      
+    - include_tasks:
+        file: add-gen3-notebook.yml
+      vars:
+        path_to_notebook: "{{ usecase_dest }}/dynatraceassets/notebooks/ArgoCD Log Analytics.json"
+        notebook_name: "ArgoCD Log Analytics"
+      ignore_errors: yes      
   rescue:
     - name: Rescue Message
       debug:
