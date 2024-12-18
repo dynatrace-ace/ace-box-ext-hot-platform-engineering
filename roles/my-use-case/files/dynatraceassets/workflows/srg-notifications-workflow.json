@@ -181,7 +181,7 @@
         "state": "merged",
         "authorId": "",
         "projectId": "{{ result(\"js_get_project_id\")['gitlab_project_id'] }}",
-        "connection": "vu9U3hXa3q0AAAABAClhcHA6ZHluYXRyYWNlLmdpdGxhYi5jb25uZWN0b3I6Y29ubmVjdGlvbgAGdGVuYW50AAZ0ZW5hbnQAJDNhYzVkNzU5LTRjM2QtM2ZkOC1hMTBiLTEzZWZlMWJmNjk4Zr7vVN4V2t6t"
+        "connection": "GITLAB_CONNECTION_PLACEHOLDER"
       },
       "active": true,
       "position": {
