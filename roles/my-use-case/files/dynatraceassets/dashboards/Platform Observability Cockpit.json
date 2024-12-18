@@ -191,9 +191,10 @@
                         "[\"event.name\"]": 517,
                         "[\"k8s.namespace.name\"]": 187,
                         "[\"event.type\"]": 174.953125,
-                        "[\"app_name\"]": 202.59375,
+                        "[\"app_name\"]": 253.59375,
                         "[\"commit_url\"]": 549,
-                        "[\"event.status\"]": 171.484375
+                        "[\"event.status\"]": 171.484375,
+                        "[\"proj_name\"]": 148.28750610351562
                     },
                     "columnTypeOverrides": [
                         {
@@ -1424,6 +1425,114 @@
                 "defaultSamplingRatio": 10,
                 "enableSampling": false
             }
+        },
+        "19": {
+            "type": "data",
+            "title": "",
+            "query": "fetch events, from:now()-7d, to:now()\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.provider == \"argocd\"\n| filter app_name == $application\n| summarize {\n  started = takeMin(if(event.type == \"app-sync\" and event.status == \"started\", timestamp)),\n  finished = takeMax(if(event.type == \"app-deployed\", timestamp))\n}, by: {vcs.repository.ref.revision}\n| fieldsAdd duration = finished - started\n| summarize avg_sync_duration = avg(duration)",
+            "davis": {
+                "enabled": false,
+                "davisVisualization": {
+                    "isAvailable": true
+                }
+            },
+            "visualization": "singleValue",
+            "visualizationSettings": {
+                "thresholds": [],
+                "chartSettings": {
+                    "xAxisScaling": "analyzedTimeframe",
+                    "gapPolicy": "gap",
+                    "circleChartSettings": {
+                        "groupingThresholdType": "relative",
+                        "groupingThresholdValue": 0,
+                        "valueType": "relative"
+                    },
+                    "categoryOverrides": {},
+                    "curve": "linear",
+                    "pointsDisplay": "auto",
+                    "categoricalBarChartSettings": {
+                        "layout": "horizontal",
+                        "categoryAxisTickLayout": "horizontal",
+                        "scale": "absolute",
+                        "groupMode": "stacked",
+                        "colorPaletteMode": "multi-color",
+                        "categoryAxis": [
+                            "avg_sync_duration"
+                        ],
+                        "categoryAxisLabel": "avg_sync_duration",
+                        "valueAxis": [
+                            "avg_sync_duration"
+                        ],
+                        "valueAxisLabel": "avg_sync_duration",
+                        "tooltipVariant": "single"
+                    },
+                    "colorPalette": "categorical",
+                    "valueRepresentation": "absolute",
+                    "truncationMode": "middle"
+                },
+                "singleValue": {
+                    "showLabel": true,
+                    "label": "App Avg Deploy Time",
+                    "prefixIcon": "ClockIcon",
+                    "recordField": "avg_sync_duration",
+                    "autoscale": true,
+                    "alignment": "center",
+                    "trend": {
+                        "trendType": "auto",
+                        "isVisible": true
+                    },
+                    "colorThresholdTarget": "value",
+                    "isIconVisible": true
+                },
+                "table": {
+                    "rowDensity": "condensed",
+                    "enableSparklines": false,
+                    "hiddenColumns": [],
+                    "linewrapEnabled": false,
+                    "lineWrapIds": [],
+                    "monospacedFontEnabled": false,
+                    "monospacedFontColumns": [],
+                    "columnWidths": {},
+                    "columnTypeOverrides": []
+                },
+                "honeycomb": {
+                    "shape": "hexagon",
+                    "legend": {
+                        "hidden": false,
+                        "position": "auto"
+                    },
+                    "displayedFields": [],
+                    "dataMappings": {},
+                    "truncationMode": "middle",
+                    "colorMode": "color-palette",
+                    "colorPalette": "categorical"
+                },
+                "histogram": {
+                    "legend": "auto",
+                    "yAxis": {
+                        "label": "Frequency",
+                        "scale": "linear"
+                    },
+                    "colorPalette": "categorical",
+                    "dataMappings": [
+                        {
+                            "valueAxis": "avg_sync_duration",
+                            "rangeAxis": ""
+                        }
+                    ],
+                    "variant": "single",
+                    "truncationMode": "middle",
+                    "displayedFields": []
+                },
+                "autoSelectVisualization": false
+            },
+            "querySettings": {
+                "maxResultRecords": 1000,
+                "defaultScanLimitGbytes": 500,
+                "maxResultMegaBytes": 1,
+                "defaultSamplingRatio": 10,
+                "enableSampling": false
+            }
         }
     },
     "layouts": {
@@ -1509,11 +1618,17 @@
             "x": 0,
             "y": 12,
             "w": 3,
-            "h": 4
+            "h": 2
         },
         "18": {
             "x": 3,
             "y": 5,
+            "w": 3,
+            "h": 2
+        },
+        "19": {
+            "x": 0,
+            "y": 14,
             "w": 3,
             "h": 2
         }
