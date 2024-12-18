@@ -132,6 +132,8 @@
 # Install K3s
 - include_role:
     name: k3s
+  vars:
+    k3s_pod_limit: 200
 
 #
 # Install Dynatrace Operator

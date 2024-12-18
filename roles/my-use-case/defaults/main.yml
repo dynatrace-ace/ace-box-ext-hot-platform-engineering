@@ -5,4 +5,3 @@ gitlab_backstage_template_repo_name: "backstage-templates"
 gitlab_app_template_repo_name: "applications-templates"
 gitlab_platform_repo_name: "platform"
 dynatrace_geolocation: "GEOLOCATION-DDAA176627F5667A"
-k3s_pod_limit: 200
