@@ -161,5 +161,5 @@ data:
           | parse execution_context, "JSON:context"
           | filter contains(context[component_name], "$${componentName}")
           | sort timestamp desc
-          | fieldsAdd srglink= concat("https://daf92530.apps.dynatrace.com/ui/apps/dynatrace.site.reliability.guardian/analysis/", guardian.id, "?validationId=", validation.id)
+          | fieldsAdd srglink= concat("DT_TENANT_APPS_PLACEHOLDER/ui/apps/dynatrace.site.reliability.guardian/analysis/", guardian.id, "?validationId=", validation.id)
           | fields time=formatTimestamp(timestamp, format:"MM-dd-yyyy hh:mm:ss"), name=guardian.name, buildId=if(isnull(context[buildId]),"<none>", else: context[buildId]), version=if(isnull(context[version]),"<none>", else: context[version]), status=record({type="link", text=validation.status, url=srglink})
