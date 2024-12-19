@@ -1,3 +1,3 @@
 ## Deploying a New Version
 
-TODO
+![New Release](../../assets/images/05_00_new_release.png)
