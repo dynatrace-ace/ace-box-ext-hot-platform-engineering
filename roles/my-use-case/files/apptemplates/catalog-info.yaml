@@ -25,6 +25,8 @@ spec:
           description: Which project would you like to deploy?
           enum:
             - 'simplenodeservice'
+      required:
+        - projectName
     - title: Your Team's Details
       required:
         - teamIdentifier
