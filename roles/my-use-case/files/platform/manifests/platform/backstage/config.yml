@@ -151,12 +151,12 @@ data:
           fetch logs
           | filter contains(k8s.namespace.name, "$${componentName}")
           | filter content != " "
-          | sort timestamp
+          | sort timestamp desc
           | fields content 
           | limit 50
       - id: validations
         query: >
-          fetch bizevents
+          fetch bizevents, from:now() - 12h
           | filter event.type == "guardian.validation.finished"
           | parse execution_context, "JSON:context"
           | filter contains(context[component_name], "$${componentName}")
