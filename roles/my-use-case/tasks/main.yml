@@ -673,10 +673,12 @@
 
 #
 # Final Step. Add our use case specific links to the ACE Dashboard
-- set_fact:
-    include_dashboard_value_file: "{{ role_path }}/templates/my-use-case.yml.j2" # rename with your use case name 
+- name: Add Use Case Links to ACE Dashboard
+  block:
+  - set_fact:
+      include_dashboard_value_file: "{{ role_path }}/templates/my-use-case.yml.j2" # rename with your use case name 
 
-- include_role:
-    name: dashboard
-    tasks_from: template-values-file    
+  - include_role:
+      name: dashboard
+      tasks_from: template-values-file
 
