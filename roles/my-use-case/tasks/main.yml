@@ -570,51 +570,79 @@
         workflow_name: "srg-notifications"
       ignore_errors: yes
     - include_tasks:
-        file: add-gen3-dashboard.yml
+        file: add-gen3-document.yml
       vars:
-        path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/ArgoCD Platform Observability.json"
-        dashboard_name: "ArgoCD Platform Observability"
+        path_to_document: "{{ usecase_dest }}/dynatraceassets/dashboards/ArgoCD Platform Observability.json"
+        document_name: "ArgoCD Platform Observability"
+        document_type: "dashboard"
       ignore_errors: yes
     - include_tasks:
-        file: add-gen3-dashboard.yml
+        file: add-gen3-document.yml
       vars:
-        path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/Platform Observability Cockpit.json"
-        dashboard_name: "Platform Observability Cockpit"
+        path_to_document: "{{ usecase_dest }}/dynatraceassets/dashboards/Platform Observability Cockpit.json"
+        document_name: "Platform Observability Cockpit"
+        document_type: "dashboard"
+      ignore_errors: yes
+    - set_fact:
+      platformobscockpit_document_id: "{{ document_id }}"
+    - include_tasks:
+        file: add-gen3-document.yml
+      vars:
+        path_to_document: "{{ usecase_dest }}/dynatraceassets/dashboards/GitLAB.json"
+        document_name: "GitLAB"
+        document_type: "dashboard"
       ignore_errors: yes
     - include_tasks:
-        file: add-gen3-dashboard.yml
+        file: add-gen3-document.yml
       vars:
-        path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/GitLAB.json"
-        dashboard_name: "GitLAB"
+        path_to_document: "{{ usecase_dest }}/dynatraceassets/dashboards/Releases Overview.json"
+        document_name: "Releases Overview"
+        document_type: "dashboard"
       ignore_errors: yes
     - include_tasks:
-        file: add-gen3-dashboard.yml
+        file: add-gen3-document.yml
       vars:
-        path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/Releases Overview.json"
-        dashboard_name: "Releases Overview"
+        path_to_document: "{{ usecase_dest }}/dynatraceassets/dashboards/Team Ownership Dashboard.json"
+        document_name: "Team Ownership Dashboard"
+        document_type: "dashboard"
       ignore_errors: yes
     - include_tasks:
-        file: add-gen3-dashboard.yml
+        file: add-gen3-document.yml
       vars:
-        path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/Team Ownership Dashboard.json"
-        dashboard_name: "Team Ownership Dashboard"
-      ignore_errors: yes
-    - include_tasks:
-        file: add-gen3-dashboard.yml
-      vars:
-        path_to_dashboard: "{{ usecase_dest }}/dynatraceassets/dashboards/Backstage Error Analysis.json"
-        dashboard_name: "Backstage Error Analysis"
+        path_to_document: "{{ usecase_dest }}/dynatraceassets/dashboards/Backstage Error Analysis.json"
+        document_name: "Backstage Error Analysis"
+        document_type: "dashboard"
       ignore_errors: yes      
     - include_tasks:
-        file: add-gen3-notebook.yml
+        file: add-gen3-document.yml
       vars:
-        path_to_notebook: "{{ usecase_dest }}/dynatraceassets/notebooks/ArgoCD Log Analytics.json"
-        notebook_name: "ArgoCD Log Analytics"
-      ignore_errors: yes      
+        path_to_document: "{{ usecase_dest }}/dynatraceassets/notebooks/ArgoCD Log Analytics.json"
+        document_name: "ArgoCD Log Analytics"
+        document_type: "notebook"
+      ignore_errors: yes
   rescue:
     - name: Rescue Message
       debug:
         msg: "Uploading Dynatrace Configuration failed but we keep going"
+
+- name: Prepare and Upload Launchpad
+  block:
+    - name: Replace PLACEHOLDERS for template files in git
+      shell: |
+        pwd
+        cd {{ usecase_dest }}
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#PLATFORMOBSCOCKPIT_DOCUMENTID_PLACEHOLDER#{{ platformobscockpit_document_id }}#g" {} \;
+    - include_tasks:
+        file: add-gen3-document.yml
+      vars:
+        path_to_document: "{{ usecase_dest }}/dynatraceassets/launchpads/Platform Engineering Launchpad.json"
+        document_name: "Platform Engineering Launchpad"
+        document_type: "launchpad"
+      ignore_errors: yes            
+  rescue:
+    - name: Rescue Message
+      debug:
+        msg: "Uploading Dynatrace Launchpad failed but we keep going"
 
 #
 # This will connect ArgoCD to the GitLab Platform Repo

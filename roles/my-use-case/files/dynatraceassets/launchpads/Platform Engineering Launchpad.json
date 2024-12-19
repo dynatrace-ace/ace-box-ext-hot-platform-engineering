@@ -1,0 +1,151 @@
+{
+    "schemaVersion": 2,
+    "icon": "default",
+    "background": "default",
+    "containerList": {
+        "containers": [
+            {
+                "blocks": [
+                    {
+                        "id": "9da3feca-9d4a-492b-8842-fd51b94d3b60",
+                        "type": "markdown",
+                        "properties": {
+                            "expanded": true
+                        },
+                        "content": "# Welcome to our Dynatrace Platform Engineering HOTDAY\n\nThanks for taking part in our Dynatrace Hands On Training (HOT)\n\nHere the links to the Environments we will need today:"
+                    },
+                    {
+                        "id": "a7cf7f56-4f44-4e88-a1fd-2e4f66a6ba26",
+                        "type": "links",
+                        "properties": {
+                            "expanded": true
+                        },
+                        "appearance": "list",
+                        "contentType": "static",
+                        "content": [
+                            {
+                                "id": "0ac532b6-d7e5-4a55-aec3-2810db123fb4",
+                                "type": "link",
+                                "title": "Backstage",
+                                "action": {
+                                    "type": "openExternalLink",
+                                    "url": "https://backstage.1577af03-863d-4cae-a2c9-f4073dd9adbd.dynatrace.training/"
+                                },
+                                "description": ""
+                            },
+                            {
+                                "id": "aa43bba5-67cc-4995-bf1b-d4b15abb0501",
+                                "type": "link",
+                                "title": "GitLab",
+                                "action": {
+                                    "type": "openExternalLink",
+                                    "url": "https://gitlab.1577af03-863d-4cae-a2c9-f4073dd9adbd.dynatrace.training/"
+                                },
+                                "description": ""
+                            },
+                            {
+                                "id": "63fdf524-63bc-4544-9aaa-3126c4bee10f",
+                                "type": "link",
+                                "title": "ArgoCD",
+                                "action": {
+                                    "type": "openExternalLink",
+                                    "url": "https://argocd.1577af03-863d-4cae-a2c9-f4073dd9adbd.dynatrace.training/"
+                                },
+                                "description": ""
+                            },
+                            {
+                                "id": "8c590346-5979-48d8-b379-fbc0fcd4006a",
+                                "type": "doc",
+                                "title": "Platform Observability Cockpit",
+                                "action": {
+                                    "type": "openDocument",
+                                    "documentId": "PLATFORMOBSCOCKPIT_DOCUMENTID_PLACEHOLDER"
+                                },
+                                "icon": "",
+                                "categoryId": "dashboards"
+                            },
+                            {
+                                "id": "1fe70edb-d1fa-43af-84a4-edc60b85b00b",
+                                "type": "app",
+                                "title": "Kubernetes",
+                                "description": "",
+                                "icon": "/platform/app-engine/registry/v1/app-icons/dynatrace.kubernetes?appVersion=1.23.1",
+                                "action": {
+                                    "type": "openApp",
+                                    "appId": "dynatrace.kubernetes"
+                                },
+                                "categoryId": "apps"
+                            },
+                            {
+                                "id": "545217e6-e9fb-4b57-8073-aa86d70bfe37",
+                                "type": "app",
+                                "title": "Synthetic",
+                                "description": "",
+                                "icon": "/platform/app-engine/registry/v1/app-icons/dynatrace.synthetic?appVersion=1.2.2",
+                                "action": {
+                                    "type": "openApp",
+                                    "appId": "dynatrace.synthetic"
+                                },
+                                "categoryId": "apps"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "462f4818-10d5-4c03-9a7d-ae4bb4a2c374",
+                        "type": "markdown",
+                        "properties": {
+                            "expanded": true
+                        },
+                        "content": "Some additional ways to engage with us!\n* [Send us, the DevRel Team, an email](mailto:devrel@dynatrace.com?subject=Platform%20Engineering%20HOT)\n* [All our GitHub Codespace Tutorials](https://github.com/topics/obslab)\n* [Ask questions on the Dynatrace community](https://community.dynatrace.com)\n* [Join the Dynatrace Automation Guild](https://dt-url.net/dt-apply-automationguild )"
+                    },
+                    {
+                        "id": "6f4bd734-afe1-413f-a711-cdf54c386e52",
+                        "type": "cards",
+                        "properties": {
+                            "expanded": true
+                        },
+                        "content": [
+                            {
+                                "id": "e2e2893e-2ebc-4ca5-9e56-9571f05f09b4",
+                                "title": "Successful Cloud Native Platform Engineering – Hype vs Reality",
+                                "action": {
+                                    "type": "openExternalLink",
+                                    "url": "https://www.youtube.com/watch?v=CLGrm4eFBoo"
+                                },
+                                "buttonName": "Watch on YouTube",
+                                "description": "Recent talk at KCD Zurich about successful platform engineering",
+                                "imageDark": "https://i3.ytimg.com/vi/CLGrm4eFBoo/maxresdefault.jpg",
+                                "imageLight": "https://i3.ytimg.com/vi/CLGrm4eFBoo/maxresdefault.jpg"
+                            },
+                            {
+                                "id": "2ca82c46-846a-4d46-9e36-4710928b6a00",
+                                "title": "How we streamlined our SDLC",
+                                "action": {
+                                    "type": "openExternalLink",
+                                    "url": "https://www.youtube.com/watch?v=9iRWng2XTR4"
+                                },
+                                "buttonName": "Watch on YouTube",
+                                "description": "Dynatrace talk at KubeCon NA 2024",
+                                "imageDark": "https://i3.ytimg.com/vi/9iRWng2XTR4/maxresdefault.jpg",
+                                "imageLight": "https://i3.ytimg.com/vi/9iRWng2XTR4/maxresdefault.jpg"
+                            },
+                            {
+                                "id": "4a3dc72d-8034-4a43-bd6e-7b8de2671a82",
+                                "title": "Platform Engineering for Architects Book",
+                                "action": {
+                                    "type": "openExternalLink",
+                                    "url": "https://dt-url.net/devrel-pe-book-amzn"
+                                },
+                                "buttonName": "Buy on Amazon",
+                                "description": "Platform Engineering for Architects Book",
+                                "imageDark": "https://m.media-amazon.com/images/I/71lCSkLT42L._SL1500_.jpg",
+                                "imageLight": "https://m.media-amazon.com/images/I/71lCSkLT42L._SL1500_.jpg"
+                            }
+                        ]
+                    }
+                ],
+                "horizontalLayoutWeight": 1
+            }
+        ]
+    }
+}
