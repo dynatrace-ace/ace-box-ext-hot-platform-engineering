@@ -3,6 +3,6 @@ extRefs:
   Backstage:
     description: "Backstage IDP"
     url: "{{ ingress_protocol }}://backstage.{{ ingress_domain }}"
-  DynatraceSaaS:
+  DynatraceLaunchpad:
     description: "Dynatrace SaaS Launchpad"
     url: "{{ extra_vars.dt_environment_url_gen3.rstrip('/') }}/ui/apps/dynatrace.launcher/launchpad/{{ launchpad_document_id }}"
