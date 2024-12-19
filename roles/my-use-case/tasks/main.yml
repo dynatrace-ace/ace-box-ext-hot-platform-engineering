@@ -555,7 +555,7 @@
 #
 # Upload Relevant Configs such as notebooks, dashboards, ...
 # Doing this from the gitlabfiles directory as this is the one that also includes the PLACEHOLDER replacements
-- name: Upload Dynatrace Configuration (notebooks, dashboards, workflows ...)
+- name: Upload Dynatrace Workflows
   block:
     - include_tasks:
         file: add-gen3-workflow.yml
@@ -569,6 +569,13 @@
         path_to_workflow: "{{ usecase_dest }}/dynatraceassets/workflows/srg-notifications-workflow.json"
         workflow_name: "srg-notifications"
       ignore_errors: yes
+  rescue:
+    - name: Rescue Message
+      debug:
+        msg: "Uploading Dynatrace Workflows failed but we keep going"      
+
+- name: Upload Dynatrace Dashboards
+  block:
     - include_tasks:
         file: add-gen3-document.yml
       vars:
@@ -613,6 +620,13 @@
         document_name: "Backstage Error Analysis"
         document_type: "dashboard"
       ignore_errors: yes      
+  rescue:
+    - name: Rescue Message
+      debug:
+        msg: "Uploading Dynatrace Dashboards failed but we keep going"
+
+- name: Upload Dynatrace Notebooks
+  block:
     - include_tasks:
         file: add-gen3-document.yml
       vars:
@@ -632,7 +646,7 @@
   rescue:
     - name: Rescue Message
       debug:
-        msg: "Uploading Dynatrace Configuration failed but we keep going"
+        msg: "Uploading Dynatrace Dashboards failed but we keep going"
 
 - name: Prepare and Upload Launchpad
   block:
