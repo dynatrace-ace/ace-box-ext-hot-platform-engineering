@@ -400,7 +400,7 @@
             "height": 247,
             "state": {
                 "input": {
-                    "value": "timeseries total=avg(dt.service.request.response_time, default: 0), by: { dt.entity.service }\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.$proj_name-$owner-$stage\")\n| fieldsAdd high=iCollectArray(if(total[]> (1000 * 500), total[]))\n| fieldsAdd low=iCollectArray(if(total[]<= (1000 * 500), total[]))\n| fieldsAdd highRespTimes=iCollectArray(if(isNull(high[]),0,else:1))\n| fieldsAdd lowRespTimes=iCollectArray(if(isNull(low[]),0,else:1))\n| fieldsAdd sli=100*(lowRespTimes[]/(lowRespTimes[]+highRespTimes[]))\n| fieldsRemove total, high, low, highRespTimes, lowRespTimes\n| summarize sli = avg(arrayAvg(sli))",
+                    "value": "timeseries total=avg(dt.service.request.response_time, default: 0), by: { dt.entity.service }, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd high=iCollectArray(if(total[]> (1000 * 500), total[]))\n| fieldsAdd low=iCollectArray(if(total[]<= (1000 * 500), total[]))\n| fieldsAdd highRespTimes=iCollectArray(if(isNull(high[]),0,else:1))\n| fieldsAdd lowRespTimes=iCollectArray(if(isNull(low[]),0,else:1))\n| fieldsAdd sli=100*(lowRespTimes[]/(lowRespTimes[]+highRespTimes[]))\n| fieldsRemove total, high, low, highRespTimes, lowRespTimes\n| summarize sli = avg(arrayAvg(sli))",
                     "timeframe": {
                         "from": "now()-30m",
                         "to": "now()"
@@ -571,7 +571,7 @@
             "height": 261,
             "state": {
                 "input": {
-                    "value": "timeseries { total=sum(dt.service.request.count, default: 0) ,failures=sum(dt.service.request.failure_count, default: 0) }, by: { dt.entity.service }\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.$proj_name-$owner-$stage\")\n| fieldsAdd sli=(((total[]-failures[])/total[])*(100))\n| fieldsRemove total, failures\n| summarize sli = avg(arrayAvg(sli))",
+                    "value": "timeseries { total=sum(dt.service.request.count, default: 0) ,failures=sum(dt.service.request.failure_count, default: 0) }, by: { dt.entity.service }, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd sli=(((total[]-failures[])/total[])*(100))\n| fieldsRemove total, failures\n| summarize sli = avg(arrayAvg(sli))",
                     "timeframe": {
                         "from": "now()-30m",
                         "to": "now()"
@@ -911,7 +911,7 @@
             "height": 257,
             "state": {
                 "input": {
-                    "value": "timeseries {count = sum(dt.service.request.count, default: 0)}, by: {dt.entity.service}\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.$proj_name-$owner-$stage\")\n| fieldsAdd traffic = if(count[] == 0, 0, else: 1)\n| fieldsAdd sli = (traffic[] / 1) * 100\n| fieldsRemove traffic, count\n| summarize sli = avg(arrayAvg(sli))",
+                    "value": "timeseries {count = sum(dt.service.request.count, default: 0)}, by: {dt.entity.service}, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd traffic = if(count[] == 0, 0, else: 1)\n| fieldsAdd sli = (traffic[] / 1) * 100\n| fieldsRemove traffic, count\n| summarize sli = avg(arrayAvg(sli))",
                     "timeframe": {
                         "from": "now()-30m",
                         "to": "now()"
