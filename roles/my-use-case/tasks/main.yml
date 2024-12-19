@@ -620,6 +620,13 @@
         document_name: "ArgoCD Log Analytics"
         document_type: "notebook"
       ignore_errors: yes
+    - include_tasks:
+        file: add-gen3-document.yml
+      vars:
+        path_to_document: "{{ usecase_dest }}/dynatraceassets/notebooks/SRG Objectives.json"
+        document_name: "SRG Objectives"
+        document_type: "notebook"
+      ignore_errors: yes      
   rescue:
     - name: Rescue Message
       debug:
