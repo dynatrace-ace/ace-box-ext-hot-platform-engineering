@@ -65,6 +65,17 @@
                                 "categoryId": "dashboards"
                             },
                             {
+                                "id": "8c590346-5979-48d8-b379-fbc0fcd4006a",
+                                "type": "doc",
+                                "title": "SRG Objectives",
+                                "action": {
+                                    "type": "openDocument",
+                                    "documentId": "SRGOBJECTIVES_DOCUMENTID_PLACEHOLDER"
+                                },
+                                "icon": "",
+                                "categoryId": "notebooks"
+                            },                            
+                            {
                                 "id": "1fe70edb-d1fa-43af-84a4-edc60b85b00b",
                                 "type": "app",
                                 "title": "Kubernetes",
