@@ -648,7 +648,9 @@
         path_to_document: "{{ usecase_dest }}/dynatraceassets/launchpads/Platform Engineering Launchpad.json"
         document_name: "Platform Engineering Launchpad"
         document_type: "launchpad"
-      ignore_errors: yes            
+      ignore_errors: yes
+    - set_fact:
+        launchpad_document_id: "{{ document_id }}"
   rescue:
     - name: Rescue Message
       debug:
@@ -668,3 +670,13 @@
 
 - include_role:
     name: dashboard
+
+#
+# Final Step. Add our use case specific links to the ACE Dashboard
+- set_fact:
+    include_dashboard_value_file: "{{ role_path }}/templates/my-use-case.yml.j2" # rename with your use case name 
+
+- include_role:
+    name: dashboard
+    tasks_from: template-values-file    
+
