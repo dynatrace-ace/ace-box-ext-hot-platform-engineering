@@ -1,3 +1,0 @@
-## Hands-On: GitLab
-
-TODO
