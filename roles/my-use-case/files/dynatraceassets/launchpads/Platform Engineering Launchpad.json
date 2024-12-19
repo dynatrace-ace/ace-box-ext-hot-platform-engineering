@@ -29,7 +29,7 @@
                                 "title": "Backstage",
                                 "action": {
                                     "type": "openExternalLink",
-                                    "url": "https://backstage.1577af03-863d-4cae-a2c9-f4073dd9adbd.dynatrace.training/"
+                                    "url": "PROTOCOL_PLACEHOLDER://backstage.BASE_DOMAIN_PLACEHOLDER"
                                 },
                                 "description": ""
                             },
@@ -39,7 +39,7 @@
                                 "title": "GitLab",
                                 "action": {
                                     "type": "openExternalLink",
-                                    "url": "https://gitlab.1577af03-863d-4cae-a2c9-f4073dd9adbd.dynatrace.training/"
+                                    "url": "PROTOCOL_PLACEHOLDER://gitlab.BASE_DOMAIN_PLACEHOLDER"
                                 },
                                 "description": ""
                             },
@@ -49,7 +49,7 @@
                                 "title": "ArgoCD",
                                 "action": {
                                     "type": "openExternalLink",
-                                    "url": "https://argocd.1577af03-863d-4cae-a2c9-f4073dd9adbd.dynatrace.training/"
+                                    "url": "PROTOCOL_PLACEHOLDER://argocd.BASE_DOMAIN_PLACEHOLDER"
                                 },
                                 "description": ""
                             },
