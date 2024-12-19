@@ -681,10 +681,6 @@
     argocd_appset_repositorymatch: "platform"
     argocd_gitlab_generator_k8s_path: "applications/platform"
     argocd_gitlab_generator_owner: "group1"
-
-- include_role:
-    name: dashboard
-
 #
 # Final Step. Add our use case specific links to the ACE Dashboard
 - name: Add Use Case Links to ACE Dashboard
@@ -696,3 +692,5 @@
       name: dashboard
       tasks_from: template-values-file
 
+- include_role:
+    name: dashboard
