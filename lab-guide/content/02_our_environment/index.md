@@ -1,3 +1,0 @@
-## Our Environment
-
-TODO

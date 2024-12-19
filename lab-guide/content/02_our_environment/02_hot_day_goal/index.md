@@ -1,3 +1,0 @@
-## HOT Day Goal
-
-TODO
