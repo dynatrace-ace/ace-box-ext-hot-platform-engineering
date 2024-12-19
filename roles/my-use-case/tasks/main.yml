@@ -584,7 +584,7 @@
         document_type: "dashboard"
       ignore_errors: yes
     - set_fact:
-      platformobscockpit_document_id: "{{ document_id }}"
+        platformobscockpit_document_id: "{{ document_id }}"
     - include_tasks:
         file: add-gen3-document.yml
       vars:
@@ -628,7 +628,7 @@
         document_type: "notebook"
       ignore_errors: yes      
     - set_fact:
-      srgobjective_document_id: "{{ document_id }}"      
+        srgobjective_document_id: "{{ document_id }}"      
   rescue:
     - name: Rescue Message
       debug:
