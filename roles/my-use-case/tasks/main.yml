@@ -58,6 +58,8 @@
       dt_app_version: "1.6.0"
     - dt_app_id: "dynatrace.gitlab.connector"
       dt_app_version: "1.1.3"
+    - dt_app_id: "dynatrace.synthetic.workflow.action"
+      dt_app_version: "1.2.1"      
 
 #
 # Configure Dynatrace Tenant, e.g: new K8s Experience
@@ -563,6 +565,8 @@
         path_to_workflow: "{{ usecase_dest }}/dynatraceassets/workflows/lifecycle-events-workflow.json"
         workflow_name: "lifecycle-events"
       ignore_errors: yes
+    - set_fact:
+        lifecycle_workflow_id: "{{ workflow_id }}"      
     - include_tasks:
         file: add-gen3-workflow.yml
       vars:
@@ -656,6 +660,7 @@
         cd {{ usecase_dest }}
         find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#PLATFORMOBSCOCKPIT_DOCUMENTID_PLACEHOLDER#{{ platformobscockpit_document_id }}#g" {} \;
         find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#SRGOBJECTIVES_DOCUMENTID_PLACEHOLDER#{{ srgobjective_document_id }}#g" {} \;
+        find . -type f \( -not -path '*/\.*' -not -iname "README.md" \) -exec sed -i "s#LIFECYCLE_WORKFLOWID_PLACEHOLDER#{{ lifecycle_workflow_id }}#g" {} \;        
     - include_tasks:
         file: add-gen3-document.yml
       vars:
