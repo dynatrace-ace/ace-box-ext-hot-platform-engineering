@@ -10,4 +10,6 @@ To learn more watch the KubeCon 2024 Talk from Dynatrace on [How We Streamlined 
 
 ![Reference Architecture](../../../assets/images/01_03_reference_idp_architecture.png)
 
-This reference architecture was crafted based on collaboration and feedback from various Dynatrace customers that have invested in building internal platforms for self-service. To learn more read [How platform engineering and IDP observability can accelerate developer velocity](https://www.dynatrace.com/news/blog/how-platform-engineering-can-accelerate-developer-velocity/)
+This reference architecture was crafted based on collaboration and feedback from various Dynatrace customers that have invested in building internal platforms for self-service. 
+
+To learn more read [How platform engineering and IDP observability can accelerate developer velocity](https://www.dynatrace.com/news/blog/how-platform-engineering-can-accelerate-developer-velocity/)
