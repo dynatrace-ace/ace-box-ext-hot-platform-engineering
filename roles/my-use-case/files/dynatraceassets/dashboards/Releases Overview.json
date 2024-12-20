@@ -5,7 +5,7 @@
             "key": "Product",
             "type": "query",
             "visible": true,
-            "input": "fetch dt.entity.process_group_instance, from:now() - 2h\n| fields releasesProduct\n| filter isNotNull(releasesProduct)\n| dedup releasesProduct\n| sort releasesProduct asc",
+            "input": "fetch dt.entity.process_group_instance, from:now() - 2h\n| fields releasesProduct\n| filter isNotNull(releasesProduct)\n| dedup releasesProduct\n| fieldsAdd releasePLower = lower(releasesProduct)\n| sort releasePLower asc\n| fields releasesProduct",
             "multiple": false
         }
     ],
@@ -13,7 +13,7 @@
         "0": {
             "type": "data",
             "title": "",
-            "query": "fetch dt.entity.process_group_instance, from:now() - 2h\n| fields entity.name, releasesVersion, process_group = instance_of[dt.entity.process_group], releasesBuildVersion, releasesProduct, releasesStage\n| filter isNotNull(releasesVersion)\n| filter releasesProduct  == $Product\n| fieldsAdd releaseVersion = parse(releasesVersion,\"\"\" \"ReleaseVersionInfo{version='\"LD:version\"'\"LD \"\"\")\n| summarize entity.name = takeAny(entity.name), by:{\n               process_group,\n               releaseVersion,\n               releasesBuildVersion,\n          //     releasesProduct,\n               releasesStage\n             }\n| sort lower(entity.name) asc\n| fields Name=entity.name, Version=releaseVersion,\n Stage=releasesStage \n //, Product=releasesProduct",
+            "query": "fetch dt.entity.process_group_instance, from:now() - 2h\n| fields entity.name, releasesVersion, process_group = instance_of[dt.entity.process_group], releasesBuildVersion, releasesProduct, releasesStage, container.id = belongs_to[dt.entity.container_group_instance]\n| filter isNotNull(releasesVersion)\n| filter releasesProduct  == $Product\n| lookup [\n  fetch dt.entity.container_group_instance, from: -90d\n    | fields id, container.id = id\n    //, cluster.id = belongs_to[dt.entity.kubernetes_cluster]\n    //, namespace.id = belongs_to[dt.entity.cloud_application_namespace], namespace.name = namespaceName\n    , workload.id = belongs_to[dt.entity.cloud_application], workload.name = workloadName\n], sourceField:container.id, lookupField:container.id, fields:{workload.id, workload.name}, executionOrder:leftFirst\n| fieldsAdd releaseVersion = parse(releasesVersion,\"\"\" \"ReleaseVersionInfo{version='\"LD:version\"'\"LD \"\"\")\n| summarize entity.name = takeAny(entity.name),\n            workload.id = collectArray(workload.id),\n            workload.name = collectArray(workload.name),\n            by:{\n               process_group,\n               releaseVersion,\n               releasesBuildVersion,\n          //     releasesProduct,\n               releasesStage\n             }\n| fieldsAdd workload.id = arrayRemoveNulls(workload.id)\n| fieldsAdd workload.id = arrayFirst(workload.id)\n| fieldsAdd workload.name = arrayRemoveNulls(workload.name)\n| fieldsAdd workload.name = arrayFirst(workload.name)\n| sort lower(entity.name) asc\n| fields Name=entity.name, Version=releaseVersion,\n Stage=releasesStage, dt.entity.cloud_application=workload.id,\n Workload = workload.name,\n dt.entity.process_group = process_group\n //, Product=releasesProduct",
             "davis": {
                 "enabled": false,
                 "davisVisualization": {
@@ -42,9 +42,12 @@
                         "categoryAxis": [
                             "Name",
                             "Version",
-                            "Stage"
+                            "Stage",
+                            "dt.entity.cloud_application",
+                            "Workload",
+                            "dt.entity.process_group"
                         ],
-                        "categoryAxisLabel": "Name,Version,Stage",
+                        "categoryAxisLabel": "Name,Version,Stage,dt.entity.cloud_application,Workload,dt.entity.process_group",
                         "valueAxis": [],
                         "valueAxisLabel": "",
                         "tooltipVariant": "single"
@@ -69,7 +72,14 @@
                 "table": {
                     "rowDensity": "condensed",
                     "enableSparklines": false,
-                    "hiddenColumns": [],
+                    "hiddenColumns": [
+                        [
+                            "dt.entity.cloud_application"
+                        ],
+                        [
+                            "dt.entity.process_group"
+                        ]
+                    ],
                     "linewrapEnabled": false,
                     "lineWrapIds": [],
                     "monospacedFontEnabled": false,
@@ -88,7 +98,10 @@
                     "displayedFields": [
                         "Name",
                         "Version",
-                        "Stage"
+                        "Stage",
+                        "dt.entity.cloud_application",
+                        "Workload",
+                        "dt.entity.process_group"
                     ],
                     "dataMappings": {
                         "value": "Name"
@@ -110,7 +123,9 @@
                     "displayedFields": [
                         "Name",
                         "Version",
-                        "Stage"
+                        "Stage",
+                        "Workload",
+                        "dt.entity.process_group"
                     ]
                 },
                 "autoSelectVisualization": false
@@ -219,8 +234,7 @@
                         "Guardian",
                         "Status",
                         "ObjectiveSummary",
-                        "trigger",
-                        "Descr"
+                        "trigger"
                     ]
                 }
             },
@@ -501,8 +515,8 @@
                     "colorThresholdTarget": "value",
                     "enableThresholdInRow": false,
                     "sortBy": {
-                        "columnId": "[\"timestamp\"]",
-                        "direction": "descending"
+                        "columnId": "[\"deployment.release_environment\"]",
+                        "direction": "ascending"
                     }
                 },
                 "honeycomb": {
@@ -554,7 +568,32 @@
                     "dataMappings": [],
                     "variant": "single",
                     "truncationMode": "middle",
-                    "displayedFields": []
+                    "displayedFields": [
+                        "deployment.release_build_version",
+                        "deployment.release_cluster",
+                        "deployment.release_environment",
+                        "deployment.release_health",
+                        "deployment.release_namespace",
+                        "deployment.release_product",
+                        "deployment.release_stage",
+                        "deployment.release_sync_status",
+                        "deployment.release_version",
+                        "dt.ingest.endpoint",
+                        "dt.openpipeline.source",
+                        "end_time",
+                        "event.category",
+                        "event.id",
+                        "event.kind",
+                        "event.provider",
+                        "event.status",
+                        "event.type",
+                        "event.version",
+                        "ownership.development",
+                        "start_time",
+                        "task.id",
+                        "task.name",
+                        "task.outcome"
+                    ]
                 },
                 "autoSelectVisualization": false
             },
@@ -676,7 +715,15 @@
                     "monospacedFontEnabled": false,
                     "monospacedFontColumns": [],
                     "columnWidths": {},
-                    "columnTypeOverrides": []
+                    "columnTypeOverrides": [
+                        {
+                            "fields": [
+                                "count"
+                            ],
+                            "value": "sparkline",
+                            "id": 1734699483074
+                        }
+                    ]
                 },
                 "honeycomb": {
                     "shape": "hexagon",
@@ -697,7 +744,12 @@
                         "scale": "linear"
                     },
                     "colorPalette": "categorical",
-                    "dataMappings": [],
+                    "dataMappings": [
+                        {
+                            "valueAxis": "interval",
+                            "rangeAxis": ""
+                        }
+                    ],
                     "variant": "single",
                     "truncationMode": "middle",
                     "displayedFields": []
