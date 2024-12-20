@@ -4,7 +4,7 @@ Begin by opening the Site Reliability Guardian App within the Dynatrace environm
 
 ### Tags for organization and automation
 
-SCREENSHOT
+![SRG Tags](../../../assets/images/04_02_srg_tags.png)
 
 1. Click on `+ Guardian` to create a new Guardian
 
@@ -18,7 +18,7 @@ SCREENSHOT
 
 ### Variables for dynamic DQL queries in our objectives
 
-SCREENSHOT
+![SRG Variables](../../../assets/images/04_02_srg_variables.png)
 
 1. Next to the Guardian name, click the `...` button and choose `Variables`
 
@@ -33,13 +33,13 @@ SCREENSHOT
 
 ### Use DQL queries from our Notebook as your objectives
 
-SCREENSHOT
+![SRG Objectives Notebook](../../../assets/images/04_02_srg_objectives_notebook.png)
 
 Open the Notebooks App and find the Notebook titled `SRG Objectives`.  This Notebook contains the DQL queries that can be copied and pasted into the Guardian's objectives.  These queries include the variables that were defined in the previous step.
 
 ### Define an objective with DQL and static thresholds
 
-SCREENSHOT
+![SRG DQL Objective](../../../assets/images/04_02_srg_pod_availability.png)
 
 1. Give the objective a name.  Guardian objectives support DQL queries and Classic SLO metrics.  Choose `Grail using DQL`.  Paste the query from the Notebook into the `DQL Query` field.  Optionally, you can test the query manually from this screen.  If the query fails, that's OK; it's likely that the deployment needs more time to generate data for that objective.
 
@@ -48,6 +48,8 @@ SCREENSHOT
 3. Click on `Save` to save the Guardian and the objective.
 
 ### (optionally) Add the remaining DQL objectives
+
+![SRG Objectives](../../../assets/images/04_02_srg_additional_objectives.png)
 
 Guardians require at least 1 objective.  Time permitting, complete the Guardian by adding the remaining 5 objectives, for a total of 6.
 

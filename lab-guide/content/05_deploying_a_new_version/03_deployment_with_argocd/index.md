@@ -1,3 +1,0 @@
-## Deployment with ArgoCD
-
-TODO
