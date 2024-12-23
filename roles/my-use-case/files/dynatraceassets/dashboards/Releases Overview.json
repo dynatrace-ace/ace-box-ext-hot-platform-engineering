@@ -125,7 +125,8 @@
                         "Version",
                         "Stage",
                         "Workload",
-                        "dt.entity.process_group"
+                        "dt.entity.process_group",
+                        "dt.entity.cloud_application"
                     ]
                 },
                 "autoSelectVisualization": false
@@ -147,7 +148,7 @@
         "4": {
             "type": "data",
             "title": "Guardian Validations",
-            "query": "fetch bizEvents\n| filter event.type == \"guardian.validation.finished\" \n// | filter guardian.variables \n| fields timestamp, Guardian=guardian.name, Descr=guardian.description,Status=validation.status, ObjectiveSummary=validation.summary, trigger=validation.workflow.trigger_type",
+            "query": "fetch bizEvents\n| filter event.type == \"guardian.validation.finished\" \n// | filter contains (guardian.name,  $Product)\n| fields timestamp, Guardian=guardian.name, Descr=guardian.description,Status=validation.status, ObjectiveSummary=validation.summary, trigger=validation.workflow.trigger_type, guardian.id, validation.id",
             "davis": {
                 "enabled": false,
                 "davisVisualization": {
@@ -168,17 +169,19 @@
                     "categoryOverrides": {},
                     "truncationMode": "middle",
                     "categoricalBarChartSettings": {
+                        "categoryAxisLabel": "Guardian,Status,ObjectiveSummary,trigger,guardian.id,validation.id,Descr",
+                        "valueAxisLabel": "",
+                        "tooltipVariant": "single",
                         "categoryAxis": [
                             "Guardian",
                             "Status",
                             "ObjectiveSummary",
                             "trigger",
+                            "guardian.id",
+                            "validation.id",
                             "Descr"
                         ],
-                        "categoryAxisLabel": "Guardian,Status,ObjectiveSummary,trigger,Descr",
-                        "valueAxis": [],
-                        "valueAxisLabel": "",
-                        "tooltipVariant": "single"
+                        "valueAxis": []
                     }
                 },
                 "singleValue": {
@@ -215,10 +218,12 @@
                     },
                     "displayedFields": [
                         "Guardian",
+                        "Descr",
                         "Status",
                         "ObjectiveSummary",
                         "trigger",
-                        "Descr"
+                        "guardian.id",
+                        "validation.id"
                     ],
                     "legend": {
                         "hidden": false,
@@ -232,9 +237,12 @@
                     "variant": "single",
                     "displayedFields": [
                         "Guardian",
+                        "Descr",
                         "Status",
                         "ObjectiveSummary",
-                        "trigger"
+                        "trigger",
+                        "guardian.id",
+                        "validation.id"
                     ]
                 }
             },
@@ -249,7 +257,7 @@
         "5": {
             "type": "data",
             "title": "Guardian Validation Results",
-            "query": "fetch bizEvents\n| filter event.type == \"guardian.validation.finished\"\n// | filter guardian.variables \n| summarize count(), by:{validation.status}",
+            "query": "fetch bizEvents\n| filter event.type == \"guardian.validation.finished\"\n// | filter contains (guardian.name,  $Product)\n| summarize count(), by:{validation.status}",
             "davis": {
                 "enabled": false,
                 "davisVisualization": {
@@ -279,15 +287,15 @@
                         }
                     },
                     "categoricalBarChartSettings": {
+                        "categoryAxisLabel": "validation.status",
+                        "valueAxisLabel": "count()",
+                        "tooltipVariant": "single",
                         "categoryAxis": [
                             "validation.status"
                         ],
-                        "categoryAxisLabel": "validation.status",
                         "valueAxis": [
                             "count()"
-                        ],
-                        "valueAxisLabel": "count()",
-                        "tooltipVariant": "single"
+                        ]
                     },
                     "colorPalette": "categorical",
                     "legend": {
@@ -721,7 +729,7 @@
                                 "count"
                             ],
                             "value": "sparkline",
-                            "id": 1734699483074
+                            "id": 1734948708116
                         }
                     ]
                 },
@@ -765,60 +773,60 @@
                 "enableSampling": false
             }
         },
-        "9": {
+        "10": {
             "type": "markdown",
             "title": "",
-            "content": "## Activity Trend"
+            "content": "# Release Observability\nGet an overview of all your [software lifecycle events](https://docs.dynatrace.com/docs/deliver/sdlc-events) including [release validation](https://docs.dynatrace.com/docs/deliver/quality-gates) results of any triggered Site Reliability Guardian (SRG).\nTo drill deeper simply try the \"Open Record With\" feature on the tables to access the deployment on your K8s cluster or see the results of the guardian!\n\n## Activity Trend"
         }
     },
     "layouts": {
         "0": {
             "x": 0,
-            "y": 5,
+            "y": 7,
             "w": 12,
             "h": 7
         },
         "1": {
             "x": 0,
-            "y": 4,
+            "y": 6,
             "w": 12,
             "h": 1
         },
         "4": {
             "x": 4,
-            "y": 12,
+            "y": 14,
             "w": 16,
             "h": 5
         },
         "5": {
             "x": 0,
-            "y": 12,
+            "y": 14,
             "w": 4,
             "h": 5
         },
         "6": {
             "x": 12,
-            "y": 5,
+            "y": 7,
             "w": 8,
             "h": 7
         },
         "7": {
             "x": 12,
-            "y": 4,
+            "y": 6,
             "w": 5,
             "h": 1
         },
         "8": {
             "x": 0,
-            "y": 1,
+            "y": 3,
             "w": 20,
             "h": 3
         },
-        "9": {
+        "10": {
             "x": 0,
             "y": 0,
-            "w": 19,
-            "h": 1
+            "w": 20,
+            "h": 3
         }
     },
     "importedWithCode": false,
