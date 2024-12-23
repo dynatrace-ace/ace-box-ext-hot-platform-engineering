@@ -10,6 +10,7 @@ Guardians are attached to Workflow automations, allowing them to be integrated i
 
 ![Best Practices](../../../assets/images/04_01_best_practices_on_srg.png)
 
-Best Practices
-
-TODO
+Learn moer about the guardian and best practices here
+- Read [Site Reliability Guardian (Docs)](https://docs.dynatrace.com/docs/deliver/site-reliability-guardian)
+- Watch [Site Reliability Guardian AppSpotlight (YouTube)](https://www.youtube.com/watch?v=4KYZv8YnqQo)
+- Watch [Composite Site Reliability Guardian (YouTube)](https://www.youtube.com/watch?app=desktop&v=N1On6Ausukc&t=0s)

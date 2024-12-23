@@ -7,3 +7,5 @@
 ### Platform Engineering in Practice
 
 ![Platform Engineering in Practice](../../../assets/images/01_02_platform_engineering_in_practice.png)
+
+These are examples of organizations providing self-service platforms for engineering teams to reduce the manual effort of building, testing, deploying and operating software!

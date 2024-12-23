@@ -4,7 +4,11 @@
 
 ![Best Practices](../../../assets/images/04_04_srg_best_practices.png)
 
-TODO
+Learn moer about the guardian and best practices here
+- Read [Site Reliability Guardian (Docs)](https://docs.dynatrace.com/docs/deliver/site-reliability-guardian)
+- Watch [Site Reliability Guardian AppSpotlight (YouTube)](https://www.youtube.com/watch?v=4KYZv8YnqQo)
+- Watch [Composite Site Reliability Guardian (YouTube)](https://www.youtube.com/watch?app=desktop&v=N1On6Ausukc&t=0s)
+
 
 ### Triggering SRG based on Lifecycle Event
 
@@ -32,7 +36,9 @@ Click on `Query past events` to see previous events that would have triggered th
 
 3. Modify the `run_validation` SRG Task by updating the timeframe to use the Last 5 minutes (`-5m -> Now`)
 
-4. Save the Workflow
+4. Switch from simple workflow to full functionality
+
+5. Save the Workflow
 
 ### Trigger Workflow with previous event
 
@@ -57,3 +63,7 @@ It's worth noting that in this current configuration, our Workflow is classified
 ![SRG Validation Result](../../../assets/images/04_04_srg_validation_results.png)
 
 Switch over to the Site Reliability Guardian App and locate your Guardian.  You will now see an additional (new) validation in the Validation history for you to review and analyze.
+
+![SRG Notification Workflow](../../../assets/images/04_04_srg_notification_workflow.png)
+
+Open the Workflows app and locate the `SRG Notification Workflow`.  This workflow triggers on the SRG validation event and sends the results to Backstage and GitLab.  When the release is associated with a merge request, the validation results are added as a comment.  Our next hands-on exercise will leverage this feature!

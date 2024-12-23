@@ -9,3 +9,7 @@
 2. On the Backstage component page, locate the `Dynatrace Validations` section.  Every time the automated release validation takes place, via the Site Reliability Guardian, Dynatrace will store the result and Backstage will display it here.
 
 3. In GitLab, navigate back to your merge request.  When the SRG release validation takes place, Dynatrace will post a message (comment) on the merge request that was submitted to deploy the new release that includes the validation result.
+
+4. In Dynatrace, open the Platform Cockpit Dashboard and explore all Lifecycle events for your application
+
+5. Validate that your app is really deployed in the new version by browsing to the app. Get the link from Backstage, Argo or the Dynatrace dashboard
