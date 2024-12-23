@@ -30,6 +30,7 @@ Please add a note pointing out which versions of the external use case are compa
 | Release | Verified against ace-box version |
 | --- | --- |
 | v0.9.3 | v1.27.0 |
+| v0.9.5 | v1.28.0 |
 
 ## Extra variables
 
@@ -38,3 +39,19 @@ No extra variables needed
 ## DTU provisioning
 
 When an ACE-Box with external use case is provisioned by the DTU team, make sure to grant read access to the Github [ace-box-dtu](https://github.com/orgs/dynatrace-ace/teams/ace-box-dtu) team. This allows them to source the use case during their provisioning process.
+
+
+## Additional optional configuration
+
+Here some additional OpenPipeline Configuration to correctly parse the log status from the simplenodeservice demo application.
+
+**Pipeline**: `OTel Simplenode Ingest`
+- DQL Processor: `Parse Log  Legel`
+  - Matching condition: `isNotNull(content) and content != ""`
+  - DQL processor definition: `parse content, "JSONTIMESTAMP ' - ' STRING:logstatus"`
+- Add fields: `Add LogLevel for empty log lines`
+  - Matching condition: `isNull(content) or content == "" or content == " "`` 
+  - Fields: `logstatus:Empty`
+
+**Dynamic Route**: `otel simplenode`
+- Matching condition: `matchesPhrase(k8s.namespace.name,"simplenodeservice")`
