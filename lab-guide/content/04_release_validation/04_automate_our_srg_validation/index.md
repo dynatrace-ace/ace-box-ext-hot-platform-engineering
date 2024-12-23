@@ -63,3 +63,7 @@ It's worth noting that in this current configuration, our Workflow is classified
 ![SRG Validation Result](../../../assets/images/04_04_srg_validation_results.png)
 
 Switch over to the Site Reliability Guardian App and locate your Guardian.  You will now see an additional (new) validation in the Validation history for you to review and analyze.
+
+![SRG Notification Workflow](../../../assets/images/04_04_srg_notification_workflow.png)
+
+Open the Workflows app and locate the `SRG Notification Workflow`.  This workflow triggers on the SRG validation event and sends the results to Backstage and GitLab.  When the release is associated with a merge request, the validation results are added as a comment.  Our next hands-on exercise will leverage this feature!

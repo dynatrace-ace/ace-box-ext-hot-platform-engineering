@@ -28,5 +28,6 @@ To learn more about Synthetics read [HTTP Monitors](https://www.dynatrace.com/ne
 
 ![ArgoCD Health](../../../assets/images/06_01_dynatrace_otel_prometheus.png)
 
-ArgoCD is exposing OpenTelemetry as well as Prometheus data
+ArgoCD is exposing OpenTelemetry as well as Prometheus data.
+
 Find the ArgoCD Service and explore the traces. Also use the global metrics search and find some of the prometheus metrics!
