@@ -54,9 +54,14 @@ Click on `Query past events` to see previous events that would have triggered th
 
 The Workflow should run successfully.  After the execution completes, check the `run_validation` task and look at the result.
 
+**Simple vs Normal Workflows**
 It's worth noting that in this current configuration, our Workflow is classified as a Simple Workflow.  Simple Workflows have a limited feature set and do not consume any Workflow licensing.  Simple Workflows include one trigger and one task.  To leverage the full capabilities of Workflows, simply add an additional task to it and Dynatrace will automatically convert it to a Standard Workflow.
 
 [Simple Workflow Documentation](https://docs.dynatrace.com/docs/analyze-explore-automate/workflows/simple-workflow)
+
+**For HOT: SWITCH TO NORMAL WORKFLOW**
+In our testing we encountered an issue with Simple Workflows when triggering the Site Reliability Guardian (SRG) Action. 
+To overcome this current limitation lets enable the full functionality of Workflows. This also allows us to expand the workflow with additional actions, e.g: Triggering our  Synthetic Tests prior to SRG
 
 ### Check the validation result in SRG App
 
