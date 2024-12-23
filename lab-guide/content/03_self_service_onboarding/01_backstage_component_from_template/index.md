@@ -15,3 +15,10 @@ Using the links on the Dynatrace Training dashboard, navigate to Backstage in yo
 4. Leave the `Application Version`, `Software Lifecycle Stage`, `DORA metric tracking enabled`, `Include Security scans`, and `Include Dynatrace Configuration` at their default values.  Click `Review`.
 
 5. Verify the information you entered is correct.  Click `Create` to create your new component.
+
+Backstage will now execute a series of steps that will
+1. **Fetch** the files from our template Git repository
+2. **Replace** placeholders with the values we entered in the wizard
+3. **Publishes** those changed files as a new repository in GitLab
+4. **Sends** an SDLC Event to Dynatrace
+5. **Registers** this newly created app in Backstage to show up in the catalog

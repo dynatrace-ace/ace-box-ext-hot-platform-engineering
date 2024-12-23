@@ -8,6 +8,10 @@
 
 2. The repo contains an ArgoCD app manifest, allowing Argo to automatically start managing the app
 
+**Argo Sync with GitLab**
+Argo can be configured to either periodically scan (Schedule) the Git repositories for any change - or - a Git system can notify Argo about a change (Webhook).
+In our case we have setup Argo with a schedule of 3 minutes. This is why it can take up to 3 minutes for Argo to show your new app
+
 ### It automatically synced our GitLab repository to Kubernetes
 
 ![ArgoCD Sync](../../../assets/images/03_03_argocd_sync_k8s.png)
