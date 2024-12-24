@@ -674,6 +674,9 @@
     - name: Rescue Message
       debug:
         msg: "Uploading Dynatrace Launchpad failed but we keep going"
+    - set_fact:
+        launchpad_document_id: "111"
+
 
 #
 # This will connect ArgoCD to the GitLab Platform Repo
