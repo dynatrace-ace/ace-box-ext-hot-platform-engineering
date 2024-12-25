@@ -154,6 +154,8 @@
     }
   },
   "description": "This workflow sends notifications back to ArgoCD Notifications Plugin when a new BizEvent is received from Argo",
+  "actor": "",
+  "owner": "",
   "ownerType": "USER",
   "isPrivate": false,
   "trigger": {
