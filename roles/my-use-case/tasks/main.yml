@@ -576,7 +576,10 @@
   rescue:
     - name: Rescue Message
       debug:
-        msg: "Uploading Dynatrace Workflows failed but we keep going"      
+        msg: "Uploading Dynatrace Workflows failed but we keep going"
+    - set_fact:
+        lifecycle_workflow_id: "111"
+
 
 - name: Upload Dynatrace Dashboards
   block:
@@ -651,6 +654,8 @@
     - name: Rescue Message
       debug:
         msg: "Uploading Dynatrace Dashboards failed but we keep going"
+    - set_fact:
+        lifecycle_workflow_id: "111"
 
 - name: Prepare and Upload Launchpad
   block:
