@@ -225,7 +225,6 @@
   },
   "description": "This workflow triggers on SRG validation events and sends notifications to Backstage and GitLab",
   "actor": "",
-  "owner": "",
   "ownerType": "USER",
   "isPrivate": false,
   "trigger": {
