@@ -580,7 +580,6 @@
     - set_fact:
         lifecycle_workflow_id: "111"
 
-
 - name: Upload Dynatrace Dashboards
   block:
     - include_tasks:

@@ -16,24 +16,40 @@
 - set_fact:
     dt_oauth_access_token: "{{ auth_response_raw.json.access_token }}"
 
+# - name: Add {{workflow_name}} workflow
+# shell: >
+#   curl -X 'POST' \
+#     '{{ extra_vars.dt_environment_url_gen3 }}/platform/automation/v1/workflows' \
+#     -H 'accept: application/json' \
+#     -H 'Authorization: Bearer {{ dt_oauth_access_token }}' \
+#     -H 'Content-Type: application/json' \
+#     -d @/{{path_to_workflow}}
+# register: auth_response_raw
+
 - name: Add {{workflow_name}} workflow
-  shell: >
-    curl -X 'POST' \
-      '{{ extra_vars.dt_environment_url_gen3 }}/platform/automation/v1/workflows' \
-      -H 'accept: application/json' \
-      -H 'Authorization: Bearer {{ dt_oauth_access_token }}' \
-      -H 'Content-Type: application/json' \
-      -d @/{{path_to_workflow}}
-  register: auth_response_raw
+  ansible.builtin.uri:
+    url: "{{ extra_vars.dt_environment_url_gen3 }}/platform/automation/v1/workflows"
+    method: POST
+    status_code: [200,201]
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+      Authorization: "Bearer {{ dt_oauth_access_token }}"
+    body: "{{ lookup('ansible.builtin.file', path_to_workflow) }}"
+    body_format: json
+  register: workflow_post_raw_response
+  retries: 10
+  delay: 30
+  until: workflow_post_raw_response.status != 500
 
 - name: Print variable
-  debug: "msg='{{ auth_response_raw }}'"
+  debug: "msg='{{ workflow_post_raw_response }}'"
 
 - set_fact:
-    workflow_id: "{{ (auth_response_raw.stdout | from_json).id }}"
+    workflow_id: "{{ workflow_post_raw_response.json.id }}"
 
 - set_fact:
-    workflow_version: "{{ (auth_response_raw.stdout | from_json).version }}"
+    workflow_version: "{{ workflow_post_raw_response.json.version }}"
 
 - name: Print variable
   debug: "msg='{{ workflow_id }}'"
