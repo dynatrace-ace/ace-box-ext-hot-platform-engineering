@@ -143,12 +143,13 @@
                             {
                                 "id": "52653cc2-a7e6-4c8f-9b7b-cb35c8375788",
                                 "type": "app",
-                                "title": "Workflows",
+                                "title": "Site Reliability Guardian",
+                                "description": "",
+                                "icon": "/platform/app-engine/registry/v1/app-icons/dynatrace.site.reliability.guardian?appVersion=1.15.0",
                                 "action": {
                                     "type": "openApp",
-                                    "appId": "dynatrace.automations"
+                                    "appId": "dynatrace.site.reliability.guardian"
                                 },
-                                "icon": "/platform/app-engine/registry/v1/app-icons/dynatrace.automations?appVersion=1.1104.4",
                                 "categoryId": "apps"
                             },
                             {
