@@ -1658,7 +1658,7 @@
         "21": {
             "type": "data",
             "title": "Validated Deployments Overview",
-            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.type == \"app-deployed.validated\"\n| summarize owner=takeLast(owner), by:{stage,version}",
+            "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter event.type == \"app-deployed.validated\"\n| fields stage,version, owner",
             "davis": {
                 "enabled": false
             },
