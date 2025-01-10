@@ -30,10 +30,6 @@ From the GitLab repo page, check the manifest `workflow-post-sync-apply-monaco.y
 
 ### Software Delivery Lifecycle Events
 
-![Lifecycle Events with ArgoCD](../../../assets/images/03_05_argocd_lifecycle_events.png)
-
-TODO
-
 ![ArgoCD Notification Events](../../../assets/images/03_05_argocd_notifications_events.png)
 
 From the GitLab `platform` repo, check the manifest `argocd-notifications-cm.yml`.  This contains the details on how ArgoCD is sending SDLC events to Dynatrace via webhooks.  These events then trigger the Lifecycle Events Workflow automation in Dynatrace, adding additional SDLC event generation and notifications to Backstage.

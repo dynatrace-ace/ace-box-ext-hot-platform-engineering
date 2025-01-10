@@ -8,6 +8,9 @@ A Guardian is a collection of defined objectives that are evaluated for a specif
 
 Guardians are attached to Workflow automations, allowing them to be integrated into your software delivery lifecycle.
 
+![Starting with SRG through Templates](../../../assets/images/04_01_introducing_srg_easy_through_templates.png)
+
+
 ![Best Practices](../../../assets/images/04_01_best_practices_on_srg.png)
 
 Learn moer about the guardian and best practices here
