@@ -7,6 +7,16 @@
     "defaultSegments": [],
     "sections": [
         {
+            "id": "2d442502-fdec-41ef-a1fe-8c8b1abd1827",
+            "type": "markdown",
+            "markdown": "## Reference Objectives for Release Validation\nThe following are DQL (Dynatrace Query Language) queries that are a good reference and best practice to use to validate the success of deployments across various dimensions of health: \n- infrastructure: pod availability\n- service: performance, availability, error logs, throughput\n- synthetics: availability\n\nThe DQL Queries are parameterized and can be copy/pasted into Objectives of a Site Reliability Guardian (SRG). The SRG needs to have the following variables configured:\n- `proj_name`: e.g: simplenodeservcie\n- `owner`: e.g: team01\n- `stage`: e.g: preprod\n\nThose variables are used as filters in the different DQL queries, e.g: those pods with a backstage.io/component label following the pattern: `default.$proj_name-$owner-$stage`\n\nFind a brief explanation of every DQL Query, how it filters and what the values mean can be found below!"
+        },
+        {
+            "id": "8074680e-1062-4e70-9872-e2254393a823",
+            "type": "markdown",
+            "markdown": "#### pod availability\nCalculates the ratio between the desired and active pods for the identified workload.\n\nFilter: Workloads with the label `backstage.io/component` == `default.default.$proj_name-$owner-$stage`\n\nIdeally this ratio is always 100% as this would mean that ALL pods that should be running are actively running. A value below 100% would indicate that k8s cannot deploy all requested pods. During a rollout this number will slightly dip below 100% while k8s deploys new requested pods - the number should however always come back to 100%"
+        },
+        {
             "id": "aecaabdc-e088-4e4f-bdbf-554ebff6dd06",
             "type": "dql",
             "title": "pod availability",
@@ -40,21 +50,21 @@
                         ],
                         "metadata": {
                             "grail": {
-                                "canonicalQuery": "timeseries by:{dt.entity.cloud_application}, {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application, \"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.simplenodeservice-team01-qa\"\n| fieldsAdd sli = active[] / desired[] * 100\n| summarize sli = avg(arrayAvg(sli))",
-                                "timezone": "America/Chicago",
-                                "query": "timeseries {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}, by: {dt.entity.cloud_application}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application,\"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.simplenodeservice-team01-qa\"\n| fieldsAdd sli = (active[]/desired[]) * 100\n| summarize sli = avg(arrayAvg(sli))",
-                                "scannedRecords": 43,
+                                "canonicalQuery": "timeseries by:{dt.entity.cloud_application}, {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application, \"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.simplenodeservice-team01-preprod\"\n| fieldsAdd sli = active[] / desired[] * 100\n| summarize sli = avg(arrayAvg(sli))",
+                                "timezone": "Europe/Berlin",
+                                "query": "timeseries {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}, by: {dt.entity.cloud_application}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application,\"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.simplenodeservice-team01-preprod\"\n| fieldsAdd sli = (active[]/desired[]) * 100\n| summarize sli = avg(arrayAvg(sli))",
+                                "scannedRecords": 42,
                                 "dqlVersion": "V1_0",
                                 "scannedBytes": 0,
-                                "scannedDataPoints": 9172,
+                                "scannedDataPoints": 12400,
                                 "analysisTimeframe": {
-                                    "start": "2024-12-08T23:03:00.000Z",
-                                    "end": "2024-12-09T01:04:00.000Z"
+                                    "start": "2025-01-10T07:40:00.000Z",
+                                    "end": "2025-01-10T09:41:00.000Z"
                                 },
                                 "locale": "en-US",
-                                "executionTimeMilliseconds": 77,
+                                "executionTimeMilliseconds": 85,
                                 "notifications": [],
-                                "queryId": "498b9509-270e-47ef-99b6-488917404e94",
+                                "queryId": "7d94035b-ad74-4134-aece-ae71003a9439",
                                 "sampled": false
                             },
                             "metrics": [
@@ -96,13 +106,13 @@
                         "defaultSamplingRatio": 10,
                         "enableSampling": false
                     },
-                    "dateTime": "2024-12-09T01:03:09.273Z",
+                    "dateTime": "2025-01-10T09:40:24.542Z",
                     "input": {
                         "timeframe": {
                             "from": "now()-2h",
                             "to": "now()"
                         },
-                        "value": "timeseries {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}, by: {dt.entity.cloud_application}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application,\"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.simplenodeservice-team01-qa\"\n| fieldsAdd sli = (active[]/desired[]) * 100\n| summarize sli = avg(arrayAvg(sli))"
+                        "value": "timeseries {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}, by: {dt.entity.cloud_application}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application,\"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.simplenodeservice-team01-preprod\"\n| fieldsAdd sli = (active[]/desired[]) * 100\n| summarize sli = avg(arrayAvg(sli))"
                     }
                 },
                 "visualizationSettings": {
@@ -123,9 +133,15 @@
                             "scale": "absolute",
                             "groupMode": "stacked",
                             "colorPaletteMode": "multi-color",
-                            "categoryAxisLabel": "dt.entity.cloud_application,component",
-                            "valueAxisLabel": "interval",
-                            "tooltipVariant": "single"
+                            "categoryAxisLabel": "sli",
+                            "valueAxisLabel": "sli",
+                            "tooltipVariant": "single",
+                            "categoryAxis": [
+                                "sli"
+                            ],
+                            "valueAxis": [
+                                "sli"
+                            ]
                         },
                         "colorPalette": "categorical",
                         "valueRepresentation": "absolute",
@@ -199,6 +215,11 @@
             }
         },
         {
+            "id": "38a5a71f-20b6-4ec6-b271-b1e49f48a085",
+            "type": "markdown",
+            "markdown": "#### synthetic availability\nCalculates the ratio between the healthy and unhealthy synthetic checks of the synthetic test that is setup for our deployed service. \n\nFilter: Synthetic test based on the following name pattern: `Healthcheck $proj_name-$owner-$stage`. \n\nIdeally this ratio is always 100% as this would mean that the deployed service is always available based on our synthetic tests. This also helps us to validate that during a rolling update the service stays available and doesnt see any intermittent outage. "
+        },
+        {
             "id": "6383d15a-ce22-41ce-9caf-bc98c824118b",
             "type": "dql",
             "title": "synthetic availability",
@@ -208,7 +229,7 @@
             "height": 232,
             "state": {
                 "input": {
-                    "value": "timeseries {\n  total = sum(dt.synthetic.http.executions, default: 0),\n  pass = sum(dt.synthetic.http.executions, default: 0), filter: { matchesValue(http_monitor.result.status, \"HEALTHY\") }\n  },by: { dt.entity.http_check }\n| fieldsAdd name = entityName(dt.entity.http_check)\n| filter name == \"Healthcheck $proj_name-$owner-$stage\"\n| fieldsAdd sli=(((pass[])/total[])*(100))\n| fieldsRemove total, pass\n| summarize sli = avg(arrayAvg(sli))",
+                    "value": "timeseries {\n  total = sum(dt.synthetic.http.executions, default: 0),\n  pass = sum(dt.synthetic.http.executions, default: 0), filter: { matchesValue(http_monitor.result.status, \"HEALTHY\") }\n  },by: { dt.entity.http_check }\n| fieldsAdd name = entityName(dt.entity.http_check)\n| filter name == \"Healthcheck $proj_name-$owner-$stage\"\n| fieldsAdd sli=(((pass[])/total[])*(100))\n| summarize sli = avg(arrayAvg(sli))",
                     "timeframe": {
                         "from": "now()-1h",
                         "to": "now()"
@@ -232,21 +253,21 @@
                         ],
                         "metadata": {
                             "grail": {
-                                "canonicalQuery": "timeseries by:{dt.entity.http_check}, filter:matchesValue(http_monitor.result.status, \"HEALTHY\"), {total = sum(dt.synthetic.http.executions, default:0), pass = sum(dt.synthetic.http.executions, default:0)}\n| fieldsAdd name = entityName(dt.entity.http_check)\n| filter name == \"Healthcheck simplenodeservice-team01-qa\"\n| fieldsAdd sli = pass[] / total[] * 100\n| fieldsRemove total, pass\n| summarize sli = avg(arrayAvg(sli))",
-                                "timezone": "America/Chicago",
-                                "query": "timeseries {\n  total = sum(dt.synthetic.http.executions, default: 0),\n  pass = sum(dt.synthetic.http.executions, default: 0), filter: { matchesValue(http_monitor.result.status, \"HEALTHY\") }\n  },by: { dt.entity.http_check }\n| fieldsAdd name = entityName(dt.entity.http_check)\n| filter name == \"Healthcheck simplenodeservice-team01-qa\"\n| fieldsAdd sli=(((pass[])/total[])*(100))\n| fieldsRemove total, pass\n| summarize sli = avg(arrayAvg(sli))",
+                                "canonicalQuery": "timeseries by:{dt.entity.http_check}, filter:matchesValue(http_monitor.result.status, \"HEALTHY\"), {total = sum(dt.synthetic.http.executions, default:0), pass = sum(dt.synthetic.http.executions, default:0)}\n| fieldsAdd name = entityName(dt.entity.http_check)\n| filter name == \"Healthcheck simplenodeservice-team01-preprod\"\n| fieldsAdd sli = pass[] / total[] * 100\n| summarize sli = avg(arrayAvg(sli))",
+                                "timezone": "Europe/Berlin",
+                                "query": "timeseries {\n  total = sum(dt.synthetic.http.executions, default: 0),\n  pass = sum(dt.synthetic.http.executions, default: 0), filter: { matchesValue(http_monitor.result.status, \"HEALTHY\") }\n  },by: { dt.entity.http_check }\n| fieldsAdd name = entityName(dt.entity.http_check)\n| filter name == \"Healthcheck simplenodeservice-team01-preprod\"\n| fieldsAdd sli=(((pass[])/total[])*(100))\n| summarize sli = avg(arrayAvg(sli))",
                                 "scannedRecords": 1,
                                 "dqlVersion": "V1_0",
                                 "scannedBytes": 0,
-                                "scannedDataPoints": 122,
+                                "scannedDataPoints": 120,
                                 "analysisTimeframe": {
-                                    "start": "2024-12-09T21:01:00.000Z",
-                                    "end": "2024-12-09T22:02:00.000Z"
+                                    "start": "2025-01-10T09:23:00.000Z",
+                                    "end": "2025-01-10T10:24:00.000Z"
                                 },
                                 "locale": "en-US",
-                                "executionTimeMilliseconds": 51,
+                                "executionTimeMilliseconds": 64,
                                 "notifications": [],
-                                "queryId": "52db8e1f-fb94-414c-838a-e09648f7ce31",
+                                "queryId": "08f2cc81-135b-46c4-8b3e-c815261a35db",
                                 "sampled": false
                             },
                             "metrics": [
@@ -288,18 +309,19 @@
                         "defaultSamplingRatio": 10,
                         "enableSampling": false
                     },
-                    "dateTime": "2024-12-09T22:01:44.240Z",
+                    "dateTime": "2025-01-10T10:23:12.177Z",
                     "input": {
                         "timeframe": {
                             "from": "now()-1h",
                             "to": "now()"
                         },
-                        "value": "timeseries {\n  total = sum(dt.synthetic.http.executions, default: 0),\n  pass = sum(dt.synthetic.http.executions, default: 0), filter: { matchesValue(http_monitor.result.status, \"HEALTHY\") }\n  },by: { dt.entity.http_check }\n| fieldsAdd name = entityName(dt.entity.http_check)\n| filter name == \"Healthcheck simplenodeservice-team01-qa\"\n| fieldsAdd sli=(((pass[])/total[])*(100))\n| fieldsRemove total, pass\n| summarize sli = avg(arrayAvg(sli))"
+                        "value": "timeseries {\n  total = sum(dt.synthetic.http.executions, default: 0),\n  pass = sum(dt.synthetic.http.executions, default: 0), filter: { matchesValue(http_monitor.result.status, \"HEALTHY\") }\n  },by: { dt.entity.http_check }\n| fieldsAdd name = entityName(dt.entity.http_check)\n| filter name == \"Healthcheck simplenodeservice-team01-preprod\"\n| fieldsAdd sli=(((pass[])/total[])*(100))\n| summarize sli = avg(arrayAvg(sli))"
                     }
                 },
                 "visualizationSettings": {
                     "thresholds": [],
                     "chartSettings": {
+                        "xAxisScaling": "analyzedTimeframe",
                         "gapPolicy": "gap",
                         "circleChartSettings": {
                             "groupingThresholdType": "relative",
@@ -315,14 +337,19 @@
                             "scale": "absolute",
                             "groupMode": "stacked",
                             "colorPaletteMode": "multi-color",
-                            "categoryAxisLabel": "dt.entity.http_check,name",
-                            "valueAxisLabel": "interval",
-                            "tooltipVariant": "single"
+                            "categoryAxisLabel": "sli",
+                            "valueAxisLabel": "sli",
+                            "tooltipVariant": "single",
+                            "categoryAxis": [
+                                "sli"
+                            ],
+                            "valueAxis": [
+                                "sli"
+                            ]
                         },
                         "colorPalette": "categorical",
                         "valueRepresentation": "absolute",
                         "truncationMode": "middle",
-                        "xAxisScaling": "analyzedTimeframe",
                         "xAxisLabel": "timeframe",
                         "xAxisIsLabelVisible": false,
                         "hiddenLegendFields": [],
@@ -391,6 +418,11 @@
             }
         },
         {
+            "id": "2f3be9c6-1cc1-4044-8171-26ead05f36eb",
+            "type": "markdown",
+            "markdown": "#### service performance\nCalculates the ratio of total vs service request where response times are faster than 500ms!\n\nFilter: Services in the k8s namespace matching the pattern: `$proj_name-$owner-$stage`. \n\nIdeally this ratio is always 100% as this means all requests are faster than 500ms. You can adjust the performance threshold in the DQL Query if you want!"
+        },
+        {
             "id": "3ff28439-51be-4209-aa73-0f60d218e668",
             "type": "dql",
             "title": "service performance",
@@ -400,7 +432,7 @@
             "height": 247,
             "state": {
                 "input": {
-                    "value": "timeseries total=avg(dt.service.request.response_time, default: 0), by: { dt.entity.service }, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd high=iCollectArray(if(total[]> (1000 * 500), total[]))\n| fieldsAdd low=iCollectArray(if(total[]<= (1000 * 500), total[]))\n| fieldsAdd highRespTimes=iCollectArray(if(isNull(high[]),0,else:1))\n| fieldsAdd lowRespTimes=iCollectArray(if(isNull(low[]),0,else:1))\n| fieldsAdd sli=100*(lowRespTimes[]/(lowRespTimes[]+highRespTimes[]))\n| fieldsRemove total, high, low, highRespTimes, lowRespTimes\n| summarize sli = avg(arrayAvg(sli))",
+                    "value": "timeseries total=avg(dt.service.request.response_time, default: 0), by: { dt.entity.service }, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd high=iCollectArray(if(total[]> (1000 * 500), total[]))\n| fieldsAdd low=iCollectArray(if(total[]<= (1000 * 500), total[]))\n| fieldsAdd highRespTimes=iCollectArray(if(isNull(high[]),0,else:1))\n| fieldsAdd lowRespTimes=iCollectArray(if(isNull(low[]),0,else:1))\n| fieldsAdd sli=100*(lowRespTimes[]/(lowRespTimes[]+highRespTimes[]))\n| summarize sli = avg(arrayAvg(sli))",
                     "timeframe": {
                         "from": "now()-30m",
                         "to": "now()"
@@ -562,6 +594,11 @@
             }
         },
         {
+            "id": "5ce08c6d-9074-4097-a1c6-670996b57251",
+            "type": "markdown",
+            "markdown": "#### service availability\nCalculates the ratio of total vs service request that fail (e.g: HTTP 500s ...)!\n\nFilter: Services in the k8s namespace matching the pattern: `$proj_name-$owner-$stage`. \n\nIdeally this ratio is always 100% as this means all requests are always returning a successful response!"
+        },
+        {
             "id": "da2dc654-d803-4e17-8730-6b715f65bf08",
             "type": "dql",
             "title": "service availability",
@@ -571,7 +608,7 @@
             "height": 261,
             "state": {
                 "input": {
-                    "value": "timeseries { total=sum(dt.service.request.count, default: 0) ,failures=sum(dt.service.request.failure_count, default: 0) }, by: { dt.entity.service }, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd sli=(((total[]-failures[])/total[])*(100))\n| fieldsRemove total, failures\n| summarize sli = avg(arrayAvg(sli))",
+                    "value": "timeseries { total=sum(dt.service.request.count, default: 0) ,failures=sum(dt.service.request.failure_count, default: 0) }, by: { dt.entity.service }, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd sli=(((total[]-failures[])/total[])*(100))\n| summarize sli = avg(arrayAvg(sli))",
                     "timeframe": {
                         "from": "now()-30m",
                         "to": "now()"
@@ -737,6 +774,11 @@
             }
         },
         {
+            "id": "134eec97-5f4f-4382-a868-c05eeb1f1c75",
+            "type": "markdown",
+            "markdown": "#### container logs\nCalculates the ratio of total logs vs logs that have the status ERROR or WARN!\n\nFilter: All logs ingested in the k8s namespace matching the pattern: `$proj_name-$owner-$stage`. \n\nIdeally this ratio is always 100% as this means that we do not have any ERROR or WARN logs. This would especially be interesting after a deployment to see whether any change in log behavior comes in. This objective can also be used with automatic baselining vs a static threshold as applications typically have a certain number of ERROR or WARN. The Auto-Adaptive Baseline feature in SRG can learn and only alert if there is an anomaly!"
+        },
+        {
             "id": "dcc58f97-b612-4265-b420-5097fbd7a1c4",
             "type": "dql",
             "title": "container logs",
@@ -746,7 +788,7 @@
             "height": 274,
             "state": {
                 "input": {
-                    "value": "fetch logs\n| filter k8s.namespace.name == \"$proj_name-$owner-$stage\" and k8s.container.name == \"rollouts-demo\"\n| makeTimeseries {non_info = countIf(in(status,{\"ERROR\",\"WARN\"}), default:0)}\n| fieldsAdd sli = if(non_info[] != 0, 0, else: 1)\n| fieldsAdd sli = (sli[] / 1) * 100\n| fieldsRemove non_info\n| summarize sli = avg(arrayAvg(sli))",
+                    "value": "fetch logs\n| filter k8s.namespace.name == \"$proj_name-$owner-$stage\" and k8s.container.name == \"rollouts-demo\"\n| makeTimeseries {non_info = countIf(in(status,{\"ERROR\",\"WARN\"}), default:0)}\n| fieldsAdd sli = if(non_info[] != 0, 0, else: 1)\n| fieldsAdd sli = (sli[] / 1) * 100\n| summarize sli = avg(arrayAvg(sli))",
                     "timeframe": {
                         "from": "now()-1h",
                         "to": "now()"
@@ -902,6 +944,11 @@
             }
         },
         {
+            "id": "f35aa188-dbad-4ce6-a8c7-cb60ff9f8f82",
+            "type": "markdown",
+            "markdown": "#### service throughput\nCalculates the ratio of 1-min timeslots where the service handled active requests\n\nFilter: All services in the k8s namespace matching the pattern: `$proj_name-$owner-$stage`. \n\nIdeally this ratio is always 100% as this means that our service is constantly handling requests. This is especially interesting during an update or a rollout as this metric ensures that the service could always handle traffic even during the time when an update happened. ATTENTION: this only makes sense for services that have constant traffic."
+        },
+        {
             "id": "58f7c8d1-1591-45e9-a1e8-49cac82a390d",
             "type": "dql",
             "title": "service throughput",
@@ -911,7 +958,7 @@
             "height": 257,
             "state": {
                 "input": {
-                    "value": "timeseries {count = sum(dt.service.request.count, default: 0)}, by: {dt.entity.service}, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd traffic = if(count[] == 0, 0, else: 1)\n| fieldsAdd sli = (traffic[] / 1) * 100\n| fieldsRemove traffic, count\n| summarize sli = avg(arrayAvg(sli))",
+                    "value": "timeseries {count = sum(dt.service.request.count, default: 0)}, by: {dt.entity.service}, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd traffic = if(count[] == 0, 0, else: 1)\n| fieldsAdd sli = (traffic[] / 1) * 100\n| summarize sli = avg(arrayAvg(sli))",
                     "timeframe": {
                         "from": "now()-30m",
                         "to": "now()"
