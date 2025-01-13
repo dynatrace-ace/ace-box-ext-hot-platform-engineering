@@ -8,6 +8,8 @@ configs:
       enabled: "true"
       geoLocation: "GEOLOCATION_PLACEHOLDER"
       teamIdentifier: "${{ values.teamIdentifier }}"
+      stage: "${{ values.releaseStage }}"
+      projName: "${{ values.projectName }}"
     template: health-check-http.json
     skip: false
   type:

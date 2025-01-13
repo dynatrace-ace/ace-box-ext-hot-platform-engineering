@@ -107,6 +107,18 @@
       "key": "owner",
       "source": "USER",
       "value": "{{ .teamIdentifier }}"
+    },
+    {
+      "context": "CONTEXTLESS",
+      "key": "stage",
+      "source": "USER",
+      "value": "{{ .stage }}"
+    },
+    {
+      "context": "CONTEXTLESS",
+      "key": "proj_name",
+      "source": "USER",
+      "value": "{{ .projName }}"
     }
   ],
   "type": "HTTP"
