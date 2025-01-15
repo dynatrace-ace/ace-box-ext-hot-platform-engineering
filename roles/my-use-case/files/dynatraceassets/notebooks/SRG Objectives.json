@@ -26,94 +26,11 @@
             "height": 218,
             "state": {
                 "input": {
-                    "value": "timeseries {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}, by: {dt.entity.cloud_application}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application,\"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.$proj_name-$owner-$stage\"\n| fieldsAdd sli = (active[]/desired[]) * 100\n| summarize sli = avg(arrayAvg(sli))",
                     "timeframe": {
                         "from": "now()-2h",
                         "to": "now()"
-                    }
-                },
-                "visualization": "singleValue",
-                "querySettings": {
-                    "maxResultRecords": 1000,
-                    "defaultScanLimitGbytes": 500,
-                    "maxResultMegaBytes": 1,
-                    "defaultSamplingRatio": 10,
-                    "enableSampling": false
-                },
-                "result": {
-                    "code": 200,
-                    "value": {
-                        "records": [
-                            {
-                                "sli": 100
-                            }
-                        ],
-                        "metadata": {
-                            "grail": {
-                                "canonicalQuery": "timeseries by:{dt.entity.cloud_application}, {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application, \"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.simplenodeservice-team01-preprod\"\n| fieldsAdd sli = active[] / desired[] * 100\n| summarize sli = avg(arrayAvg(sli))",
-                                "timezone": "Europe/Berlin",
-                                "query": "timeseries {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}, by: {dt.entity.cloud_application}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application,\"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.simplenodeservice-team01-preprod\"\n| fieldsAdd sli = (active[]/desired[]) * 100\n| summarize sli = avg(arrayAvg(sli))",
-                                "scannedRecords": 42,
-                                "dqlVersion": "V1_0",
-                                "scannedBytes": 0,
-                                "scannedDataPoints": 12400,
-                                "analysisTimeframe": {
-                                    "start": "2025-01-10T07:40:00.000Z",
-                                    "end": "2025-01-10T09:41:00.000Z"
-                                },
-                                "locale": "en-US",
-                                "executionTimeMilliseconds": 85,
-                                "notifications": [],
-                                "queryId": "7d94035b-ad74-4134-aece-ae71003a9439",
-                                "sampled": false
-                            },
-                            "metrics": [
-                                {
-                                    "metric.key": "dt.kubernetes.workload.pods_desired",
-                                    "displayName": "Kubernetes: Workload - desired pod count",
-                                    "description": "This metric measures the number of desired pods. The most detailed level of aggregation is workload. The value corresponds to the 'replicas' defined in a deployment resource and to the 'desiredNumberScheduled' for a daemon set resource's status as examp",
-                                    "unit": "Count",
-                                    "fieldName": "desired"
-                                },
-                                {
-                                    "metric.key": "dt.kubernetes.pods",
-                                    "displayName": "Kubernetes: Pod count",
-                                    "description": "This metric measures the number of pods. The most detailed level of aggregation is workload and node. The value corresponds to the count of all pods.",
-                                    "unit": "Count",
-                                    "fieldName": "active"
-                                }
-                            ]
-                        },
-                        "types": [
-                            {
-                                "mappings": {
-                                    "sli": {
-                                        "type": "double"
-                                    }
-                                },
-                                "indexRange": [
-                                    0,
-                                    0
-                                ]
-                            }
-                        ]
                     },
-                    "notifications": [],
-                    "querySettings": {
-                        "maxResultRecords": 1000,
-                        "defaultScanLimitGbytes": 500,
-                        "maxResultMegaBytes": 1,
-                        "defaultSamplingRatio": 10,
-                        "enableSampling": false
-                    },
-                    "dateTime": "2025-01-10T09:40:24.542Z",
-                    "input": {
-                        "timeframe": {
-                            "from": "now()-2h",
-                            "to": "now()"
-                        },
-                        "value": "timeseries {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}, by: {dt.entity.cloud_application}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application,\"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.simplenodeservice-team01-preprod\"\n| fieldsAdd sli = (active[]/desired[]) * 100\n| summarize sli = avg(arrayAvg(sli))"
-                    }
+                    "value": "timeseries {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}, by: {dt.entity.cloud_application}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application,\"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.$proj_name-$owner-$stage\"\n| fieldsAdd sli = (active[]/desired[]) * 100\n| summarize sli = avg(arrayAvg(sli))"
                 },
                 "visualizationSettings": {
                     "thresholds": [],
@@ -211,7 +128,96 @@
                     },
                     "autoSelectVisualization": false
                 },
-                "state": "success"
+                "querySettings": {
+                    "maxResultRecords": 1000,
+                    "defaultScanLimitGbytes": 500,
+                    "maxResultMegaBytes": 1,
+                    "defaultSamplingRatio": 10,
+                    "enableSampling": false
+                },
+                "visualization": "singleValue",
+                "result": {
+                    "code": 200,
+                    "value": {
+                        "records": [
+                            {
+                                "sli": 100
+                            }
+                        ],
+                        "metadata": {
+                            "grail": {
+                                "canonicalQuery": "timeseries by:{dt.entity.cloud_application}, {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application, \"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.simplenodeservice-team01-preprod\"\n| fieldsAdd sli = active[] / desired[] * 100\n| summarize sli = avg(arrayAvg(sli))",
+                                "timezone": "Europe/Berlin",
+                                "query": "timeseries {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}, by: {dt.entity.cloud_application}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application,\"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.simplenodeservice-team01-preprod\"\n| fieldsAdd sli = (active[]/desired[]) * 100\n| summarize sli = avg(arrayAvg(sli))",
+                                "scannedRecords": 42,
+                                "dqlVersion": "V1_0",
+                                "scannedBytes": 0,
+                                "scannedDataPoints": 12400,
+                                "analysisTimeframe": {
+                                    "start": "2025-01-10T07:40:00.000Z",
+                                    "end": "2025-01-10T09:41:00.000Z"
+                                },
+                                "locale": "en-US",
+                                "executionTimeMilliseconds": 85,
+                                "notifications": [],
+                                "queryId": "7d94035b-ad74-4134-aece-ae71003a9439",
+                                "sampled": false
+                            },
+                            "metrics": [
+                                {
+                                    "metric.key": "dt.kubernetes.workload.pods_desired",
+                                    "displayName": "Kubernetes: Workload - desired pod count",
+                                    "description": "This metric measures the number of desired pods. The most detailed level of aggregation is workload. The value corresponds to the 'replicas' defined in a deployment resource and to the 'desiredNumberScheduled' for a daemon set resource's status as examp",
+                                    "unit": "Count",
+                                    "fieldName": "desired"
+                                },
+                                {
+                                    "metric.key": "dt.kubernetes.pods",
+                                    "displayName": "Kubernetes: Pod count",
+                                    "description": "This metric measures the number of pods. The most detailed level of aggregation is workload and node. The value corresponds to the count of all pods.",
+                                    "unit": "Count",
+                                    "fieldName": "active"
+                                }
+                            ]
+                        },
+                        "types": [
+                            {
+                                "mappings": {
+                                    "sli": {
+                                        "type": "double"
+                                    }
+                                },
+                                "indexRange": [
+                                    0,
+                                    0
+                                ]
+                            }
+                        ]
+                    },
+                    "notifications": [],
+                    "querySettings": {
+                        "maxResultRecords": 1000,
+                        "defaultScanLimitGbytes": 500,
+                        "maxResultMegaBytes": 1,
+                        "defaultSamplingRatio": 10,
+                        "enableSampling": false
+                    },
+                    "dateTime": "2025-01-10T09:40:24.542Z",
+                    "input": {
+                        "timeframe": {
+                            "from": "now()-2h",
+                            "to": "now()"
+                        },
+                        "value": "timeseries {desired = avg(dt.kubernetes.workload.pods_desired), active = avg(dt.kubernetes.pods)}, by: {dt.entity.cloud_application}\n| fieldsAdd labels = entityAttr(dt.entity.cloud_application,\"cloudApplicationLabels\")\n| fieldsAdd component = labels[`backstage.io/component`]\n| filter component == \"default.simplenodeservice-team01-preprod\"\n| fieldsAdd sli = (active[]/desired[]) * 100\n| summarize sli = avg(arrayAvg(sli))"
+                    }
+                },
+                "state": "success",
+                "davis": {
+                    "includeLogs": true,
+                    "davisVisualization": {
+                        "isAvailable": true
+                    }
+                }
             }
         },
         {
@@ -229,13 +235,108 @@
             "height": 232,
             "state": {
                 "input": {
-                    "value": "timeseries {\n  total = sum(dt.synthetic.http.executions, default: 0),\n  pass = sum(dt.synthetic.http.executions, default: 0), filter: { matchesValue(http_monitor.result.status, \"HEALTHY\") }\n  },by: { dt.entity.http_check }\n| fieldsAdd name = entityName(dt.entity.http_check)\n| filter name == \"Healthcheck $proj_name-$owner-$stage\"\n| fieldsAdd sli=(((pass[])/total[])*(100))\n| summarize sli = avg(arrayAvg(sli))",
                     "timeframe": {
                         "from": "now()-1h",
                         "to": "now()"
-                    }
+                    },
+                    "value": "timeseries {\n  total = sum(dt.synthetic.http.executions, default: 0),\n  pass = sum(dt.synthetic.http.executions, default: 0), filter: { matchesValue(http_monitor.result.status, \"HEALTHY\") }\n  },by: { dt.entity.http_check }\n| fieldsAdd name = entityName(dt.entity.http_check)\n| filter name == \"Healthcheck $proj_name-$owner-$stage\"\n| fieldsAdd sli=(((pass[])/total[])*(100))\n| summarize sli = avg(arrayAvg(sli))"
                 },
-                "visualization": "singleValue",
+                "visualizationSettings": {
+                    "thresholds": [],
+                    "chartSettings": {
+                        "gapPolicy": "gap",
+                        "circleChartSettings": {
+                            "groupingThresholdType": "relative",
+                            "groupingThresholdValue": 0,
+                            "valueType": "relative"
+                        },
+                        "categoryOverrides": {},
+                        "curve": "linear",
+                        "pointsDisplay": "auto",
+                        "categoricalBarChartSettings": {
+                            "layout": "horizontal",
+                            "categoryAxisTickLayout": "horizontal",
+                            "scale": "absolute",
+                            "groupMode": "stacked",
+                            "colorPaletteMode": "multi-color",
+                            "categoryAxisLabel": "sli",
+                            "valueAxisLabel": "sli",
+                            "tooltipVariant": "single",
+                            "categoryAxis": [
+                                "sli"
+                            ],
+                            "valueAxis": [
+                                "sli"
+                            ]
+                        },
+                        "colorPalette": "categorical",
+                        "valueRepresentation": "absolute",
+                        "truncationMode": "middle",
+                        "xAxisScaling": "analyzedTimeframe",
+                        "xAxisLabel": "timeframe",
+                        "xAxisIsLabelVisible": false,
+                        "hiddenLegendFields": [],
+                        "leftYAxisSettings": {
+                            "isLabelVisible": true,
+                            "label": "Execution count (by status) [HTTP monitor]"
+                        }
+                    },
+                    "singleValue": {
+                        "showLabel": true,
+                        "label": "sli",
+                        "prefixIcon": "",
+                        "recordField": "sli",
+                        "autoscale": true,
+                        "alignment": "center",
+                        "trend": {
+                            "trendType": "auto",
+                            "isVisible": true
+                        },
+                        "colorThresholdTarget": "value"
+                    },
+                    "table": {
+                        "rowDensity": "condensed",
+                        "enableSparklines": false,
+                        "hiddenColumns": [],
+                        "linewrapEnabled": false,
+                        "lineWrapIds": [],
+                        "monospacedFontEnabled": false,
+                        "monospacedFontColumns": [],
+                        "firstVisibleRowIndex": 0,
+                        "columnWidths": {},
+                        "columnTypeOverrides": []
+                    },
+                    "honeycomb": {
+                        "shape": "hexagon",
+                        "legend": {
+                            "hidden": false,
+                            "position": "auto"
+                        },
+                        "displayedFields": [],
+                        "dataMappings": {},
+                        "truncationMode": "middle",
+                        "colorMode": "color-palette",
+                        "colorPalette": "categorical"
+                    },
+                    "histogram": {
+                        "legend": "auto",
+                        "yAxis": {
+                            "label": "Frequency",
+                            "scale": "linear"
+                        },
+                        "colorPalette": "categorical",
+                        "dataMappings": [
+                            {
+                                "valueAxis": "sli",
+                                "rangeAxis": ""
+                            }
+                        ],
+                        "variant": "single",
+                        "truncationMode": "middle",
+                        "displayedFields": []
+                    },
+                    "autoSelectVisualization": false
+                },
                 "querySettings": {
                     "maxResultRecords": 1000,
                     "defaultScanLimitGbytes": 500,
@@ -243,6 +344,7 @@
                     "defaultSamplingRatio": 10,
                     "enableSampling": false
                 },
+                "visualization": "singleValue",
                 "result": {
                     "code": 200,
                     "value": {
@@ -318,103 +420,13 @@
                         "value": "timeseries {\n  total = sum(dt.synthetic.http.executions, default: 0),\n  pass = sum(dt.synthetic.http.executions, default: 0), filter: { matchesValue(http_monitor.result.status, \"HEALTHY\") }\n  },by: { dt.entity.http_check }\n| fieldsAdd name = entityName(dt.entity.http_check)\n| filter name == \"Healthcheck simplenodeservice-team01-preprod\"\n| fieldsAdd sli=(((pass[])/total[])*(100))\n| summarize sli = avg(arrayAvg(sli))"
                     }
                 },
-                "visualizationSettings": {
-                    "thresholds": [],
-                    "chartSettings": {
-                        "xAxisScaling": "analyzedTimeframe",
-                        "gapPolicy": "gap",
-                        "circleChartSettings": {
-                            "groupingThresholdType": "relative",
-                            "groupingThresholdValue": 0,
-                            "valueType": "relative"
-                        },
-                        "categoryOverrides": {},
-                        "curve": "linear",
-                        "pointsDisplay": "auto",
-                        "categoricalBarChartSettings": {
-                            "layout": "horizontal",
-                            "categoryAxisTickLayout": "horizontal",
-                            "scale": "absolute",
-                            "groupMode": "stacked",
-                            "colorPaletteMode": "multi-color",
-                            "categoryAxisLabel": "sli",
-                            "valueAxisLabel": "sli",
-                            "tooltipVariant": "single",
-                            "categoryAxis": [
-                                "sli"
-                            ],
-                            "valueAxis": [
-                                "sli"
-                            ]
-                        },
-                        "colorPalette": "categorical",
-                        "valueRepresentation": "absolute",
-                        "truncationMode": "middle",
-                        "xAxisLabel": "timeframe",
-                        "xAxisIsLabelVisible": false,
-                        "hiddenLegendFields": [],
-                        "leftYAxisSettings": {
-                            "isLabelVisible": true,
-                            "label": "Execution count (by status) [HTTP monitor]"
-                        }
-                    },
-                    "singleValue": {
-                        "showLabel": true,
-                        "label": "sli",
-                        "prefixIcon": "",
-                        "recordField": "sli",
-                        "autoscale": true,
-                        "alignment": "center",
-                        "trend": {
-                            "trendType": "auto",
-                            "isVisible": true
-                        },
-                        "colorThresholdTarget": "value"
-                    },
-                    "table": {
-                        "rowDensity": "condensed",
-                        "enableSparklines": false,
-                        "hiddenColumns": [],
-                        "linewrapEnabled": false,
-                        "lineWrapIds": [],
-                        "monospacedFontEnabled": false,
-                        "monospacedFontColumns": [],
-                        "firstVisibleRowIndex": 0,
-                        "columnWidths": {},
-                        "columnTypeOverrides": []
-                    },
-                    "honeycomb": {
-                        "shape": "hexagon",
-                        "legend": {
-                            "hidden": false,
-                            "position": "auto"
-                        },
-                        "displayedFields": [],
-                        "dataMappings": {},
-                        "truncationMode": "middle",
-                        "colorMode": "color-palette",
-                        "colorPalette": "categorical"
-                    },
-                    "histogram": {
-                        "legend": "auto",
-                        "yAxis": {
-                            "label": "Frequency",
-                            "scale": "linear"
-                        },
-                        "colorPalette": "categorical",
-                        "dataMappings": [
-                            {
-                                "valueAxis": "sli",
-                                "rangeAxis": ""
-                            }
-                        ],
-                        "variant": "single",
-                        "truncationMode": "middle",
-                        "displayedFields": []
-                    },
-                    "autoSelectVisualization": false
-                },
-                "state": "success"
+                "state": "success",
+                "davis": {
+                    "includeLogs": true,
+                    "davisVisualization": {
+                        "isAvailable": true
+                    }
+                }
             }
         },
         {
@@ -432,84 +444,11 @@
             "height": 247,
             "state": {
                 "input": {
-                    "value": "timeseries total=avg(dt.service.request.response_time, default: 0), by: { dt.entity.service }, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd high=iCollectArray(if(total[]> (1000 * 500), total[]))\n| fieldsAdd low=iCollectArray(if(total[]<= (1000 * 500), total[]))\n| fieldsAdd highRespTimes=iCollectArray(if(isNull(high[]),0,else:1))\n| fieldsAdd lowRespTimes=iCollectArray(if(isNull(low[]),0,else:1))\n| fieldsAdd sli=100*(lowRespTimes[]/(lowRespTimes[]+highRespTimes[]))\n| summarize sli = avg(arrayAvg(sli))",
                     "timeframe": {
                         "from": "now()-30m",
                         "to": "now()"
-                    }
-                },
-                "visualization": "singleValue",
-                "querySettings": {
-                    "maxResultRecords": 1000,
-                    "defaultScanLimitGbytes": 500,
-                    "maxResultMegaBytes": 1,
-                    "defaultSamplingRatio": 10,
-                    "enableSampling": false
-                },
-                "result": {
-                    "code": 200,
-                    "value": {
-                        "records": [
-                            {
-                                "sli": 100
-                            }
-                        ],
-                        "metadata": {
-                            "grail": {
-                                "canonicalQuery": "timeseries by:{dt.entity.service}, total = avg(dt.service.request.response_time, default:0)\n| fieldsAdd tags = entityAttr(dt.entity.service, \"tags\")\n| filter in(tags, \"[Kubernetes]backstage.io/component:default.simplenodeservice-team01-qa\")\n| fieldsAdd high = iCollectArray(if(total[] > 1000 * 500, total[]))\n| fieldsAdd low = iCollectArray(if(total[] <= 1000 * 500, total[]))\n| fieldsAdd highRespTimes = iCollectArray(if(isNull(high[]), 0, else:1))\n| fieldsAdd lowRespTimes = iCollectArray(if(isNull(low[]), 0, else:1))\n| fieldsAdd sli = 100 * (lowRespTimes[] / (lowRespTimes[] + highRespTimes[]))\n| fieldsRemove total, high, low, highRespTimes, lowRespTimes\n| summarize sli = avg(arrayAvg(sli))",
-                                "timezone": "America/Chicago",
-                                "query": "timeseries total=avg(dt.service.request.response_time, default: 0), by: { dt.entity.service }\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.simplenodeservice-team01-qa\")\n| fieldsAdd high=iCollectArray(if(total[]> (1000 * 500), total[]))\n| fieldsAdd low=iCollectArray(if(total[]<= (1000 * 500), total[]))\n| fieldsAdd highRespTimes=iCollectArray(if(isNull(high[]),0,else:1))\n| fieldsAdd lowRespTimes=iCollectArray(if(isNull(low[]),0,else:1))\n| fieldsAdd sli=100*(lowRespTimes[]/(lowRespTimes[]+highRespTimes[]))\n| fieldsRemove total, high, low, highRespTimes, lowRespTimes\n| summarize sli = avg(arrayAvg(sli))",
-                                "scannedRecords": 3,
-                                "dqlVersion": "V1_0",
-                                "scannedBytes": 0,
-                                "scannedDataPoints": 31,
-                                "analysisTimeframe": {
-                                    "start": "2024-12-09T00:46:00.000Z",
-                                    "end": "2024-12-09T01:17:00.000Z"
-                                },
-                                "locale": "en-US",
-                                "executionTimeMilliseconds": 71,
-                                "notifications": [],
-                                "queryId": "f26f178f-c9e6-47d6-94b2-818cc29a4498",
-                                "sampled": false
-                            },
-                            "metrics": [
-                                {
-                                    "metric.key": "dt.service.request.response_time",
-                                    "fieldName": "total"
-                                }
-                            ]
-                        },
-                        "types": [
-                            {
-                                "mappings": {
-                                    "sli": {
-                                        "type": "double"
-                                    }
-                                },
-                                "indexRange": [
-                                    0,
-                                    0
-                                ]
-                            }
-                        ]
                     },
-                    "notifications": [],
-                    "querySettings": {
-                        "maxResultRecords": 1000,
-                        "defaultScanLimitGbytes": 500,
-                        "maxResultMegaBytes": 1,
-                        "defaultSamplingRatio": 10,
-                        "enableSampling": false
-                    },
-                    "dateTime": "2024-12-09T01:16:24.692Z",
-                    "input": {
-                        "timeframe": {
-                            "from": "now()-30m",
-                            "to": "now()"
-                        },
-                        "value": "timeseries total=avg(dt.service.request.response_time, default: 0), by: { dt.entity.service }\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.simplenodeservice-team01-qa\")\n| fieldsAdd high=iCollectArray(if(total[]> (1000 * 500), total[]))\n| fieldsAdd low=iCollectArray(if(total[]<= (1000 * 500), total[]))\n| fieldsAdd highRespTimes=iCollectArray(if(isNull(high[]),0,else:1))\n| fieldsAdd lowRespTimes=iCollectArray(if(isNull(low[]),0,else:1))\n| fieldsAdd sli=100*(lowRespTimes[]/(lowRespTimes[]+highRespTimes[]))\n| fieldsRemove total, high, low, highRespTimes, lowRespTimes\n| summarize sli = avg(arrayAvg(sli))"
-                    }
+                    "value": "timeseries total=avg(dt.service.request.response_time, default: 0), by: { dt.entity.service }, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd high=iCollectArray(if(total[]> (1000 * 500), total[]))\n| fieldsAdd low=iCollectArray(if(total[]<= (1000 * 500), total[]))\n| fieldsAdd highRespTimes=iCollectArray(if(isNull(high[]),0,else:1))\n| fieldsAdd lowRespTimes=iCollectArray(if(isNull(low[]),0,else:1))\n| fieldsAdd sli=100*(lowRespTimes[]/(lowRespTimes[]+highRespTimes[]))\n| summarize sli = avg(arrayAvg(sli))"
                 },
                 "visualizationSettings": {
                     "thresholds": [],
@@ -590,7 +529,86 @@
                     },
                     "autoSelectVisualization": false
                 },
-                "state": "success"
+                "querySettings": {
+                    "maxResultRecords": 1000,
+                    "defaultScanLimitGbytes": 500,
+                    "maxResultMegaBytes": 1,
+                    "defaultSamplingRatio": 10,
+                    "enableSampling": false
+                },
+                "visualization": "singleValue",
+                "result": {
+                    "code": 200,
+                    "value": {
+                        "records": [
+                            {
+                                "sli": 100
+                            }
+                        ],
+                        "metadata": {
+                            "grail": {
+                                "canonicalQuery": "timeseries by:{dt.entity.service}, total = avg(dt.service.request.response_time, default:0)\n| fieldsAdd tags = entityAttr(dt.entity.service, \"tags\")\n| filter in(tags, \"[Kubernetes]backstage.io/component:default.simplenodeservice-team01-qa\")\n| fieldsAdd high = iCollectArray(if(total[] > 1000 * 500, total[]))\n| fieldsAdd low = iCollectArray(if(total[] <= 1000 * 500, total[]))\n| fieldsAdd highRespTimes = iCollectArray(if(isNull(high[]), 0, else:1))\n| fieldsAdd lowRespTimes = iCollectArray(if(isNull(low[]), 0, else:1))\n| fieldsAdd sli = 100 * (lowRespTimes[] / (lowRespTimes[] + highRespTimes[]))\n| fieldsRemove total, high, low, highRespTimes, lowRespTimes\n| summarize sli = avg(arrayAvg(sli))",
+                                "timezone": "America/Chicago",
+                                "query": "timeseries total=avg(dt.service.request.response_time, default: 0), by: { dt.entity.service }\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.simplenodeservice-team01-qa\")\n| fieldsAdd high=iCollectArray(if(total[]> (1000 * 500), total[]))\n| fieldsAdd low=iCollectArray(if(total[]<= (1000 * 500), total[]))\n| fieldsAdd highRespTimes=iCollectArray(if(isNull(high[]),0,else:1))\n| fieldsAdd lowRespTimes=iCollectArray(if(isNull(low[]),0,else:1))\n| fieldsAdd sli=100*(lowRespTimes[]/(lowRespTimes[]+highRespTimes[]))\n| fieldsRemove total, high, low, highRespTimes, lowRespTimes\n| summarize sli = avg(arrayAvg(sli))",
+                                "scannedRecords": 3,
+                                "dqlVersion": "V1_0",
+                                "scannedBytes": 0,
+                                "scannedDataPoints": 31,
+                                "analysisTimeframe": {
+                                    "start": "2024-12-09T00:46:00.000Z",
+                                    "end": "2024-12-09T01:17:00.000Z"
+                                },
+                                "locale": "en-US",
+                                "executionTimeMilliseconds": 71,
+                                "notifications": [],
+                                "queryId": "f26f178f-c9e6-47d6-94b2-818cc29a4498",
+                                "sampled": false
+                            },
+                            "metrics": [
+                                {
+                                    "metric.key": "dt.service.request.response_time",
+                                    "fieldName": "total"
+                                }
+                            ]
+                        },
+                        "types": [
+                            {
+                                "mappings": {
+                                    "sli": {
+                                        "type": "double"
+                                    }
+                                },
+                                "indexRange": [
+                                    0,
+                                    0
+                                ]
+                            }
+                        ]
+                    },
+                    "notifications": [],
+                    "querySettings": {
+                        "maxResultRecords": 1000,
+                        "defaultScanLimitGbytes": 500,
+                        "maxResultMegaBytes": 1,
+                        "defaultSamplingRatio": 10,
+                        "enableSampling": false
+                    },
+                    "dateTime": "2024-12-09T01:16:24.692Z",
+                    "input": {
+                        "timeframe": {
+                            "from": "now()-30m",
+                            "to": "now()"
+                        },
+                        "value": "timeseries total=avg(dt.service.request.response_time, default: 0), by: { dt.entity.service }\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.simplenodeservice-team01-qa\")\n| fieldsAdd high=iCollectArray(if(total[]> (1000 * 500), total[]))\n| fieldsAdd low=iCollectArray(if(total[]<= (1000 * 500), total[]))\n| fieldsAdd highRespTimes=iCollectArray(if(isNull(high[]),0,else:1))\n| fieldsAdd lowRespTimes=iCollectArray(if(isNull(low[]),0,else:1))\n| fieldsAdd sli=100*(lowRespTimes[]/(lowRespTimes[]+highRespTimes[]))\n| fieldsRemove total, high, low, highRespTimes, lowRespTimes\n| summarize sli = avg(arrayAvg(sli))"
+                    }
+                },
+                "state": "success",
+                "davis": {
+                    "includeLogs": true,
+                    "davisVisualization": {
+                        "isAvailable": true
+                    }
+                }
             }
         },
         {
@@ -608,13 +626,91 @@
             "height": 261,
             "state": {
                 "input": {
-                    "value": "timeseries { total=sum(dt.service.request.count, default: 0) ,failures=sum(dt.service.request.failure_count, default: 0) }, by: { dt.entity.service }, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd sli=(((total[]-failures[])/total[])*(100))\n| summarize sli = avg(arrayAvg(sli))",
                     "timeframe": {
                         "from": "now()-30m",
                         "to": "now()"
-                    }
+                    },
+                    "value": "timeseries { total=sum(dt.service.request.count, default: 0) ,failures=sum(dt.service.request.failure_count, default: 0) }, by: { dt.entity.service }, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd sli=(((total[]-failures[])/total[])*(100))\n| summarize sli = avg(arrayAvg(sli))"
                 },
-                "visualization": "singleValue",
+                "visualizationSettings": {
+                    "thresholds": [],
+                    "chartSettings": {
+                        "gapPolicy": "gap",
+                        "circleChartSettings": {
+                            "groupingThresholdType": "relative",
+                            "groupingThresholdValue": 0,
+                            "valueType": "relative"
+                        },
+                        "categoryOverrides": {},
+                        "curve": "linear",
+                        "pointsDisplay": "auto",
+                        "categoricalBarChartSettings": {
+                            "layout": "horizontal",
+                            "categoryAxisTickLayout": "horizontal",
+                            "scale": "absolute",
+                            "groupMode": "stacked",
+                            "colorPaletteMode": "multi-color"
+                        },
+                        "colorPalette": "categorical",
+                        "valueRepresentation": "absolute",
+                        "truncationMode": "middle"
+                    },
+                    "singleValue": {
+                        "showLabel": true,
+                        "label": "sli",
+                        "prefixIcon": "",
+                        "recordField": "sli",
+                        "autoscale": true,
+                        "alignment": "center",
+                        "trend": {
+                            "trendType": "auto",
+                            "isVisible": true
+                        },
+                        "colorThresholdTarget": "value"
+                    },
+                    "table": {
+                        "rowDensity": "condensed",
+                        "enableSparklines": false,
+                        "hiddenColumns": [],
+                        "linewrapEnabled": false,
+                        "lineWrapIds": [],
+                        "monospacedFontEnabled": false,
+                        "monospacedFontColumns": [],
+                        "firstVisibleRowIndex": 0,
+                        "columnWidths": {},
+                        "columnTypeOverrides": []
+                    },
+                    "honeycomb": {
+                        "shape": "hexagon",
+                        "legend": {
+                            "hidden": false,
+                            "position": "auto"
+                        },
+                        "displayedFields": [],
+                        "dataMappings": {},
+                        "truncationMode": "middle",
+                        "colorMode": "color-palette",
+                        "colorPalette": "categorical"
+                    },
+                    "histogram": {
+                        "legend": "auto",
+                        "yAxis": {
+                            "label": "Frequency",
+                            "scale": "linear"
+                        },
+                        "colorPalette": "categorical",
+                        "dataMappings": [
+                            {
+                                "valueAxis": "sli",
+                                "rangeAxis": ""
+                            }
+                        ],
+                        "variant": "single",
+                        "truncationMode": "middle",
+                        "displayedFields": []
+                    },
+                    "autoSelectVisualization": false
+                },
                 "querySettings": {
                     "maxResultRecords": 1000,
                     "defaultScanLimitGbytes": 500,
@@ -622,6 +718,7 @@
                     "defaultSamplingRatio": 10,
                     "enableSampling": false
                 },
+                "visualization": "singleValue",
                 "result": {
                     "code": 200,
                     "value": {
@@ -691,6 +788,36 @@
                         "value": "timeseries { total=sum(dt.service.request.count, default: 0) ,failures=sum(dt.service.request.failure_count, default: 0) }, by: { dt.entity.service }\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.simplenodeservice-team01-qa\")\n| fieldsAdd sli=(((total[]-failures[])/total[])*(100))\n| fieldsRemove total, failures\n| summarize sli = avg(arrayAvg(sli))"
                     }
                 },
+                "state": "success",
+                "davis": {
+                    "includeLogs": true,
+                    "davisVisualization": {
+                        "isAvailable": true
+                    }
+                }
+            }
+        },
+        {
+            "id": "134eec97-5f4f-4382-a868-c05eeb1f1c75",
+            "type": "markdown",
+            "markdown": "#### container logs\nCalculates the ratio of total logs vs logs that have the status ERROR or WARN!\n\nFilter: All logs ingested in the k8s namespace matching the pattern: `$proj_name-$owner-$stage`. \n\nIdeally this ratio is always 100% as this means that we do not have any ERROR or WARN logs. This would especially be interesting after a deployment to see whether any change in log behavior comes in. This objective can also be used with automatic baselining vs a static threshold as applications typically have a certain number of ERROR or WARN. The Auto-Adaptive Baseline feature in SRG can learn and only alert if there is an anomaly!"
+        },
+        {
+            "id": "dcc58f97-b612-4265-b420-5097fbd7a1c4",
+            "type": "dql",
+            "title": "container logs",
+            "filterSegments": [],
+            "drilldownPath": [],
+            "previousFilterSegments": [],
+            "height": 274,
+            "state": {
+                "input": {
+                    "timeframe": {
+                        "from": "now()-1h",
+                        "to": "now()"
+                    },
+                    "value": "fetch logs\n| filter k8s.namespace.name == \"$proj_name-$owner-$stage\" and k8s.container.name == \"rollouts-demo\"\n| makeTimeseries {non_info = countIf(in(status,{\"ERROR\",\"WARN\"}), default:0)}\n| fieldsAdd sli = if(non_info[] != 0, 0, else: 1)\n| fieldsAdd sli = (sli[] / 1) * 100\n| summarize sli = avg(arrayAvg(sli))"
+                },
                 "visualizationSettings": {
                     "thresholds": [],
                     "chartSettings": {
@@ -770,31 +897,6 @@
                     },
                     "autoSelectVisualization": false
                 },
-                "state": "success"
-            }
-        },
-        {
-            "id": "134eec97-5f4f-4382-a868-c05eeb1f1c75",
-            "type": "markdown",
-            "markdown": "#### container logs\nCalculates the ratio of total logs vs logs that have the status ERROR or WARN!\n\nFilter: All logs ingested in the k8s namespace matching the pattern: `$proj_name-$owner-$stage`. \n\nIdeally this ratio is always 100% as this means that we do not have any ERROR or WARN logs. This would especially be interesting after a deployment to see whether any change in log behavior comes in. This objective can also be used with automatic baselining vs a static threshold as applications typically have a certain number of ERROR or WARN. The Auto-Adaptive Baseline feature in SRG can learn and only alert if there is an anomaly!"
-        },
-        {
-            "id": "dcc58f97-b612-4265-b420-5097fbd7a1c4",
-            "type": "dql",
-            "title": "container logs",
-            "filterSegments": [],
-            "drilldownPath": [],
-            "previousFilterSegments": [],
-            "height": 274,
-            "state": {
-                "input": {
-                    "value": "fetch logs\n| filter k8s.namespace.name == \"$proj_name-$owner-$stage\" and k8s.container.name == \"rollouts-demo\"\n| makeTimeseries {non_info = countIf(in(status,{\"ERROR\",\"WARN\"}), default:0)}\n| fieldsAdd sli = if(non_info[] != 0, 0, else: 1)\n| fieldsAdd sli = (sli[] / 1) * 100\n| summarize sli = avg(arrayAvg(sli))",
-                    "timeframe": {
-                        "from": "now()-1h",
-                        "to": "now()"
-                    }
-                },
-                "visualization": "singleValue",
                 "querySettings": {
                     "maxResultRecords": 1000,
                     "defaultScanLimitGbytes": 500,
@@ -802,6 +904,7 @@
                     "defaultSamplingRatio": 10,
                     "enableSampling": false
                 },
+                "visualization": "singleValue",
                 "result": {
                     "code": 200,
                     "value": {
@@ -861,86 +964,13 @@
                         "value": "fetch logs\n| filter k8s.namespace.name == \"simplenodeservice-team01-qa\" and k8s.container.name == \"rollouts-demo\"\n| makeTimeseries {non_info = countIf(in(status,{\"ERROR\",\"WARN\"}), default:0)}\n| fieldsAdd sli = if(non_info[] != 0, 0, else: 1)\n| fieldsAdd sli = (sli[] / 1) * 100\n| fieldsRemove non_info\n| summarize sli = avg(arrayAvg(sli))"
                     }
                 },
-                "visualizationSettings": {
-                    "thresholds": [],
-                    "chartSettings": {
-                        "gapPolicy": "gap",
-                        "circleChartSettings": {
-                            "groupingThresholdType": "relative",
-                            "groupingThresholdValue": 0,
-                            "valueType": "relative"
-                        },
-                        "categoryOverrides": {},
-                        "curve": "linear",
-                        "pointsDisplay": "auto",
-                        "categoricalBarChartSettings": {
-                            "layout": "horizontal",
-                            "categoryAxisTickLayout": "horizontal",
-                            "scale": "absolute",
-                            "groupMode": "stacked",
-                            "colorPaletteMode": "multi-color"
-                        },
-                        "colorPalette": "categorical",
-                        "valueRepresentation": "absolute",
-                        "truncationMode": "middle"
-                    },
-                    "singleValue": {
-                        "showLabel": true,
-                        "label": "sli",
-                        "prefixIcon": "",
-                        "recordField": "sli",
-                        "autoscale": true,
-                        "alignment": "center",
-                        "trend": {
-                            "trendType": "auto",
-                            "isVisible": true
-                        },
-                        "colorThresholdTarget": "value"
-                    },
-                    "table": {
-                        "rowDensity": "condensed",
-                        "enableSparklines": false,
-                        "hiddenColumns": [],
-                        "linewrapEnabled": false,
-                        "lineWrapIds": [],
-                        "monospacedFontEnabled": false,
-                        "monospacedFontColumns": [],
-                        "firstVisibleRowIndex": 0,
-                        "columnWidths": {},
-                        "columnTypeOverrides": []
-                    },
-                    "honeycomb": {
-                        "shape": "hexagon",
-                        "legend": {
-                            "hidden": false,
-                            "position": "auto"
-                        },
-                        "displayedFields": [],
-                        "dataMappings": {},
-                        "truncationMode": "middle",
-                        "colorMode": "color-palette",
-                        "colorPalette": "categorical"
-                    },
-                    "histogram": {
-                        "legend": "auto",
-                        "yAxis": {
-                            "label": "Frequency",
-                            "scale": "linear"
-                        },
-                        "colorPalette": "categorical",
-                        "dataMappings": [
-                            {
-                                "valueAxis": "sli",
-                                "rangeAxis": ""
-                            }
-                        ],
-                        "variant": "single",
-                        "truncationMode": "middle",
-                        "displayedFields": []
-                    },
-                    "autoSelectVisualization": false
-                },
-                "state": "success"
+                "state": "success",
+                "davis": {
+                    "includeLogs": true,
+                    "davisVisualization": {
+                        "isAvailable": true
+                    }
+                }
             }
         },
         {
@@ -958,84 +988,11 @@
             "height": 257,
             "state": {
                 "input": {
-                    "value": "timeseries {count = sum(dt.service.request.count, default: 0)}, by: {dt.entity.service}, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd traffic = if(count[] == 0, 0, else: 1)\n| fieldsAdd sli = (traffic[] / 1) * 100\n| summarize sli = avg(arrayAvg(sli))",
                     "timeframe": {
                         "from": "now()-30m",
                         "to": "now()"
-                    }
-                },
-                "visualization": "singleValue",
-                "querySettings": {
-                    "maxResultRecords": 1000,
-                    "defaultScanLimitGbytes": 500,
-                    "maxResultMegaBytes": 1,
-                    "defaultSamplingRatio": 10,
-                    "enableSampling": false
-                },
-                "result": {
-                    "code": 200,
-                    "value": {
-                        "records": [
-                            {
-                                "sli": 70.96774193548387
-                            }
-                        ],
-                        "metadata": {
-                            "grail": {
-                                "canonicalQuery": "timeseries by:{dt.entity.service}, count = sum(dt.service.request.count, default:0)\n| fieldsAdd tags = entityAttr(dt.entity.service, \"tags\")\n| filter in(tags, \"[Kubernetes]backstage.io/component:default.simplenodeservice-team01-qa\")\n| fieldsAdd traffic = if(count[] == 0, 0, else:1)\n| fieldsAdd sli = traffic[] / 1 * 100\n| fieldsRemove traffic, count\n| summarize sli = avg(arrayAvg(sli))",
-                                "timezone": "America/Chicago",
-                                "query": "timeseries {count = sum(dt.service.request.count, default: 0)}, by: {dt.entity.service}\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.simplenodeservice-team01-qa\")\n| fieldsAdd traffic = if(count[] == 0, 0, else: 1)\n| fieldsAdd sli = (traffic[] / 1) * 100\n| fieldsRemove traffic, count\n| summarize sli = avg(arrayAvg(sli))",
-                                "scannedRecords": 3,
-                                "dqlVersion": "V1_0",
-                                "scannedBytes": 0,
-                                "scannedDataPoints": 31,
-                                "analysisTimeframe": {
-                                    "start": "2024-12-09T00:44:00.000Z",
-                                    "end": "2024-12-09T01:15:00.000Z"
-                                },
-                                "locale": "en-US",
-                                "executionTimeMilliseconds": 64,
-                                "notifications": [],
-                                "queryId": "0e1d908d-b065-4fba-acb5-b6d2e606b1b0",
-                                "sampled": false
-                            },
-                            "metrics": [
-                                {
-                                    "metric.key": "dt.service.request.count",
-                                    "fieldName": "count"
-                                }
-                            ]
-                        },
-                        "types": [
-                            {
-                                "mappings": {
-                                    "sli": {
-                                        "type": "double"
-                                    }
-                                },
-                                "indexRange": [
-                                    0,
-                                    0
-                                ]
-                            }
-                        ]
                     },
-                    "notifications": [],
-                    "querySettings": {
-                        "maxResultRecords": 1000,
-                        "defaultScanLimitGbytes": 500,
-                        "maxResultMegaBytes": 1,
-                        "defaultSamplingRatio": 10,
-                        "enableSampling": false
-                    },
-                    "dateTime": "2024-12-09T01:14:58.310Z",
-                    "input": {
-                        "timeframe": {
-                            "from": "now()-30m",
-                            "to": "now()"
-                        },
-                        "value": "timeseries {count = sum(dt.service.request.count, default: 0)}, by: {dt.entity.service}\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.simplenodeservice-team01-qa\")\n| fieldsAdd traffic = if(count[] == 0, 0, else: 1)\n| fieldsAdd sli = (traffic[] / 1) * 100\n| fieldsRemove traffic, count\n| summarize sli = avg(arrayAvg(sli))"
-                    }
+                    "value": "timeseries {count = sum(dt.service.request.count, default: 0)}, by: {dt.entity.service}, filter: { k8s.namespace.name == \"$proj_name-$owner-$stage\" }\n| fieldsAdd traffic = if(count[] == 0, 0, else: 1)\n| fieldsAdd sli = (traffic[] / 1) * 100\n| summarize sli = avg(arrayAvg(sli))"
                 },
                 "visualizationSettings": {
                     "thresholds": [],
@@ -1124,8 +1081,92 @@
                     },
                     "autoSelectVisualization": false
                 },
-                "state": "success"
+                "querySettings": {
+                    "maxResultRecords": 1000,
+                    "defaultScanLimitGbytes": 500,
+                    "maxResultMegaBytes": 1,
+                    "defaultSamplingRatio": 10,
+                    "enableSampling": false
+                },
+                "visualization": "singleValue",
+                "result": {
+                    "code": 200,
+                    "value": {
+                        "records": [
+                            {
+                                "sli": 70.96774193548387
+                            }
+                        ],
+                        "metadata": {
+                            "grail": {
+                                "canonicalQuery": "timeseries by:{dt.entity.service}, count = sum(dt.service.request.count, default:0)\n| fieldsAdd tags = entityAttr(dt.entity.service, \"tags\")\n| filter in(tags, \"[Kubernetes]backstage.io/component:default.simplenodeservice-team01-qa\")\n| fieldsAdd traffic = if(count[] == 0, 0, else:1)\n| fieldsAdd sli = traffic[] / 1 * 100\n| fieldsRemove traffic, count\n| summarize sli = avg(arrayAvg(sli))",
+                                "timezone": "America/Chicago",
+                                "query": "timeseries {count = sum(dt.service.request.count, default: 0)}, by: {dt.entity.service}\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.simplenodeservice-team01-qa\")\n| fieldsAdd traffic = if(count[] == 0, 0, else: 1)\n| fieldsAdd sli = (traffic[] / 1) * 100\n| fieldsRemove traffic, count\n| summarize sli = avg(arrayAvg(sli))",
+                                "scannedRecords": 3,
+                                "dqlVersion": "V1_0",
+                                "scannedBytes": 0,
+                                "scannedDataPoints": 31,
+                                "analysisTimeframe": {
+                                    "start": "2024-12-09T00:44:00.000Z",
+                                    "end": "2024-12-09T01:15:00.000Z"
+                                },
+                                "locale": "en-US",
+                                "executionTimeMilliseconds": 64,
+                                "notifications": [],
+                                "queryId": "0e1d908d-b065-4fba-acb5-b6d2e606b1b0",
+                                "sampled": false
+                            },
+                            "metrics": [
+                                {
+                                    "metric.key": "dt.service.request.count",
+                                    "fieldName": "count"
+                                }
+                            ]
+                        },
+                        "types": [
+                            {
+                                "mappings": {
+                                    "sli": {
+                                        "type": "double"
+                                    }
+                                },
+                                "indexRange": [
+                                    0,
+                                    0
+                                ]
+                            }
+                        ]
+                    },
+                    "notifications": [],
+                    "querySettings": {
+                        "maxResultRecords": 1000,
+                        "defaultScanLimitGbytes": 500,
+                        "maxResultMegaBytes": 1,
+                        "defaultSamplingRatio": 10,
+                        "enableSampling": false
+                    },
+                    "dateTime": "2024-12-09T01:14:58.310Z",
+                    "input": {
+                        "timeframe": {
+                            "from": "now()-30m",
+                            "to": "now()"
+                        },
+                        "value": "timeseries {count = sum(dt.service.request.count, default: 0)}, by: {dt.entity.service}\n| fieldsAdd tags = entityAttr(dt.entity.service,\"tags\")\n| filter in(tags,\"[Kubernetes]backstage.io/component:default.simplenodeservice-team01-qa\")\n| fieldsAdd traffic = if(count[] == 0, 0, else: 1)\n| fieldsAdd sli = (traffic[] / 1) * 100\n| fieldsRemove traffic, count\n| summarize sli = avg(arrayAvg(sli))"
+                    }
+                },
+                "state": "success",
+                "davis": {
+                    "includeLogs": true,
+                    "davisVisualization": {
+                        "isAvailable": true
+                    }
+                }
             }
+        },
+        {
+            "id": "36a9df61-f838-446a-8c30-ea6eb499192d",
+            "type": "markdown",
+            "markdown": "## Observability Score Validation\n\nWhile its great to allow every team to define their own SRG to validate their own application & service objectives its important to also validate a set of objectives ACROSS ALL deployments.\n\nIf you are a central observability, security, platform or architecture team you want to make sure that after every deployment you have\n- Dynatrace successfully ingest logs, metrics, traces, events ... => otherwise you are flying blind\n- No Security Vulnerabilities ==> you don't want vulnerable code in your environments\n- Ingress works as expected ==> you want to make sure deployed apps are accessible\n\nAs an additional best practice - and to expand on the examples above with the used variables - we can define an SRG to validate all of this. Here are two examples of DQL Queries you can use to validate that Dynatrace ingests logs and metrics:\n**Objective**: validate capturing logs\n**Description**: Validate that logs are being captured\n```\nfetch logs\n| filter k8s.namespace.name == \"$proj_name-$owner-$stage\" and k8s.container.name == \"rollouts-demo\"\n| summarize count()\n```\n\n**Objective**: validate capturing requests\n**Description**: Validates that Dynatrace captured requests\n```\ntimeseries {\n   requestCount=sum(dt.service.request.count)\n}, by:{dt.entity.service}, filter: k8s.namespace.name == \"$proj_name-$owner-$stage\", nonempty: true\n| fields maxCount = arrayMax(requestCount)\n```"
         }
     ]
 }
