@@ -7,13 +7,20 @@
             "visible": true,
             "input": "fetch dt.entity.process_group_instance, from:now() - 2h\n| fields releasesProduct\n| filter isNotNull(releasesProduct)\n| dedup releasesProduct\n| fieldsAdd releasePLower = lower(releasesProduct)\n| sort releasePLower asc\n| fields releasesProduct",
             "multiple": false
+        },
+        {
+            "key": "Environment",
+            "type": "query",
+            "visible": false,
+            "input": "fetch dt.system.events | fields dt.system.environment | limit 1",
+            "multiple": false
         }
     ],
     "tiles": {
         "0": {
             "type": "data",
-            "title": "",
-            "query": "fetch dt.entity.process_group_instance, from:now() - 2h\n| fields entity.name, releasesVersion, process_group = instance_of[dt.entity.process_group], releasesBuildVersion, releasesProduct, releasesStage, container.id = belongs_to[dt.entity.container_group_instance]\n| filter isNotNull(releasesVersion)\n| filter releasesProduct  == $Product\n| lookup [\n  fetch dt.entity.container_group_instance, from: -90d\n    | fields id, container.id = id\n    //, cluster.id = belongs_to[dt.entity.kubernetes_cluster]\n    //, namespace.id = belongs_to[dt.entity.cloud_application_namespace], namespace.name = namespaceName\n    , workload.id = belongs_to[dt.entity.cloud_application], workload.name = workloadName\n], sourceField:container.id, lookupField:container.id, fields:{workload.id, workload.name}, executionOrder:leftFirst\n| fieldsAdd releaseVersion = parse(releasesVersion,\"\"\" \"ReleaseVersionInfo{version='\"LD:version\"'\"LD \"\"\")\n| summarize entity.name = takeAny(entity.name),\n            workload.id = collectArray(workload.id),\n            workload.name = collectArray(workload.name),\n            by:{\n               process_group,\n               releaseVersion,\n               releasesBuildVersion,\n          //     releasesProduct,\n               releasesStage\n             }\n| fieldsAdd workload.id = arrayRemoveNulls(workload.id)\n| fieldsAdd workload.id = arrayFirst(workload.id)\n| fieldsAdd workload.name = arrayRemoveNulls(workload.name)\n| fieldsAdd workload.name = arrayFirst(workload.name)\n| sort lower(entity.name) asc\n| fields Name=entity.name, Version=releaseVersion,\n Stage=releasesStage, dt.entity.cloud_application=workload.id,\n Workload = workload.name,\n dt.entity.process_group = process_group\n //, Product=releasesProduct",
+            "title": "To drill in: Click on the id and select \"Open record with\"",
+            "query": "// get all PGIs\nfetch dt.entity.process_group_instance, from:now() - 2h\n| fields Entity = entity.name, releasesVersion, process_group = instance_of[dt.entity.process_group], releasesBuildVersion, releasesProduct, Environment = releasesStage, container.id = belongs_to[dt.entity.container_group_instance]\n// with a releaseVersion\n| filter isNotNull(releasesVersion)\n// for the following component\n| filter releasesProduct  == $Product\n// parse release version\n| fieldsAdd Version = parse(releasesVersion,\"\"\" \"ReleaseVersionInfo{version='\"LD:version\"'\"LD \"\"\")\n// and remove raw releaseVersion field as it's no longer needed\n| fieldsRemove releasesVersion\n\n// now lookup the cloud application id (workload.id) via container.id in container_group_instance\n| lookup [\n  fetch dt.entity.container_group_instance, from: -90d // ToDo: does this really need to be -90 days? seems a lot\n    | fields id, container.id = id\n    //, cluster.id = belongs_to[dt.entity.kubernetes_cluster]\n    //, namespace.id = belongs_to[dt.entity.cloud_application_namespace], namespace.name = namespaceName\n    , workload.id = belongs_to[dt.entity.cloud_application], workload.name = workloadName\n], sourceField:container.id, lookupField:container.id, fields:{workload.id, workload.name}, executionOrder:leftFirst\n// based on workload.id, we can now lookup running and desired pods\n| lookup [\n  timeseries pods_running = sum(dt.kubernetes.pods), filter: pod_phase == \"Running\", by:{dt.entity.cloud_application}, from: -2m\n  | lookup [\n    timeseries pods_desired = sum(dt.kubernetes.workload.pods_desired), by:{dt.entity.cloud_application}, from: -2m\n  ], sourceField: dt.entity.cloud_application, lookupField: dt.entity.cloud_application, fields:{pods_desired}\n  // we only need the first entry of the timeseries\n  | fieldsAdd Running = arrayFirst(pods_running), Desired = arrayFirst(pods_desired)\n], sourceField:workload.id, lookupField:dt.entity.cloud_application, fields:{Running, Desired}, executionOrder:leftFirst\n// based on workload.id, we can now lookup cpu usage\n| lookup [\n  timeseries values = sum(dt.kubernetes.container.cpu_usage), by:{dt.entity.cloud_application}, from: -2m\n| fieldsAdd raw_cpu_usage = arrayFirst(values)\n], sourceField:workload.id, lookupField:dt.entity.cloud_application, fields:{raw_cpu_usage}, executionOrder:leftFirst\n| fieldsAdd CPU = if(isNull(raw_cpu_usage), 0, else: raw_cpu_usage)\n// as well as memory\n| lookup [\n  timeseries values = sum(dt.kubernetes.container.memory_working_set), by:{dt.entity.cloud_application}, from: -2m\n| fieldsAdd raw_memory_usage = arrayFirst(values)\n], sourceField:workload.id, lookupField:dt.entity.cloud_application, fields:{raw_memory_usage}, executionOrder:leftFirst\n| fieldsAdd Mem = if(isNull(raw_memory_usage), 0, else: raw_memory_usage)\n| fieldsAdd id = workload.id\n\n// now you can run summarize, etc... to make the result look pretty",
             "davis": {
                 "enabled": false,
                 "davisVisualization": {
@@ -40,16 +47,27 @@
                         "groupMode": "stacked",
                         "colorPaletteMode": "multi-color",
                         "categoryAxis": [
-                            "Name",
+                            "Entity",
+                            "process_group",
+                            "releasesBuildVersion",
+                            "releasesProduct",
+                            "Environment",
+                            "container.id",
                             "Version",
-                            "Stage",
-                            "dt.entity.cloud_application",
-                            "Workload",
-                            "dt.entity.process_group"
+                            "workload.id",
+                            "workload.name",
+                            "id"
                         ],
-                        "categoryAxisLabel": "Name,Version,Stage,dt.entity.cloud_application,Workload,dt.entity.process_group",
-                        "valueAxis": [],
-                        "valueAxisLabel": "",
+                        "categoryAxisLabel": "Entity,process_group,releasesBuildVersion,releasesProduct,Environment,container.id,Version,workload.id,workload.name,id",
+                        "valueAxis": [
+                            "Running",
+                            "Desired",
+                            "raw_cpu_usage",
+                            "CPU",
+                            "raw_memory_usage",
+                            "Mem"
+                        ],
+                        "valueAxisLabel": "Running,Desired,raw_cpu_usage,CPU,raw_memory_usage,Mem",
                         "tooltipVariant": "single"
                     },
                     "colorPalette": "categorical",
@@ -74,10 +92,31 @@
                     "enableSparklines": false,
                     "hiddenColumns": [
                         [
-                            "dt.entity.cloud_application"
+                            "process_group"
                         ],
                         [
-                            "dt.entity.process_group"
+                            "releasesBuildVersion"
+                        ],
+                        [
+                            "releasesProduct"
+                        ],
+                        [
+                            "container.id"
+                        ],
+                        [
+                            "workload.id"
+                        ],
+                        [
+                            "workload.name"
+                        ],
+                        [
+                            "Desired"
+                        ],
+                        [
+                            "raw_cpu_usage"
+                        ],
+                        [
+                            "raw_memory_usage"
                         ]
                     ],
                     "linewrapEnabled": false,
@@ -85,7 +124,9 @@
                     "monospacedFontEnabled": false,
                     "monospacedFontColumns": [],
                     "columnWidths": {
-                        "[\"Name\"]": 378
+                        "[\"Name\"]": 325,
+                        "[\"Stage\"]": 204.578125,
+                        "[\"Version\"]": 94.234375
                     },
                     "columnTypeOverrides": []
                 },
@@ -96,19 +137,23 @@
                         "position": "auto"
                     },
                     "displayedFields": [
-                        "Name",
+                        "Entity",
+                        "process_group",
+                        "releasesBuildVersion",
+                        "releasesProduct",
+                        "Environment",
+                        "container.id",
                         "Version",
-                        "Stage",
-                        "dt.entity.cloud_application",
-                        "Workload",
-                        "dt.entity.process_group"
+                        "workload.id",
+                        "workload.name",
+                        "id"
                     ],
                     "dataMappings": {
-                        "value": "Name"
+                        "value": "Running"
                     },
                     "truncationMode": "middle",
                     "colorMode": "color-palette",
-                    "colorPalette": "categorical"
+                    "colorPalette": "blue"
                 },
                 "histogram": {
                     "legend": "auto",
@@ -117,19 +162,119 @@
                         "scale": "linear"
                     },
                     "colorPalette": "categorical",
-                    "dataMappings": [],
+                    "dataMappings": [
+                        {
+                            "valueAxis": "Running",
+                            "rangeAxis": ""
+                        },
+                        {
+                            "valueAxis": "Desired",
+                            "rangeAxis": ""
+                        },
+                        {
+                            "valueAxis": "raw_cpu_usage",
+                            "rangeAxis": ""
+                        },
+                        {
+                            "valueAxis": "CPU",
+                            "rangeAxis": ""
+                        },
+                        {
+                            "valueAxis": "raw_memory_usage",
+                            "rangeAxis": ""
+                        },
+                        {
+                            "valueAxis": "Mem",
+                            "rangeAxis": ""
+                        }
+                    ],
                     "variant": "single",
                     "truncationMode": "middle",
                     "displayedFields": [
-                        "Name",
+                        "Entity",
+                        "process_group",
+                        "releasesBuildVersion",
+                        "releasesProduct",
+                        "container.id",
                         "Version",
-                        "Stage",
-                        "Workload",
-                        "dt.entity.process_group",
-                        "dt.entity.cloud_application"
+                        "workload.id",
+                        "workload.name",
+                        "id"
                     ]
                 },
-                "autoSelectVisualization": false
+                "label": {
+                    "showLabel": false,
+                    "label": "Running"
+                },
+                "icon": {
+                    "showIcon": false,
+                    "icon": ""
+                },
+                "valueBoundaries": {
+                    "min": "auto",
+                    "max": "auto"
+                },
+                "autoSelectVisualization": false,
+                "unitsOverrides": [
+                    {
+                        "identifier": "Running",
+                        "unitCategory": "unspecified",
+                        "baseUnit": "none",
+                        "displayUnit": null,
+                        "decimals": 0,
+                        "suffix": "",
+                        "delimiter": false,
+                        "added": 1736506136473
+                    },
+                    {
+                        "identifier": "Desired",
+                        "unitCategory": "unspecified",
+                        "baseUnit": "none",
+                        "displayUnit": null,
+                        "decimals": 0,
+                        "suffix": "",
+                        "delimiter": false,
+                        "added": 1736506173932
+                    },
+                    {
+                        "identifier": "CPU",
+                        "unitCategory": "unspecified",
+                        "baseUnit": "millicore",
+                        "displayUnit": null,
+                        "decimals": 2,
+                        "suffix": "",
+                        "delimiter": true,
+                        "added": 1736506205233
+                    },
+                    {
+                        "identifier": "Mem",
+                        "unitCategory": "data",
+                        "baseUnit": "byte",
+                        "displayUnit": null,
+                        "decimals": 2,
+                        "suffix": "",
+                        "delimiter": false,
+                        "added": 1736506242697
+                    }
+                ],
+                "dataMapping": {
+                    "dimension": "Entity",
+                    "displayedFields": [
+                        "Entity",
+                        "process_group",
+                        "releasesProduct",
+                        "Environment",
+                        "container.id",
+                        "Version",
+                        "workload.id",
+                        "workload.name",
+                        "id"
+                    ],
+                    "value": "Running",
+                    "longitude": "Running",
+                    "latitude": "Desired"
+                },
+                "tooltip": {}
             },
             "visualization": "table",
             "querySettings": {
@@ -138,17 +283,18 @@
                 "maxResultMegaBytes": 1,
                 "defaultSamplingRatio": 10,
                 "enableSampling": false
-            }
+            },
+            "description": ""
         },
         "1": {
             "type": "markdown",
             "title": "",
-            "content": "## ✨ Deployment Inventory"
+            "content": "## Deployment Inventory & History\n\n---\n\nEnrich your deployments to let the [K8s version detection strategy](https://docs.dynatrace.com/docs/deliver/release-monitoring/version-detection-strategies#kubernetes) pick up your versions.\n"
         },
         "4": {
             "type": "data",
-            "title": "Guardian Validations",
-            "query": "fetch bizEvents\n| filter event.type == \"guardian.validation.finished\" \n// | filter contains (guardian.name,  $Product)\n| fields timestamp, Guardian=guardian.name, Descr=guardian.description,Status=validation.status, ObjectiveSummary=validation.summary, trigger=validation.workflow.trigger_type, guardian.id, validation.id",
+            "title": "Validations",
+            "query": "fetch bizEvents\n| filter event.type == \"guardian.validation.finished\" \n// | filter contains (guardian.name,  $Product)\n| parse validation.summary, \"\"\"JSON:result\"\"\"\n| fields timestamp\n, Guardian=concat(\"[\",guardian.name,\"](https://\",$Environment,\".dev.apps.dynatracelabs.com/ui/apps/dynatrace.site.reliability.guardian/analysis/\",guardian.id,\"?validationId=\",validation.id,\")\")\n, Descr=coalesce(guardian.description, \"\")\n,Status=validation.status\n, Pass = result[pass]\n, Warning=result[warning]\n, Fail=result[fail]\n, Error=result[error]\n, trigger=validation.workflow.trigger_type\n",
             "davis": {
                 "enabled": false,
                 "davisVisualization": {
@@ -169,20 +315,38 @@
                     "categoryOverrides": {},
                     "truncationMode": "middle",
                     "categoricalBarChartSettings": {
-                        "categoryAxisLabel": "Guardian,Status,ObjectiveSummary,trigger,guardian.id,validation.id,Descr",
-                        "valueAxisLabel": "",
+                        "categoryAxisLabel": "Guardian,Descr,Status,trigger",
+                        "valueAxisLabel": "Pass,Warning,Fail,Error",
                         "tooltipVariant": "single",
                         "categoryAxis": [
                             "Guardian",
+                            "Descr",
                             "Status",
-                            "ObjectiveSummary",
-                            "trigger",
-                            "guardian.id",
-                            "validation.id",
-                            "Descr"
+                            "trigger"
                         ],
-                        "valueAxis": []
-                    }
+                        "valueAxis": [
+                            "Pass",
+                            "Warning",
+                            "Fail",
+                            "Error"
+                        ]
+                    },
+                    "fieldMapping": {
+                        "timestamp": "timestamp",
+                        "leftAxisValues": [
+                            "Pass"
+                        ]
+                    },
+                    "xAxisLabel": "timestamp",
+                    "xAxisIsLabelVisible": false,
+                    "valueRepresentation": "absolute",
+                    "hiddenLegendFields": [
+                        "Pass",
+                        "Warning",
+                        "Fail",
+                        "Error"
+                    ],
+                    "leftYAxisSettings": {}
                 },
                 "singleValue": {
                     "showLabel": true,
@@ -203,48 +367,111 @@
                     "lineWrapIds": [],
                     "columnWidths": {
                         "[\"timestamp\"]": 148,
-                        "[\"Guardian\"]": 123,
+                        "[\"Guardian\"]": 256,
                         "[\"Status\"]": 91,
-                        "[\"ObjectiveSummary\"]": 347,
-                        "[\"trigger\"]": 267.234375,
+                        "[\"ObjectiveSummary\"]": 173,
+                        "[\"trigger\"]": 93.234375,
                         "[\"Descr\"]": 162.015625
                     },
-                    "columnTypeOverrides": []
+                    "columnTypeOverrides": [
+                        {
+                            "id": 7048856.4,
+                            "fields": [
+                                "Guardian"
+                            ],
+                            "value": "markdown"
+                        },
+                        {
+                            "id": 43701.19999998808,
+                            "fields": [
+                                "Pass"
+                            ],
+                            "value": "markdown"
+                        }
+                    ],
+                    "sortBy": {
+                        "columnId": "[\"timestamp\"]",
+                        "direction": "descending"
+                    },
+                    "linewrapEnabled": false,
+                    "monospacedFontEnabled": false,
+                    "monospacedFontColumns": []
                 },
                 "honeycomb": {
                     "shape": "square",
                     "dataMappings": {
-                        "value": "Guardian"
+                        "value": "Pass"
                     },
                     "displayedFields": [
                         "Guardian",
                         "Descr",
                         "Status",
-                        "ObjectiveSummary",
-                        "trigger",
-                        "guardian.id",
-                        "validation.id"
+                        "trigger"
                     ],
                     "legend": {
                         "hidden": false,
                         "position": "auto"
                     },
                     "colorMode": "color-palette",
-                    "colorPalette": "categorical"
+                    "colorPalette": "blue"
                 },
                 "histogram": {
-                    "dataMappings": [],
+                    "dataMappings": [
+                        {
+                            "valueAxis": "Pass",
+                            "rangeAxis": ""
+                        },
+                        {
+                            "valueAxis": "Warning",
+                            "rangeAxis": ""
+                        },
+                        {
+                            "valueAxis": "Fail",
+                            "rangeAxis": ""
+                        },
+                        {
+                            "valueAxis": "Error",
+                            "rangeAxis": ""
+                        }
+                    ],
                     "variant": "single",
                     "displayedFields": [
                         "Guardian",
                         "Descr",
                         "Status",
-                        "ObjectiveSummary",
-                        "trigger",
-                        "guardian.id",
-                        "validation.id"
+                        "trigger"
                     ]
-                }
+                },
+                "label": {
+                    "showLabel": false,
+                    "label": "Pass"
+                },
+                "icon": {
+                    "showIcon": false,
+                    "icon": ""
+                },
+                "valueBoundaries": {
+                    "min": "auto",
+                    "max": "auto"
+                },
+                "dataMapping": {
+                    "dimension": "timestamp",
+                    "displayedFields": [
+                        "timestamp",
+                        "Guardian",
+                        "Descr",
+                        "Status",
+                        "Pass",
+                        "Warning",
+                        "Fail",
+                        "Error",
+                        "trigger"
+                    ],
+                    "value": "Pass",
+                    "longitude": "Pass",
+                    "latitude": "Warning"
+                },
+                "tooltip": {}
             },
             "querySettings": {
                 "maxResultRecords": 1000,
@@ -350,6 +577,30 @@
                     "displayedFields": [
                         "validation.status"
                     ]
+                },
+                "label": {
+                    "showLabel": false,
+                    "label": "count()"
+                },
+                "icon": {
+                    "showIcon": false,
+                    "icon": ""
+                },
+                "valueBoundaries": {
+                    "min": "auto",
+                    "max": "auto"
+                },
+                "dataMapping": {
+                    "dimension": "validation.status",
+                    "displayedFields": [
+                        "validation.status",
+                        "count()"
+                    ],
+                    "value": "count()",
+                    "longitude": "count()"
+                },
+                "tooltip": {
+                    "showCustomFields": false
                 }
             },
             "querySettings": {
@@ -362,7 +613,7 @@
         },
         "6": {
             "type": "data",
-            "title": "",
+            "title": "History",
             "query": "fetch events\n| filter event.kind == \"SDLC_EVENT\"\n| filter deployment.release_product == $Product",
             "davis": {
                 "enabled": false,
@@ -516,15 +767,17 @@
                     "monospacedFontEnabled": false,
                     "monospacedFontColumns": [],
                     "columnWidths": {
-                        "[\"deployment.release_environment\"]": 112.703125,
-                        "[\"deployment.release_stage\"]": 65.25
+                        "[\"deployment.release_environment\"]": 293.703125,
+                        "[\"deployment.release_stage\"]": 65.25,
+                        "[\"When\"]": 198.96875,
+                        "[\"Environment\"]": 175.796875
                     },
                     "columnTypeOverrides": [],
                     "colorThresholdTarget": "value",
                     "enableThresholdInRow": false,
                     "sortBy": {
-                        "columnId": "[\"deployment.release_environment\"]",
-                        "direction": "ascending"
+                        "columnId": "[\"When\"]",
+                        "direction": "descending"
                     }
                 },
                 "honeycomb": {
@@ -576,34 +829,26 @@
                     "dataMappings": [],
                     "variant": "single",
                     "truncationMode": "middle",
-                    "displayedFields": [
-                        "deployment.release_build_version",
-                        "deployment.release_cluster",
-                        "deployment.release_environment",
-                        "deployment.release_health",
-                        "deployment.release_namespace",
-                        "deployment.release_product",
-                        "deployment.release_stage",
-                        "deployment.release_sync_status",
-                        "deployment.release_version",
-                        "dt.ingest.endpoint",
-                        "dt.openpipeline.source",
-                        "end_time",
-                        "event.category",
-                        "event.id",
-                        "event.kind",
-                        "event.provider",
-                        "event.status",
-                        "event.type",
-                        "event.version",
-                        "ownership.development",
-                        "start_time",
-                        "task.id",
-                        "task.name",
-                        "task.outcome"
-                    ]
+                    "displayedFields": []
                 },
-                "autoSelectVisualization": false
+                "label": {
+                    "showLabel": false
+                },
+                "icon": {
+                    "showIcon": false,
+                    "icon": ""
+                },
+                "valueBoundaries": {
+                    "min": "auto",
+                    "max": "auto"
+                },
+                "autoSelectVisualization": false,
+                "dataMapping": {
+                    "displayedFields": []
+                },
+                "tooltip": {
+                    "showCustomFields": false
+                }
             },
             "visualization": "table",
             "querySettings": {
@@ -613,12 +858,14 @@
                 "defaultSamplingRatio": 10,
                 "enableSampling": false
             },
-            "description": "SDLC Events for the selected Product"
-        },
-        "7": {
-            "type": "markdown",
-            "title": "",
-            "content": "## Lifecycle Events "
+            "description": "SDLC Events for the selected Product",
+            "timeframe": {
+                "tileTimeframeEnabled": false,
+                "tileTimeframe": {
+                    "from": "now()-2h",
+                    "to": "now()"
+                }
+            }
         },
         "8": {
             "type": "data",
@@ -723,15 +970,7 @@
                     "monospacedFontEnabled": false,
                     "monospacedFontColumns": [],
                     "columnWidths": {},
-                    "columnTypeOverrides": [
-                        {
-                            "fields": [
-                                "count"
-                            ],
-                            "value": "sparkline",
-                            "id": 1734948708116
-                        }
-                    ]
+                    "columnTypeOverrides": []
                 },
                 "honeycomb": {
                     "shape": "hexagon",
@@ -752,17 +991,29 @@
                         "scale": "linear"
                     },
                     "colorPalette": "categorical",
-                    "dataMappings": [
-                        {
-                            "valueAxis": "interval",
-                            "rangeAxis": ""
-                        }
-                    ],
+                    "dataMappings": [],
                     "variant": "single",
                     "truncationMode": "middle",
                     "displayedFields": []
                 },
-                "autoSelectVisualization": false
+                "label": {
+                    "showLabel": false
+                },
+                "icon": {
+                    "showIcon": false,
+                    "icon": ""
+                },
+                "valueBoundaries": {
+                    "min": "auto",
+                    "max": "auto"
+                },
+                "autoSelectVisualization": false,
+                "dataMapping": {
+                    "displayedFields": []
+                },
+                "tooltip": {
+                    "showCustomFields": false
+                }
             },
             "visualization": "barChart",
             "querySettings": {
@@ -773,48 +1024,52 @@
                 "enableSampling": false
             }
         },
+        "9": {
+            "type": "markdown",
+            "title": "",
+            "content": "# Activity trend"
+        },
         "10": {
             "type": "markdown",
             "title": "",
-            "content": "# Release Observability\nGet an overview of all your [software lifecycle events](https://docs.dynatrace.com/docs/deliver/sdlc-events) including [release validation](https://docs.dynatrace.com/docs/deliver/quality-gates) results of any triggered Site Reliability Guardian (SRG).\nTo drill deeper simply try the \"Open Record With\" feature on the tables to access the deployment on your K8s cluster or see the results of the guardian!\n\n## Activity Trend"
+            "content": "# Release Observability\n\n---\n\nGet an overview of all your deployments and [software lifecycle events](https://docs.dynatrace.com/docs/deliver/sdlc-events) including [release validation](https://docs.dynatrace.com/docs/deliver/quality-gates) results of any triggered Site Reliability Guardian (SRG)."
+        },
+        "11": {
+            "type": "markdown",
+            "title": "",
+            "content": "## Site Reliability Guardians"
         }
     },
     "layouts": {
         "0": {
             "x": 0,
-            "y": 7,
-            "w": 12,
-            "h": 7
+            "y": 8,
+            "w": 14,
+            "h": 6
         },
         "1": {
             "x": 0,
             "y": 6,
-            "w": 12,
-            "h": 1
+            "w": 20,
+            "h": 2
         },
         "4": {
             "x": 4,
-            "y": 14,
+            "y": 15,
             "w": 16,
             "h": 5
         },
         "5": {
             "x": 0,
-            "y": 14,
+            "y": 15,
             "w": 4,
             "h": 5
         },
         "6": {
-            "x": 12,
-            "y": 7,
-            "w": 8,
-            "h": 7
-        },
-        "7": {
-            "x": 12,
-            "y": 6,
-            "w": 5,
-            "h": 1
+            "x": 14,
+            "y": 8,
+            "w": 6,
+            "h": 6
         },
         "8": {
             "x": 0,
@@ -822,11 +1077,23 @@
             "w": 20,
             "h": 3
         },
+        "9": {
+            "x": 0,
+            "y": 2,
+            "w": 20,
+            "h": 1
+        },
         "10": {
             "x": 0,
             "y": 0,
             "w": 20,
-            "h": 3
+            "h": 2
+        },
+        "11": {
+            "x": 0,
+            "y": 14,
+            "w": 13,
+            "h": 1
         }
     },
     "importedWithCode": false,
