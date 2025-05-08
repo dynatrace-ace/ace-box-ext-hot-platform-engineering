@@ -115,7 +115,7 @@
       "input": {
         "url": "{{ result(\"js_set_parameters\")[\"notificationEndpoint\"]}}",
         "method": "POST",
-        "payload": "{\n  \"message\": \"Dynatrace Observability Ready for service {{ result(\"js_validate_entity\")[\"workload_name\"] }} ({{event()[\"stage\"] }}:{{event()[\"version\"] }}): {{ environment().url }}/ui/apps/dynatrace.kubernetes/resources/workload?entityId={{ result(\"js_validate_entity\")[\"workload_id\"] }} \",\n  \"channel\": \"{{ event()[\"owner\"] }}\",\n  \"origin\": \"Dynatrace Workflow\"\n}"
+        "payload": "{\n  \"message\": \"Dynatrace Observability Ready for service {{ result(\"js_validate_entity\")[\"workload_name\"] }} ({{event()[\"stage\"] }}:{{event()[\"version\"] }}): {{ environment().url }}/ui/apps/dynatrace.kubernetes/explorer/workload?detailsId={{ result(\"js_validate_entity\")[\"workload_id\"] }} \",\n  \"channel\": \"{{ event()[\"owner\"] }}\",\n  \"origin\": \"Dynatrace Workflow\"\n}"
       },
       "position": {
         "x": 1,

@@ -116,7 +116,6 @@
           -d '[
                 {
                   "schemaId":"builtin:dt-javascript-runtime.allowed-outbound-connections",
-                  "schemaVersion":"1.0.2",
                   "scope":"environment",
                   "value": {
                     "allowedOutboundConnections":{

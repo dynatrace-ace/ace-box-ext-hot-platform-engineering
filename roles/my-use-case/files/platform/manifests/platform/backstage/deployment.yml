@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
         - name: backstage
-          image: ghcr.io/katharinasick/backstage-playground:1.2.4
+          # image: ghcr.io/katharinasick/backstage-playground:1.2.4
+          image: ghcr.io/katharinasick/backstage-playground:2.0.4
           imagePullPolicy: Always # Pull always because the backstage-playground has no proper version tagging yet
           ports:
             - name: http

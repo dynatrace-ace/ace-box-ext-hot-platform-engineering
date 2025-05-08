@@ -44,7 +44,10 @@ data:
 
     # See https://backstage.io/docs/auth/
     auth:
-      providers: {}
+      providers:
+        # See https://backstage.io/docs/auth/guest/provider
+        guest:
+          dangerouslyAllowOutsideDevelopment: true
 
     # See https://backstage.io/docs/features/software-templates/configuration
     scaffolder: {}

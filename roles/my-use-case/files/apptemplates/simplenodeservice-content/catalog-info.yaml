@@ -8,7 +8,7 @@ metadata:
     backstage.io/techdocs-ref: dir:.
     # Not working
     'backstage.io/kubernetes-label-selector': 'app.kubernetes.io/name=userinterface'
-    'backstage.io/kubernetes-namespace': '${{ values.projectName }}-${{ values.teamIdentifier }}-${{ values.releaseStage }}-cd'
+    'backstage.io/kubernetes-namespace': '${{ values.projectName }}-${{ values.teamIdentifier }}-${{ values.releaseStage }}'
     argocd/app-name: ${{ values.projectName }}-${{ values.teamIdentifier }}-${{ values.releaseStage }}-cd
   links:
     - url: PROTOCOL_PLACEHOLDER://gitlab.BASE_DOMAIN_PLACEHOLDER/group1/${{ values.projectName }}-${{ values.teamIdentifier }}-${{ values.releaseStage }}-cd
