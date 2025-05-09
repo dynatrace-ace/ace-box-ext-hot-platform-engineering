@@ -31,6 +31,8 @@ Please add a note pointing out which versions of the external use case are compa
 | --- | --- |
 | v0.9.3 | v1.27.0 |
 | v0.9.5 | v1.28.0 |
+| v1.0.0 | v1.28.0 |
+| v1.0.1 | v1.28.0 |
 
 ## Extra variables
 
