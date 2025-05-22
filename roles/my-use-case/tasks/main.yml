@@ -261,6 +261,9 @@
                 {
                   "schemaId":"app:dynatrace.gitlab.connector:connection",
                   "scope":"environment",
+                  "permissions": {
+                    "allUsers": "read"
+                  },
                   "value": {
                     "name": "platform-engineering-gitlab",
                     "url": "{{ gitlab_external_endpoint }}",
